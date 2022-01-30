@@ -54,6 +54,10 @@
         <el-input v-model="customerDialogForm.name" maxlength="10" show-word-limit clearable placeholder="请输入客户姓名">
         </el-input>
       </el-form-item>
+      <el-form-item label="联系人：" prop="linkman">
+        <el-input v-model="customerDialogForm.linkman" maxlength="10" show-word-limit clearable placeholder="请输入联系人姓名">
+        </el-input>
+      </el-form-item>
       <el-form-item label="客户手机：" prop="mobile">
         <el-input v-model="customerDialogForm.mobile" :maxlength="11" clearable placeholder="请输入手机号"></el-input>
       </el-form-item>
@@ -93,7 +97,8 @@ export default {
         name: '',
         mobile: '',
         address: '',
-        descs: ''
+        descs: '',
+        linkman: ''
       }
     }
     // customerDialog ref

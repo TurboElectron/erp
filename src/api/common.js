@@ -51,29 +51,53 @@ export const getListByCategoryId = (data = {}) => {
 
 
 /** 添加客户 */
-export const addCustomer = (data = {}) => {
-    return httpFetch.post('customer/add', data)
+export const addCustomer = async (data = {}) => {
+    // return httpFetch.post('customer/add', data)
+    const res = await prisma.sale_customer.create({
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 修改客户 */
-export const updateCustomer = (data = {}) => {
-    return httpFetch.post('customer/update', data)
+export const updateCustomer = async (data = {}) => {
+    // return httpFetch.post('customer/update', data)
+    const res = await prisma.sale_customer.update({
+        where: {id: data.id},
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 删除客户 */
-export const removeCustomer = (data = {}) => {
-    return httpFetch.post('customer/delete', data)
+export const removeCustomer = async (data = {}) => {
+    // return httpFetch.post('customer/delete', data)
+    const res = await prisma.sale_customer.delete({
+        where: {id: data.id},
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 /** 客户列表 */
 export const customerList = async (data = {}) => {
     // return httpFetch.post('customer/list', data)
     const {pageSize, pageNo, name, mobile} = data
-    const total = await prisma.sale_customer.count()
-    const records = await prisma.sale_customer.findMany({
-        skip: pageSize* (pageNo-1),
-        take: pageSize,
-        where: prismaContains({name, mobile})
-    })
+    const [total,records] = await prisma.$transaction([
+         prisma.sale_customer.count(),
+         prisma.sale_customer.findMany({
+            skip: pageSize* (pageNo-1),
+            take: pageSize,
+            where: prismaContains({name, mobile})
+        })
+    ])
     return {
         code: 200,
         message: {
