@@ -14,6 +14,7 @@
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border default-expand-all>
     <el-table-column prop="name" label="仓库名称" />
+    <el-table-column prop="code" label="仓库编号" />
     <el-table-column prop="address" label="仓库地址" />
     <el-table-column label="操作" width="200">
       <template #default="scope">
@@ -40,8 +41,11 @@
         <el-input v-model.trim="dialogForm.name" maxlength="20" show-word-limit clearable placeholder="请输入仓库名称">
         </el-input>
       </el-form-item>
-
-      <el-form-item label="仓库地址：" prop="address">
+      <el-form-item label="仓库编号：" prop="code">
+        <el-input v-model.trim="dialogForm.code" maxlength="4" show-word-limit clearable placeholder="请输入仓库编号">
+        </el-input>
+      </el-form-item>
+      <el-form-item label="仓库地址：" prop="code">
         <el-input v-model.trim="dialogForm.address" :rows="3" type="textarea" maxlength="50" show-word-limit clearable
           placeholder="请输入仓库地址" style="width:100%"></el-input>
       </el-form-item>
@@ -79,6 +83,7 @@ export default {
     // 新增、修改form
     let dialogForm = reactive({
       name: '',
+      code: '',
       address: ''
     })
     // 新增、修改formRules
@@ -86,7 +91,7 @@ export default {
       name: [{
         required: true, message: '请输入产品名称', trigger: 'blur',
       }],
-      address: [{
+      code: [{
         required: true, message: '请输入仓库地址', trigger: 'blur',
       }],
 
@@ -101,7 +106,7 @@ export default {
         state.loadTable = true
         const params = Object.assign({}, state.queryForm)
         const res = await getRepoList(params)
-        res.code === 200 && (state.tableData = res.message)
+        res.code === 200 && (state.tableData = res.message.records)
         state.loadTable = false
       },
       /**
@@ -111,6 +116,7 @@ export default {
         state.isEdit = true
         state.currentEditData = item
         dialogForm.name = item.name
+        dialogForm.code = item.code
         dialogForm.address = item.address
         state.dialogVisible = true
       },
@@ -121,6 +127,7 @@ export default {
       handlerAdd(item = {}) {
         state.currentEditData = item
         dialogForm.name = ''
+        dialogForm.code = ''
         dialogForm.address = ''
         state.isEdit = false
         state.dialogVisible = true

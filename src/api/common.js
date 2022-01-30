@@ -108,23 +108,58 @@ export const customerList = async (data = {}) => {
 }
 
 /** 添加仓库 */
-export const addRepo = (data = {}) => {
-    return httpFetch.post('repo/add', data)
+export const addRepo = async (data = {}) => {
+    // return httpFetch.post('repo/add', data)
+    const res = await prisma.base_repo.create({
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 更新仓库 */
-export const updateRepo = (data = {}) => {
-    return httpFetch.post('repo/update', data)
+export const updateRepo = async (data = {}) => {
+    // return httpFetch.post('repo/update', data)
+    const res = await prisma.base_repo.update({
+        where: {id: data.id},
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 仓库列表 */
-export const getRepoList = (data = {}) => {
-    return httpFetch.post('repo/list', data)
+export const getRepoList = async (data = {}) => {
+    // return httpFetch.post('repo/list', data)
+    const [total, records] = await prisma.$transaction([
+        prisma.base_repo.count(),
+        prisma.base_repo.findMany({
+            where: prismaContains(data)
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
 }
 
 /** 删除仓库 */
-export const deleteRepo = id => {
-    return httpFetch.post('repo/delete?id=' + id)
+export const deleteRepo = async id => {
+    // return httpFetch.post('repo/delete?id=' + id)
+    const res = await prisma.base_repo.delete({
+        where: {id},
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 
