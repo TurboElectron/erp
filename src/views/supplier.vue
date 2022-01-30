@@ -56,7 +56,7 @@
         <el-input v-model.trim="dialogForm.linkman" clearable placeholder="请输入联系人"></el-input>
       </el-form-item>
       <el-form-item label="联系电话：" prop="mobile">
-        <el-input v-model.number="dialogForm.mobile" maxlength="11" clearable placeholder="请输入联系电话"></el-input>
+        <el-input v-model="dialogForm.mobile" maxlength="11" clearable placeholder="请输入联系电话"></el-input>
       </el-form-item>
       <el-form-item label="公司地址：" prop="address">
         <el-input v-model.trim="dialogForm.address" type="textarea" :row="2" show-word-limit maxlength="30" clearable

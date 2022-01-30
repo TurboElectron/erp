@@ -211,7 +211,7 @@ export const getSupplierList = async (data = {}) => {
 /** 删除供应商*/
 export const deleteSupplier = async id => {
     // return httpFetch.post('supplier/delete?id=' + id)
-    const res = await prisma.base_repo.delete({
+    const res = await prisma.purchase_supplier.delete({
         where: {id},
     })
     return {
