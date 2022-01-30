@@ -2,7 +2,7 @@
  <template>
   <el-form :inline="true" size="small" :model="formInline" class="demo-form-inline">
     <el-form-item label="姓名：">
-      <el-input v-model="formInline.name" @keyup.native.enter="onQuery()" clearable placeholder="请输入用户姓名">
+      <el-input v-model="formInline.account" @keyup.native.enter="onQuery()" clearable placeholder="请输入用户姓名">
       </el-input>
     </el-form-item>
 
@@ -15,14 +15,14 @@
   </el-form>
   <!-- 表格 -->
   <el-table :data="tableData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
-    <el-table-column prop="name" label="姓名" />
+    <el-table-column prop="account" label="姓名" />
     <el-table-column fixed="right" label="操作" width="220">
       <template #default="scope">
-        <el-button icon="Edit" size="mini" v-if="scope.row.name!=='admin'"
+        <el-button icon="Edit" size="mini" v-if="scope.row.account!=='admin'"
           @click.prevent="editPassword(scope.$index, scope.row)">
           修改密码
         </el-button>
-        <template v-if="scope.row.name!=='admin'">
+        <template v-if="scope.row.account!=='admin'">
           <el-popconfirm title="确定要删除吗?" @confirm="deleteUser(scope.row)" confirm-button-text="确定"
             cancel-button-text="取消">
             <template #reference>
@@ -40,8 +40,8 @@
   <el-dialog v-model="userDailog" width="500px" title="添加用户" :before-close="resetDialogForm">
     <el-form size="small" ref="userDialogRef" :model="userDialogForm" :rules="userDialogFormRules"
       class="demo-form-inline">
-      <el-form-item label="用户姓名：" prop="name">
-        <el-input v-model="userDialogForm.name" clearable placeholder="请输入用户姓名"></el-input>
+      <el-form-item label="用户姓名：" prop="account">
+        <el-input v-model="userDialogForm.account" clearable placeholder="请输入用户姓名"></el-input>
       </el-form-item>
       <el-form-item label="用户手机：" prop="mobile">
         <el-input v-model="userDialogForm.mobile" clearable placeholder="请输入手机号"></el-input>
@@ -101,7 +101,7 @@ export default {
     //新增用户数据
     const getUserDialogFormValues = () => {
       return {
-        name: '',
+        account: '',
         mobile: '',
         password: '',
         password1: ''
@@ -115,7 +115,7 @@ export default {
      */
     let data = reactive({
       formInline: {
-        name: ''
+        account: ''
       },
       tableData: [],
       loadingTbl: true,
@@ -155,7 +155,7 @@ export default {
         */
     const userDialogRules = reactive({
       userDialogFormRules: {
-        name: [{
+        account: [{
           required: true, message: '请输入用户姓名', trigger: 'blur',
         }],
         mobile: [
@@ -229,7 +229,7 @@ export default {
        */
       editUser(index, userData) {
         data.saveLoading = false
-        data.userDialogForm.name = userData.name
+        data.userDialogForm.account = userData.account
         data.userDialogForm.mobile = userData.mobile
         data.userDialogForm.id = userData.id
         data.userDailog = true;

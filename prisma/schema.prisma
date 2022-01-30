@@ -181,12 +181,16 @@ model sys_role {
 
 model sys_user {
   id         Int       @id @default(autoincrement())
-  name    String
-  mobile    String
-  password    String
+  account    String
+  password   String
+  roleId     Int?
+  roleName   String?
+  employeeId Int?
   updater    String?
   updatime   DateTime?
   state      Int       @default(1)
   isLocked   Int?      @default(0)
   lockTime   DateTime?
+
+  @@index([account, password], map: "idx_sys_user_idx_user_account")
 }
