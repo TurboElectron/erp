@@ -1,0 +1,195 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
+  engineType    = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model base_employee {
+  id       Int       @id @default(autoincrement())
+  name     String
+  code     String?
+  idCard   String?
+  mobile   String?
+  sex      Int?      @default(0)
+  birthday DateTime?
+  address  String?
+  email    String?
+  type     String?
+  updater  String?
+  updatime DateTime?
+  state    Int       @default(1)
+}
+
+model base_goods {
+  id        Int       @id @default(autoincrement())
+  name      String
+  code      String
+  type      String?
+  brand     String?
+  unit      String?
+  color     String?
+  standard  String?
+  material  String?
+  buyPrice  String?
+  salePrice String?
+  descs     String?
+  updater   String?
+  updatime  DateTime?
+  state     Int       @default(1)
+  picture   String?
+}
+
+model base_param {
+  id       Int       @id @default(autoincrement())
+  name     String
+  descs    String?
+  state    Int       @default(1)
+  type     String
+  creater  String?
+  creatime DateTime?
+}
+
+model base_repo {
+  id       Int       @id @default(autoincrement())
+  name     String
+  code     String
+  address  String?
+  descs    String?
+  adminId  Int?
+  updater  String?
+  updatime DateTime?
+  state    Int       @default(1)
+}
+
+model purchase_order {
+  id           Int       @id @default(autoincrement())
+  goodsId      Int?
+  supplierId   Int?
+  supplierName String?
+  repoId       Int?
+  orderNumber  String?
+  count        Int?
+  unitPrice    Decimal?
+  totalPrice   Decimal?
+  employeeId   Int?
+  descs        String?
+  checkState   Int?
+  checkResult  String?
+  checkAccount String?
+  checktime    DateTime?
+  taketime     DateTime?
+  creater      String?
+  creatime     DateTime?
+  updater      String?
+  updatime     DateTime?
+  state        Int?
+  type         Int       @default(1)
+}
+
+model purchase_supplier {
+  id       Int       @id @default(autoincrement())
+  name     String
+  linkman  String
+  mobile   String?
+  address  String?
+  descs    String?
+  state    Int       @default(1)
+  updater  String?
+  updatime DateTime?
+}
+
+model sale_customer {
+  id       Int       @id @default(autoincrement())
+  name     String
+  linkman  String
+  mobile   String?
+  address  String?
+  descs    String?
+  state    Int       @default(1)
+  updater  String?
+  updatime DateTime?
+}
+
+model sale_order {
+  id           Int       @id @default(autoincrement())
+  goodsId      Int?
+  customerId   Int?
+  customerName String?
+  repoId       Int?
+  orderNumber  String?
+  count        Int?
+  unitPrice    Decimal?
+  totalPrice   Decimal?
+  employeeId   Int?
+  descs        String?
+  checkState   Int?
+  checkResult  String?
+  checkAccount String?
+  checktime    DateTime?
+  taketime     DateTime?
+  creater      String?
+  creatime     DateTime?
+  updater      String?
+  updatime     DateTime?
+  state        Int?
+  type         Int       @default(1)
+}
+
+model stock {
+  id             Int       @id @default(autoincrement())
+  goodsId        Int
+  repoId         Int
+  totalCount     Int?
+  saleCount      Int?
+  buyPrice       Decimal?
+  avgBuyPrice    Decimal?
+  salePrice      Decimal?
+  totalBuyPrice  Decimal?
+  totalSalePrice Decimal?
+  updatime       DateTime?
+  state          Int       @default(1)
+}
+
+model sys_menu {
+  id       Int       @id @default(autoincrement())
+  name     String
+  upId     Int       @default(0)
+  path     String?
+  isLeaf   Int       @default(0)
+  state    Int       @default(1)
+  updater  String?
+  updatime DateTime?
+}
+
+model sys_role {
+  id        Int       @id @default(autoincrement())
+  name      String
+  code      String?
+  descs     String?
+  menuIds   String?
+  menuNames String?
+  state     Int       @default(1)
+  updater   String?
+  updatime  DateTime?
+}
+
+model sys_user {
+  id         Int       @id @default(autoincrement())
+  account    String
+  password   String
+  roleId     Int?
+  roleName   String?
+  employeeId Int?
+  updater    String?
+  updatime   DateTime?
+  state      Int       @default(1)
+  isLocked   Int?      @default(0)
+  lockTime   DateTime?
+
+  @@index([account, password], map: "idx_sys_user_idx_user_account")
+}

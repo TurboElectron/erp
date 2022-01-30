@@ -4,8 +4,21 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
-    "build": "vue-cli-service build --mode prod"
+    "build": "vue-cli-service build --mode prod",
+    "electron:build": "vue-cli-service electron:build --mode dev",
+    "electron:serve": "vue-cli-service electron:serve --mode dev",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
+    "prisma:chain": "npm run prisma:db:push:force && npm run prisma:introspect && npm run prisma:generate && npm run serve",
+    "prisma:db:push": "npx prisma db push",
+    "prisma:db:pull": "npx prisma db pull",
+    "prisma:db:push:force": "npx prisma db push --accept-data-loss",
+    "prisma:db:seed": "npx prisma db seed --preview-feature",
+    "prisma:generate": "npx prisma generate",
+    "prisma:init": "npx prisma migrate dev && PRISMA_CLI_BINARY_TARGETS=darwin,darwin-arm64 npm install @prisma/engines",
+    "prisma:studio": "npx prisma studio"
   },
+  "main": "background.js",
   "dependencies": {
     "@element-plus/icons": "0.0.11",
     "@element-plus/icons-vue": "^0.2.4",
@@ -28,8 +41,12 @@
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "electron": "^13.0.0",
+    "electron-devtools-installer": "^3.1.0",
     "node-sass": "^4.12.0",
+    "prisma": "^3.8.1",
     "sass-loader": "^8.0.2",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
     "webpack-bundle-analyzer": "^4.4.2"
   },
   "browserslist": [
