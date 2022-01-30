@@ -26,6 +26,12 @@ model base_employee {
   state    Int       @default(1)
 }
 
+model category {
+  id            Int   @id @default(autoincrement())
+  name      String
+  pid Int?
+}
+
 model base_goods {
   id        Int       @id @default(autoincrement())
   name      String

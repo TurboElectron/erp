@@ -11,8 +11,26 @@ export const getCategory = (data = {}) => {
     return httpFetch.post('category/getCategories', data)
 }
 /** 获取分类列表树 */
-export const getCategoryTree = (data = {}) => {
-    return httpFetch.post('category/getCategoriesTree', data)
+export const getCategoryTree = async (data = {}) => {
+    // return httpFetch.post('category/getCategoriesTree', data)
+    const list = await prisma.category.findMany({
+        where: {pid: null},
+    })
+    async function iter(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            const _ = arr[i]
+            _.children = await prisma.category.findMany({
+                where: {pid: _.id},
+            })
+            await iter(_.children)
+        }
+    }
+    await iter(list)
+    return {
+        code: 200,
+        message: list
+    }
+
 }
 
 /** 修改类别*/
