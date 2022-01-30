@@ -16,7 +16,6 @@
   <!-- 表格 -->
   <el-table :data="tableData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
     <el-table-column prop="name" label="姓名" />
-    <el-table-column prop="phone" label="手机号" />
     <el-table-column fixed="right" label="操作" width="220">
       <template #default="scope">
         <el-button icon="Edit" size="mini" v-if="scope.row.name!=='admin'"
@@ -44,8 +43,8 @@
       <el-form-item label="用户姓名：" prop="name">
         <el-input v-model="userDialogForm.name" clearable placeholder="请输入用户姓名"></el-input>
       </el-form-item>
-      <el-form-item label="用户手机：" prop="phone">
-        <el-input v-model="userDialogForm.phone" clearable placeholder="请输入手机号"></el-input>
+      <el-form-item label="用户手机：" prop="mobile">
+        <el-input v-model="userDialogForm.mobile" clearable placeholder="请输入手机号"></el-input>
       </el-form-item>
       <el-form-item label="登录密码：" prop="password">
         <el-input v-model="userDialogForm.password" autocomplete="off" clearable show-password placeholder="请输入密码">
@@ -95,6 +94,7 @@
 import { reactive, toRefs, ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElLoading } from "element-plus";
 import * as api from '@/api/user.js'
+import {omit} from "lodash";
 export default {
   name: 'user',
   setup() {
@@ -102,7 +102,7 @@ export default {
     const getUserDialogFormValues = () => {
       return {
         name: '',
-        phone: '',
+        mobile: '',
         password: '',
         password1: ''
       }
@@ -158,7 +158,7 @@ export default {
         name: [{
           required: true, message: '请输入用户姓名', trigger: 'blur',
         }],
-        phone: [
+        mobile: [
           { required: true, message: '请输入手机号', trigger: "blur" },
           { pattern: /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/, message: '手机号码格式错误', trigger: "blur" }
         ],
@@ -219,7 +219,7 @@ export default {
       async onQuery() {
         data.loadingTbl = true
         const responseData = await api.userList(data.formInline)
-        responseData.code === 200 && (data.tableData = responseData.message.data);
+        responseData.code === 200 && (data.tableData = responseData.message.records);
         data.loadingTbl = false
       },
       /**
@@ -230,7 +230,7 @@ export default {
       editUser(index, userData) {
         data.saveLoading = false
         data.userDialogForm.name = userData.name
-        data.userDialogForm.phone = userData.phone
+        data.userDialogForm.mobile = userData.mobile
         data.userDialogForm.id = userData.id
         data.userDailog = true;
       },
@@ -315,9 +315,9 @@ export default {
      */
     const handlerSaveUser = async () => {
       data.saveLoading = true
-      const response = await api.addUser(data.userDialogForm)
+      const response = await api.addUser(omit(data.userDialogForm, ['password1']))
       data.saveLoading = false
-      if (response.code == 200) {
+      if (response.code === 200) {
         ElMessage.success(response.message);
         //刷新表格
         methods.onQuery()

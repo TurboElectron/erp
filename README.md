@@ -1,4 +1,4 @@
-# dyt-erp
+# erp
 
 ## Project setup
 
