@@ -8,7 +8,7 @@
         <component :is="collapse?'Expand':'Fold'" />
       </el-icon>
     </div>
-    <div class="logo">erp管理系统</div>
+    <div class="logo">进销存管理系统</div>
     <div class="header-right">
       <div class="header-user-con">
         <!-- 用户头像 -->

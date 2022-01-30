@@ -1,4 +1,6 @@
 import httpFetch from '@/utils/https'
+import {prisma} from "@/db";
+import {prismaContains} from "@/utils";
 /** 注册分类 */
 export const addCategory = (data = {}) => {
     return httpFetch.post('category/addCategory', data)
@@ -63,8 +65,22 @@ export const removeCustomer = (data = {}) => {
     return httpFetch.post('customer/delete', data)
 }
 /** 客户列表 */
-export const customerList = (data = {}) => {
-    return httpFetch.post('customer/list', data)
+export const customerList = async (data = {}) => {
+    // return httpFetch.post('customer/list', data)
+    const {pageSize, pageNo, name, mobile} = data
+    const total = await prisma.sale_customer.count()
+    const records = await prisma.sale_customer.findMany({
+        skip: pageSize* (pageNo-1),
+        take: pageSize,
+        where: prismaContains({name, mobile})
+    })
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
 }
 
 /** 添加仓库 */
@@ -204,8 +220,8 @@ export const getOutboundRaking = (data = {}) => {
 
 /**
  *  根据 时间范围 商品 用户、按照 年 月日 汇总统计销量
- * @param {*} data 
- * @returns 
+ * @param {*} data
+ * @returns
  */
 export const getCategorySales = (data = {}) => {
     return httpFetch.post('outboundDetail/categorySales', data)
@@ -241,10 +257,10 @@ export const getCustomersByName = (data = {}) => {
 
 /**
  *  前五十名客户 购买 欠费  实付金额 排名
- * @param {*} data 
+ * @param {*} data
  * startDate ?: Date 开始日期
  * endDate ?: Date 结束日期
- * @returns 
+ * @returns
  */
 export const getCustomerRaking = (data = {}) => {
     return httpFetch.post('outbound/customerRaking', data)

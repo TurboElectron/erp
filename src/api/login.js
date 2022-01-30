@@ -1,9 +1,19 @@
 import httpFetch from '@/utils/https'
+import {prisma} from "@/db";
 /** 登录 */
-export const login = (data = {}) => {
-    return httpFetch.post('user/login', data, {
-        params: data
+export const login = async (data = {}) => {
+    // return httpFetch.post('user/login', data, {
+    //     params: data
+    // })
+    const user = await prisma.sys_user.findUnique({
+        where: {
+            id: 1
+        }
     })
+    return {
+        code: 200,
+        message: user
+    }
 }
 /** 注册用户 */
 export const register = (data = {}) => {

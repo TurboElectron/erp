@@ -5,6 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
 import fs from "fs";
+require('@electron/remote/main').initialize()
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const dbPath = isDevelopment ? join(__dirname, './prisma/dev.db') : path.join(app.getPath('userData'), 'database.db')
 
@@ -39,7 +40,7 @@ async function createWindow() {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   })
-
+  require('@electron/remote/main').enable(win.webContents)
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)

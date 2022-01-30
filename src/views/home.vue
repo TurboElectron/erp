@@ -228,9 +228,9 @@ export default {
       }
     }
     // 商品销售排名
-    methods.getOutboundRakingData()
+    // methods.getOutboundRakingData()
     // 进一年各商品销售分布图
-    methods.getCategorySalesData()
+    // methods.getCategorySalesData()
 
     return {
       ...toRefs(state),

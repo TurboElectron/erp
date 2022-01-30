@@ -3,10 +3,10 @@ import { nextTick } from "vue";
 import mathJs from './math'
 /**
  * 查找计量单位根
- * @param {*} data 
- * @param {*} pid 
- * @param {*} bData 
- * @returns 
+ * @param {*} data
+ * @param {*} pid
+ * @param {*} bData
+ * @returns
  */
 const getParentIdById = (data, pid, bData) => {
     if (!pid) return bData
@@ -25,7 +25,7 @@ export const getDataById = (data, id) => {
 }
 /**
  * loading
- * @returns 
+ * @returns
  */
 export const globalLoading = function () {
     return ElLoading.service({
@@ -36,10 +36,10 @@ export const globalLoading = function () {
     })
 }
 /**
- * message 
- * @param {*} type 
- * @param {*} message 
- * @param {*} duration 
+ * message
+ * @param {*} type
+ * @param {*} message
+ * @param {*} duration
  */
 export const showMessage = (type, message, duration = 3000) => {
     ElMessage({
@@ -54,12 +54,12 @@ export const showMessage = (type, message, duration = 3000) => {
 
 /**
  *  比较两个计量单位是否属于同一根
- * @param {*} data 
+ * @param {*} data
  * @param {*} unitId1 入库数量单位
  * @param {*} unitId2 批次数量单位
  * @param {*} speciePrice 批次价格
  * @param {*} amount 计算价格的数量
- * @returns 
+ * @returns
  */
 export const equalUnitRoot = (data, unitId1, unitId2, speciePrice, amount) => {
     const unit1Data = getParentIdById(data, unitId1, []),
@@ -121,3 +121,14 @@ export function downLoadFile(url) {
 
 
 
+export function prismaContains (map,where={}) {
+    Object.keys(map).forEach(key => {
+        const value = map[key]
+        if (value) {
+            where[key] = {
+                contains: value
+            }
+        }
+    })
+    return where
+}

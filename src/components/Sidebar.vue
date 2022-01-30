@@ -86,11 +86,13 @@ export default {
         icon: "Shop",
         index: "/specie",
         title: "批次管理"
-      }, {
-        icon: "Coin",
-        index: "/unitManager",
-        title: "单位管理"
-      }, {
+      },
+      // {
+      //   icon: "Coin",
+      //   index: "/unitManager",
+      //   title: "单位管理"
+      // },
+      {
         icon: "OfficeBuilding",
         index: "/repoManager",
         title: "仓库管理"

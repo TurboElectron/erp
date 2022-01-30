@@ -1,7 +1,12 @@
 <template>
   <router-view />
+  <el-button style="position: absolute;left: 0;top: 0" @click="handleRefresh">刷新({{$route.fullPath}})</el-button>
 </template>
-
+<script setup>
+const handleRefresh = () => {
+  window.location.reload()
+}
+</script>
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

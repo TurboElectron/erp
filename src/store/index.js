@@ -11,14 +11,14 @@ export default createStore({
       path: '/',
       name: 'home'
     }],
-    collapse: false,
+    collapse: true,
     userInfos: null
   },
   mutations: {
     /**
      * 设置当前登录用户信息
-     * @param {*} state 
-     * @param {*} data 
+     * @param {*} state
+     * @param {*} data
      */
     SET_USE_INFOS(state, data) {
       state.userInfos = data

@@ -6,7 +6,7 @@
       </el-input>
     </el-form-item>
     <el-form-item label="电话：">
-      <el-input v-model="formInline.phone" @keyup.native.enter="onQuery()" clearable placeholder="请输入客户电话">
+      <el-input v-model="formInline.mobile" @keyup.native.enter="onQuery()" clearable placeholder="请输入客户电话">
       </el-input>
     </el-form-item>
 
@@ -20,9 +20,9 @@
   <!-- 表格 -->
   <el-table :data="tableData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
     <el-table-column prop="name" label="姓名" width="100" />
-    <el-table-column prop="phone" label="手机号" width="120" />
+    <el-table-column prop="mobile" label="手机号" width="120" />
     <el-table-column prop="address" label="地址" />
-    <el-table-column prop="remarks" label="备注" />
+    <el-table-column prop="descs" label="备注" />
     <el-table-column label="操作" width="200">
       <template #default="scope">
         <el-button icon="Edit" size="mini" @click.prevent="editCustomer(scope.row)">
@@ -54,16 +54,16 @@
         <el-input v-model="customerDialogForm.name" maxlength="10" show-word-limit clearable placeholder="请输入客户姓名">
         </el-input>
       </el-form-item>
-      <el-form-item label="客户手机：" prop="phone">
-        <el-input v-model="customerDialogForm.phone" :maxlength="11" clearable placeholder="请输入手机号"></el-input>
+      <el-form-item label="客户手机：" prop="mobile">
+        <el-input v-model="customerDialogForm.mobile" :maxlength="11" clearable placeholder="请输入手机号"></el-input>
       </el-form-item>
       <el-form-item label="联系地址：" prop="address">
         <el-input v-model="customerDialogForm.address" maxlength="30" show-word-limit autocomplete="off" :rows="3"
           type="textarea" clearable placeholder="请输入联系地址：">
         </el-input>
       </el-form-item>
-      <el-form-item label="备注信息：" prop="remarks">
-        <el-input v-model="customerDialogForm.remarks" maxlength="50" show-word-limit autocomplete="off" :rows="3"
+      <el-form-item label="备注信息：" prop="descs">
+        <el-input v-model="customerDialogForm.descs" maxlength="50" show-word-limit autocomplete="off" :rows="3"
           type="textarea" clearable placeholder="请输入备注信息">
         </el-input>
       </el-form-item>
@@ -91,9 +91,9 @@ export default {
     const getCustomerDialogFormValues = () => {
       return {
         name: '',
-        phone: '',
+        mobile: '',
         address: '',
-        remarks: ''
+        descs: ''
       }
     }
     // customerDialog ref
@@ -108,7 +108,7 @@ export default {
        */
       formInline: {
         name: '',
-        phone: ''
+        mobile: ''
       },
       tableData: [],
       currentPage: 1,//当前页数
@@ -131,7 +131,7 @@ export default {
         name: [{
           required: true, message: '请输入客户姓名', trigger: 'blur',
         }],
-        // phone: [
+        // mobile: [
         //   { required: true, message: '请输入手机号', trigger: "blur" },
         //   { pattern: /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/, message: '手机号码格式错误', trigger: "blur" }
         // ]
