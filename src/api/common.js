@@ -136,8 +136,8 @@ export const updateRepo = async (data = {}) => {
 export const getRepoList = async (data = {}) => {
     // return httpFetch.post('repo/list', data)
     const [total, records] = await prisma.$transaction([
-        prisma.base_repo.count(),
-        prisma.base_repo.findMany({
+        prisma.purchase_supplier.count(),
+        prisma.purchase_supplier.findMany({
             where: prismaContains(data)
         })
     ])
@@ -164,22 +164,60 @@ export const deleteRepo = async id => {
 
 
 /** 添加供应商 */
-export const addSupplier = (data = {}) => {
-    return httpFetch.post('supplier/add', data)
+export const addSupplier = async (data = {}) => {
+    // return httpFetch.post('supplier/add', data)
+    const res = await prisma.purchase_supplier.create({
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 更新供应商*/
-export const updateSupplier = (data = {}) => {
-    return httpFetch.post('supplier/update', data)
+export const updateSupplier = async (data = {}) => {
+    // return httpFetch.post('supplier/update', data)
+    const res = await prisma.purchase_supplier.update({
+        where: {id: data.id},
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /**供应商列表 */
-export const getSupplierList = (data = {}) => {
-    return httpFetch.post('supplier/list', data)
+export const getSupplierList = async (data = {}) => {
+    // return httpFetch.post('supplier/list', data)
+    const {pageSize, pageNo, name, mobile} = data
+    const [total, records] = await prisma.$transaction([
+        prisma.purchase_supplier.count(),
+        prisma.purchase_supplier.findMany({
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+            where: prismaContains({name, mobile})
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
 }
 /** 删除供应商*/
-export const deleteSupplier = id => {
-    return httpFetch.post('supplier/delete?id=' + id)
+export const deleteSupplier = async id => {
+    // return httpFetch.post('supplier/delete?id=' + id)
+    const res = await prisma.base_repo.delete({
+        where: {id},
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 

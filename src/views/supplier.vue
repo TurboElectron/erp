@@ -13,10 +13,10 @@
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border default-expand-all>
     <el-table-column prop="name" label="供应商名称" />
-    <el-table-column prop="contact" label="联系人" width="110" />
-    <el-table-column prop="phone" label="电话" width="110" />
+    <el-table-column prop="linkman" label="联系人" width="110" />
+    <el-table-column prop="mobile" label="电话" width="110" />
     <el-table-column prop="address" label="地址" />
-    <el-table-column prop="remarks" label="备注" />
+    <el-table-column prop="descs" label="备注" />
     <el-table-column label="操作" width="200" fixed="right">
       <template #default="scope">
         <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
@@ -52,19 +52,19 @@
         </el-input>
       </el-form-item>
 
-      <el-form-item label="联系人：" prop="contact">
-        <el-input v-model.trim="dialogForm.contact" clearable placeholder="请输入联系人"></el-input>
+      <el-form-item label="联系人：" prop="linkman">
+        <el-input v-model.trim="dialogForm.linkman" clearable placeholder="请输入联系人"></el-input>
       </el-form-item>
-      <el-form-item label="联系电话：" prop="phone">
-        <el-input v-model.number="dialogForm.phone" maxlength="11" clearable placeholder="请输入联系电话"></el-input>
+      <el-form-item label="联系电话：" prop="mobile">
+        <el-input v-model.number="dialogForm.mobile" maxlength="11" clearable placeholder="请输入联系电话"></el-input>
       </el-form-item>
       <el-form-item label="公司地址：" prop="address">
         <el-input v-model.trim="dialogForm.address" type="textarea" :row="2" show-word-limit maxlength="30" clearable
           placeholder="请输入公司地址">
         </el-input>
       </el-form-item>
-      <el-form-item label="备注信息：" prop="remarks">
-        <el-input v-model.trim="dialogForm.remarks" @keyup.enter.native="handlerSava()" type="textarea" :row="3"
+      <el-form-item label="备注信息：" prop="descs">
+        <el-input v-model.trim="dialogForm.descs" @keyup.enter.native="handlerSava()" type="textarea" :row="3"
           show-word-limit maxlength="50" clearable placeholder="请输入备注信息">
         </el-input>
       </el-form-item>
@@ -113,10 +113,10 @@ export default {
     //供应商数据
     const getSupplierFormData = () => ({
       name: '',
-      contact: '',
-      phone: '',
+      linkman: '',
+      mobile: '',
       address: '',
-      remarks: ''
+      descs: ''
     })
     // 新增、修改form
     let dialogForm = reactive(getSupplierFormData())
