@@ -20,40 +20,17 @@
     >
       <template #default="{ node, data }">
           <span class="custom-tree-node">
-            <span v-contextmenu:contextmenu @contextmenu="currentEditData = node" @click="currentEditData = node">{{ node.label }}</span>
+            <span v-contextmenu:contextmenu @contextmenu="currentEditData = node" @click="handleClickNode(node)">{{ node.label }}</span>
           </span>
       </template>
     </el-tree>
-    <el-table :data="treeData" style="width: 80%" row-key="id" border default-expand-all>
-      <el-table-column prop="label" label="分类名称" />
-      <el-table-column label="操作" width="280">
-        <template #default="scope">
-          <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
-            修改
-          </el-button>
-          <el-button type="primary" size="mini" icon="Plus" @click.prevent="handlerAdd(scope.row)">
-            新增
-          </el-button>
-
-          <el-popconfirm title="确定要删除吗?" v-if="scope.row.children.length===0" @confirm="handlerDelete(scope.row)"
-                         confirm-button-text="确定" cancel-button-text="取消">
-            <template #reference>
-              <el-button size="small" type="danger" icon="Delete">
-                删除
-              </el-button>
-
-            </template>
-          </el-popconfirm>
-
-        </template>
-      </el-table-column>
-    </el-table>
+    <goods :cid="currentEditData.id" ref="goodsRef"/>
   </div>
 
-  <!-- 新增客户 dialog -->
+  <!-- 新增产品分类 dialog -->
   <el-dialog v-model="dialogVisible" width="500px" :title="isEdit?'修改产品类别':'新增产品类别'" :before-close="resetDialogForm">
     <el-form size="small" ref="dialogRef" :model="dialogForm" :rules="dialogFormRules" class="demo-form-inline">
-      <el-form-item label="产品名称：" prop="label">
+      <el-form-item label="产品分类：" prop="label">
         <el-input v-model="dialogForm.label" clearable placeholder="请输入产品名称"></el-input>
       </el-form-item>
     </el-form>
@@ -72,8 +49,10 @@
 import { reactive, toRefs, ref } from 'vue'
 import { getCategoryTree, addCategory, updateCategory, deleteCategory } from '@/api/common'
 import { globalLoading, showMessage } from '@/utils'
+import Goods from "@/views/goods";
 export default {
   name: 'category',
+  components: {Goods},
   setup(props, context) {
     const state = reactive({
       treeData: [],
@@ -83,6 +62,7 @@ export default {
       saveLoading: false,
       currentEditData: {},//当前修改数据
     })
+    const goodsRef = ref()
     // 新增、修改form
     const dialogForm = reactive({
       label: ''
@@ -96,6 +76,10 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
+      handleClickNode(node){
+        state.currentEditData = node
+        goodsRef.value.onQuery()
+      },
       /**
        * 修改产品
        */
@@ -158,9 +142,6 @@ export default {
       const categorytreeData = await getCategoryTree()
       state.treeData = categorytreeData.message
     }
-    const handleGetProduct = async () => {
-      // const productData = await getPr
-    }
     //加载产品类别数据
     handlerGetCategory()
 
@@ -170,6 +151,7 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
+      goodsRef
     }
   },
 }

@@ -30,12 +30,15 @@ model category {
   id            Int   @id @default(autoincrement())
   label      String
   pid Int?
+  goods base_goods[]
 }
 
 model base_goods {
   id        Int       @id @default(autoincrement())
   name      String
   code      String
+  category   category @relation(fields: [cid], references: [id])
+  cid Int
   type      String?
   brand     String?
   unit      String?

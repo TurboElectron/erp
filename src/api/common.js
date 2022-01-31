@@ -1,6 +1,62 @@
 import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
-import {prismaContains} from "@/utils";
+import {prismaContains, prismaEquals} from "@/utils";
+import {omit} from "lodash";
+/** 添加产品 */
+export const addGoods = async (data = {}) => {
+    // return httpFetch.post('customer/add', data)
+    const res = await prisma.base_goods.create({
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
+}
+
+/** 修改产品 */
+export const updateGoods  = async (data = {}) => {
+    // return httpFetch.post('customer/update', data)
+    const res = await prisma.base_goods.update({
+        where: {id: data.id},
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
+}
+
+/** 删除产品 */
+export const removeGoods  = async (data = {}) => {
+    // return httpFetch.post('customer/delete', data)
+    const res = await prisma.base_goods.delete({
+        where: {id: data.id},
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
+}
+/** 客户产品 */
+export const goodsList = async (data = {}) => {
+    const {pageSize, pageNo, cid} = data
+    const [total,records] = await prisma.$transaction([
+        prisma.base_goods.count(),
+        prisma.base_goods.findMany({
+            skip: pageSize* (pageNo-1),
+            take: pageSize,
+            where: prismaEquals({cid})
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
+}
 /** 注册分类 */
 export const addCategory = async (data = {}) => {
     // return httpFetch.post('category/addCategory', data)

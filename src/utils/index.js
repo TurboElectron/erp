@@ -132,3 +132,14 @@ export function prismaContains (map,where={}) {
     })
     return where
 }
+export function prismaEquals (map,where={}) {
+    Object.keys(map).forEach(key => {
+        const value = map[key]
+        if (value) {
+            where[key] = {
+                equals: value
+            }
+        }
+    })
+    return where
+}
