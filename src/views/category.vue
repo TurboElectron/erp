@@ -7,12 +7,12 @@
    </v-contextmenu>
   <el-form :inline="true" size="small" class="demo-form-inline">
     <el-form-item>
-      <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增产品系列</el-button>
+      <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
     </el-form-item>
   </el-form>
   <div style="display: flex;gap: 20px">
     <el-tree
-        :data="tableData"
+        :data="treeData"
         show-checkbox
         node-key="id"
         default-expand-all
@@ -24,7 +24,7 @@
           </span>
       </template>
     </el-tree>
-    <el-table :data="tableData" style="width: 80%" row-key="id" border default-expand-all>
+    <el-table :data="treeData" style="width: 80%" row-key="id" border default-expand-all>
       <el-table-column prop="label" label="分类名称" />
       <el-table-column label="操作" width="280">
         <template #default="scope">
@@ -76,6 +76,7 @@ export default {
   name: 'category',
   setup(props, context) {
     const state = reactive({
+      treeData: [],
       tableData: [],
       dialogVisible: false,// 修改、新增产品dialog
       isEdit: false,
@@ -154,8 +155,11 @@ export default {
      * 获取产品分类树
      */
     const handlerGetCategory = async () => {
-      const categorytableData = await getCategoryTree()
-      state.tableData = categorytableData.message
+      const categorytreeData = await getCategoryTree()
+      state.treeData = categorytreeData.message
+    }
+    const handleGetProduct = async () => {
+      // const productData = await getPr
     }
     //加载产品类别数据
     handlerGetCategory()
