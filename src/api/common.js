@@ -2,13 +2,15 @@ import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
 import {prismaContains} from "@/utils";
 /** 注册分类 */
-export const addCategory = (data = {}) => {
-    return httpFetch.post('category/addCategory', data)
-}
-
-/** 获取分类列表 */
-export const getCategory = (data = {}) => {
-    return httpFetch.post('category/getCategories', data)
+export const addCategory = async (data = {}) => {
+    // return httpFetch.post('category/addCategory', data)
+    const res = await prisma.category.create({
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 /** 获取分类列表树 */
 export const getCategoryTree = async (data = {}) => {
@@ -34,12 +36,27 @@ export const getCategoryTree = async (data = {}) => {
 }
 
 /** 修改类别*/
-export const updateCategory = (data = {}) => {
-    return httpFetch.post('category/update', data)
+export const updateCategory = async (data = {}) => {
+    // return httpFetch.post('category/update', data)
+    const res = await prisma.category.update({
+        where: {id: data.id},
+        data
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 /** 删除类别*/
-export const deleteCategory = id => {
-    return httpFetch.post('category/deleteCategory?id=' + id)
+export const deleteCategory = async id => {
+    // return httpFetch.post('category/deleteCategory?id=' + id)
+    const res = await prisma.category.delete({
+        where: {id},
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 新增批次 */

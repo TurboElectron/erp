@@ -20,11 +20,13 @@ import * as ElIcons from '@element-plus/icons'
 const userInfos = sessionStorage.getItem('erp')
 userInfos && (store.state.userInfos = JSON.parse(userInfos));
 import vueDirective from '@/directive'
+import "v-contextmenu/dist/themes/default.css";
+import Contextmenu from "v-contextmenu";
 
 const app = createApp(App)
 // element图标全局挂载
 for (const name in ElIcons) {
     app.component(name, ElIcons[name])
 }
-app.use(store).use(router).use(ElementPlus, { locale }).use(vueDirective)
+app.use(store).use(router).use(ElementPlus, { locale }).use(vueDirective).use(Contextmenu)
 app.mount('#app')
