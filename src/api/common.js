@@ -390,6 +390,7 @@ export const addGrnList = async (data = {}) => {
     await prisma.purchase_order.create({
         data: {
             ...omit(data,['children']),
+            date: new Date(data.date),
             itemList: {
                 create: data.children
             },
@@ -417,7 +418,14 @@ export const getGrnList = async (data = {}) => {
         prisma.purchase_order.findMany({
             skip: pageSize * (pageNo - 1),
             take: pageSize,
-            where: {}
+            where: {},
+            include: {
+                itemList: {
+                    include: {
+                        goods: true
+                    }
+                }
+            }
         })
     ])
     return {

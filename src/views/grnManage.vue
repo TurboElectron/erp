@@ -38,36 +38,25 @@
       <el-button icon="Download" @click="handleExport()">导出</el-button>
     </el-form-item>
   </el-form>
-  <el-table :data="tableData" v-loading="loadTable" row-key="id" border >
-<!--    <el-table-column type="expand">-->
-<!--      <template #default="props">-->
-<!--        <div class="grn-detail-list">-->
-<!--          <el-table :data="props.row.children">-->
-<!--            <el-table-column prop="categoryName" label="产品名称"></el-table-column>-->
-<!--            &lt;!&ndash; <el-table-column prop="specieName" label="批次名称"></el-table-column> &ndash;&gt;-->
-<!--            <el-table-column prop="amount" label="入库数量">-->
-<!--              <template #default="propsc">-->
-<!--                {{propsc.row.amount}} / {{propsc.row.unitName}}-->
-<!--              </template>-->
-<!--            </el-table-column>-->
-<!--            <el-table-column prop="price" label="进价">-->
-<!--              <template #default="propsc">-->
-<!--                {{propsc.row.price}} / {{propsc.row.unitName}}-->
-<!--              </template>-->
-<!--            </el-table-column>-->
-
-<!--            <el-table-column prop="repoName" label="仓库名称"></el-table-column>-->
-
-<!--          </el-table>-->
-<!--        </div>-->
-<!--      </template>-->
-<!--    </el-table-column>-->
-    <el-table-column type="index" width="50" />
-
-    <el-table-column prop="shouldPayPrice" label="应付" min-width="100"  />
-    <el-table-column prop="realPayPrice" label="实付" min-width="100" sortable  />
+  <el-table :data="tableData" v-loading="loadTable" row-key="id" border>
+    <el-table-column type="expand">
+      <template #default="props">
+        <div class="grn-detail-list">
+          <el-table :data="props.row.itemList">
+            <el-table-column prop="goods.name" label="产品名称"/>
+            <el-table-column prop="amount" label="数量"/>
+            <el-table-column prop="goods.unit" label="单位"></el-table-column>
+            <el-table-column prop="price" label="进价"/>
+            <el-table-column prop="totalPrice" label="总价"/>
+          </el-table>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column prop="code" label="订单号" min-width="100"  />
+    <el-table-column prop="totalPrice" label="应付" min-width="100"  />
+    <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
-    <el-table-column label="操作" width="200" fixed="right">
+    <el-table-column label="操作" width="200">
       <template #default="scope">
         <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
           修改

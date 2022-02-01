@@ -1,8 +1,8 @@
 generator client {
-  provider      = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
-  binaryTargets = ["native", "windows"]
-  engineType    = "library"
+  binaryTargets   = ["native", "windows"]
+  engineType      = "library"
 }
 
 datasource db {
@@ -27,31 +27,32 @@ model base_employee {
 }
 
 model category {
-  id            Int   @id @default(autoincrement())
-  label      String
-  pid Int?
+  id    Int          @id @default(autoincrement())
+  label String
+  pid   Int?
   goods base_goods[]
 }
 
 model base_goods {
-  id        Int       @id @default(autoincrement())
-  name      String
-  code      String
-  category   category? @relation(fields: [cid], references: [id])
-  cid       Int?
-  type      String?
-  brand     String?
-  unit      String?
-  color     String?
-  standard  String?
-  material  String?
-  buyPrice  String?
-  salePrice String?
-  descs     String?
-  updater   String?
-  updatime  DateTime?
-  state     Int       @default(1)
-  picture   String?
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String
+  category            category?             @relation(fields: [cid], references: [id])
+  cid                 Int?
+  type                String?
+  brand               String?
+  unit                String?
+  color               String?
+  standard            String?
+  material            String?
+  buyPrice            String?
+  salePrice           String?
+  descs               String?
+  updater             String?
+  updatime            DateTime?
+  state               Int                   @default(1)
+  picture             String?
+  purchase_order_item purchase_order_item[]
 }
 
 model base_param {
@@ -65,38 +66,43 @@ model base_param {
 }
 
 model base_repo {
-  id       Int       @id @default(autoincrement())
-  name     String
-  code     String
-  address  String?
-  descs    String?
-  adminId  Int?
-  updater  String?
-  updatime DateTime?
-  state    Int       @default(1)
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String
+  address             String?
+  descs               String?
+  adminId             Int?
+  updater             String?
+  updatime            DateTime?
+  state               Int                   @default(1)
+  purchase_order_item purchase_order_item[]
 }
 
 model purchase_order {
-  id           Int       @id @default(autoincrement())
-  itemList     purchase_order_item[]
-  supplierId   Int?
-  code  String?
-  payPrice    Decimal?
-  totalPrice   Decimal?
-  userId       Int?
-  descs        String
-  date DateTime?
+  id         Int                   @id @default(autoincrement())
+  itemList   purchase_order_item[]
+  supplierId Int?
+  code       String?
+  payPrice   Decimal?
+  totalPrice Decimal?
+  userId     Int?
+  descs      String
+  date       DateTime?
 }
+
 model purchase_order_item {
-  id           Int       @id @default(autoincrement())
-  orderId      Int
-  repoId       Int
+  id             Int            @id @default(autoincrement())
+  orderId        Int
+  repoId         Int
+  repo           base_repo      @relation(fields: [repoId], references: [id])
   purchase_order purchase_order @relation(fields: [orderId], references: [id])
-  goodsId      Int?
-  amount        Int?
-  price    Decimal?
-  totalPrice   Decimal?
+  goodsId        Int?
+  goods          base_goods?    @relation(fields: [goodsId], references: [id])
+  amount         Int?
+  price          Decimal?
+  totalPrice     Decimal?
 }
+
 model purchase_supplier {
   id       Int       @id @default(autoincrement())
   name     String
@@ -161,7 +167,6 @@ model stock {
   state          Int       @default(1)
 }
 
-
 model sys_user {
   id         Int       @id @default(autoincrement())
   account    String
@@ -174,5 +179,6 @@ model sys_user {
   state      Int       @default(1)
   isLocked   Int?      @default(0)
   lockTime   DateTime?
+
   @@index([account, password], map: "idx_sys_user_idx_user_account")
 }
