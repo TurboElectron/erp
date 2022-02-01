@@ -17,11 +17,7 @@
     </el-form-item>
 
     <el-form-item label="供货商：">
-      <el-select v-model="queryForm.supplierId" clearable remote filterable :loading="loadignData"
-        :remote-method="query=>remoteSupplierData(query,'supplierData','loadignData')" placeholder="选择供货商">
-        <el-option v-for="item in supplierData" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
+      <supplier-select v-model="queryForm.supplierId"/>
     </el-form-item>
 
     <el-form-item label="操作人：">
@@ -50,6 +46,11 @@
             <el-table-column prop="totalPrice" label="总价"/>
           </el-table>
         </div>
+      </template>
+    </el-table-column>
+    <el-table-column prop="date" label="创建时间" min-width="100">
+      <template #default="scope">
+        {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
       </template>
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
@@ -367,19 +368,6 @@ export default {
         dialogForm.itemList.splice(index, 1)
       },
       /**
-       * 入库产品明细 入库产品change事件
-       * 获取产品批次数
-       */
-      async getGrnDetailSpecie(value, index) {
-        //之前选择批次清除
-        dialogForm.itemList[index].specieId = '';
-        dialogForm.itemList[index].specieData = []
-        const res = await getListByCategoryId({ categoryIds: value.at(-1) })
-        res.code === 200 && (dialogForm.itemList[index].specieData = res.message)
-        //默认选中第一个
-        res.code === 200 && res.message.length > 0 && (dialogForm.itemList[index].specieId = res.message[0].id)
-      },
-      /**
        * 新增入库产品明细
        * 添加一个子级明细
        */
@@ -631,7 +619,8 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
-      remoteSupplierData
+      remoteSupplierData,
+      moment
     }
   },
 }

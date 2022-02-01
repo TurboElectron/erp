@@ -2,6 +2,7 @@
   <el-select
       v-model="goodsId"
       filterable
+      clearable
       remote
       placeholder="请输入产品编号"
       :remote-method="searchGoods"

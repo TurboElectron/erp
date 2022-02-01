@@ -2,6 +2,7 @@
   <el-select
       v-model="supplierId"
       filterable
+      clearable
       remote
       placeholder="请输入供应商名称"
       :remote-method="search"

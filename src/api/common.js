@@ -393,7 +393,7 @@ export const addGrnList = async (data = {}) => {
             ...omit(data,['itemList']),
             date: new Date(data.date),
             itemList: {
-                create: data.children
+                create: data.itemList
             },
         },
     })
@@ -413,9 +413,6 @@ export const updateGrnList = async (data = {}) => {
             data: {
                 ...omit(data, ['itemList', 'id']),
                 date: new Date(data.date),
-                // itemList: {
-                //     deleteMany: data.itemList.map(_ => _.id),
-                // }
             },
         })
         await prisma.purchase_order_item.deleteMany({where: {
@@ -458,8 +455,19 @@ export const deleteGrnList = async (data = {}) => {
 /** 获取入库表*/
 export const getGrnList = async (data = {}) => {
     // return httpFetch.post('grn/list', data)
-    const {pageSize, pageNo, code , supplierId} = data
+    const {pageSize, pageNo, code , supplierId, userId, startDate, endDate} = data
     let where = {}
+    if (startDate) {
+        where.date = {
+            gte: new  Date(startDate)
+        }
+    }
+    if (endDate) {
+        where.date = {
+            ...where.date,
+            lte: new Date(endDate)
+        }
+    }
     if (
         code
     ) {

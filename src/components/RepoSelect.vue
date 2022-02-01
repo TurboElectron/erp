@@ -2,6 +2,7 @@
   <el-select
       v-model="repoId"
       filterable
+      clearable
       remote
       placeholder="请输入仓库名称"
       :remote-method="search"
