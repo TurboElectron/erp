@@ -191,21 +191,21 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="产品批次" min-width="220px">
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'children.'+props.$index+'.specieId'"
-                :rules="dialogFormRules.specieName">
-                <!-- <el-select v-model="props.row.specieId" filterable :loading="props.row.specieData.length===0"
-                  style="width:100%" :disabled="props.row.specieData.length===0" clearable placeholder="请选择产品批次">
-                  <el-option v-for="item in props.row.specieData" :key="item.id" :label="item.name" :value="item.id">
-                  </el-option>
-                </el-select> -->
-                <span v-if="isEdit">{{props.row.specieName}}</span>
-                <el-input v-else v-model="props.row.specieName" placeholder="请输入产品批次名称" clearable>
-                </el-input>
-              </el-form-item>
-            </template>
-          </el-table-column>
+<!--          <el-table-column label="产品批次" min-width="220px">-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0" :prop="'children.'+props.$index+'.specieId'"-->
+<!--                :rules="dialogFormRules.specieName">-->
+<!--                &lt;!&ndash; <el-select v-model="props.row.specieId" filterable :loading="props.row.specieData.length===0"-->
+<!--                  style="width:100%" :disabled="props.row.specieData.length===0" clearable placeholder="请选择产品批次">-->
+<!--                  <el-option v-for="item in props.row.specieData" :key="item.id" :label="item.name" :value="item.id">-->
+<!--                  </el-option>-->
+<!--                </el-select> &ndash;&gt;-->
+<!--                <span v-if="isEdit">{{props.row.specieName}}</span>-->
+<!--                <el-input v-else v-model="props.row.specieName" placeholder="请输入产品批次名称" clearable>-->
+<!--                </el-input>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
           <el-table-column label="入库仓库" min-width="220px">
             <template #default="props">
@@ -761,15 +761,14 @@ export default {
     //查询产品树、用户列表、供应商
     const getUnitAndCategoryData = async () => {
       state.loadignData = true
-      const res = await Promise.all([getCategoryTree(), userList(), getSupplierList({ pageSize: 20, pageNo: 1 }), getRepoList({ name: '' }), getUnitList()]).finally(() => {
+      const res = await Promise.all([getCategoryTree(), userList(), getSupplierList({ pageSize: 20, pageNo: 1 }), getRepoList({ name: '' })]).finally(() => {
         state.loadignData = false
       })
 
       res[0].code === 200 && (state.categoryData = res[0].message)// 产品
       res[1].code === 200 && (state.agentData = res[1].message.data)// 用户
       res[2].code === 200 && (state.supplierData = res[2].message.records)// 供应商
-      res[3].code === 200 && (state.repoData = res[3].message)// 仓库
-      res[4].code === 200 && (state.unitData = res[4].message)// 数量单位
+      res[3].code === 200 && (state.repoData = res[3].message.records)// 仓库
       state.loadignData = false
     }
     //查询产品树
