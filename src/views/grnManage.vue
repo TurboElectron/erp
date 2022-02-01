@@ -68,46 +68,45 @@
       </el-dropdown>
     </el-form-item>
   </el-form>
-  <el-table :data="tableData" v-loading="loadTable" row-key="id" border :tree-props="{ children: 'childrens' }">
-    <el-table-column type="expand">
-      <template #default="props">
-        <div class="grn-detail-list">
-          <el-table :data="props.row.children">
-            <el-table-column prop="categoryName" label="产品名称"></el-table-column>
-            <!-- <el-table-column prop="specieName" label="批次名称"></el-table-column> -->
-            <el-table-column prop="amount" label="入库数量">
-              <template #default="propsc">
-                {{propsc.row.amount}} / {{propsc.row.unitName}}
-              </template>
-            </el-table-column>
-            <el-table-column prop="price" label="进价">
-              <template #default="propsc">
-                {{propsc.row.price}} / {{propsc.row.unitName}}
-              </template>
-            </el-table-column>
+  <el-table :data="tableData" v-loading="loadTable" row-key="id" border >
+<!--    <el-table-column type="expand">-->
+<!--      <template #default="props">-->
+<!--        <div class="grn-detail-list">-->
+<!--          <el-table :data="props.row.children">-->
+<!--            <el-table-column prop="categoryName" label="产品名称"></el-table-column>-->
+<!--            &lt;!&ndash; <el-table-column prop="specieName" label="批次名称"></el-table-column> &ndash;&gt;-->
+<!--            <el-table-column prop="amount" label="入库数量">-->
+<!--              <template #default="propsc">-->
+<!--                {{propsc.row.amount}} / {{propsc.row.unitName}}-->
+<!--              </template>-->
+<!--            </el-table-column>-->
+<!--            <el-table-column prop="price" label="进价">-->
+<!--              <template #default="propsc">-->
+<!--                {{propsc.row.price}} / {{propsc.row.unitName}}-->
+<!--              </template>-->
+<!--            </el-table-column>-->
 
-            <el-table-column prop="repoName" label="仓库名称"></el-table-column>
+<!--            <el-table-column prop="repoName" label="仓库名称"></el-table-column>-->
 
-          </el-table>
-        </div>
-      </template>
-    </el-table-column>
+<!--          </el-table>-->
+<!--        </div>-->
+<!--      </template>-->
+<!--    </el-table-column>-->
     <el-table-column type="index" width="50" />
-    <el-table-column prop="code" label="入库单号" min-width="200" v-if="showTableFiledsValue.includes('code')" />
-    <el-table-column label="入库产品" min-width="320" v-if="showTableFiledsValue.includes('children')">
-      <template #default="props">
-        <span v-html="getTblTemplate(props.row.children)"></span>
-      </template>
-    </el-table-column>
-    <el-table-column prop="date" label="入库日期" width="160" v-if="showTableFiledsValue.includes('date')" />
-    <el-table-column prop="agentName" label="操作人" min-width="120" v-if="showTableFiledsValue.includes('agentName')" />
-    <el-table-column prop="supplierName" label="供应商" min-width="120"
-      v-if="showTableFiledsValue.includes('supplierName')" />
+<!--    <el-table-column prop="code" label="入库单号" min-width="200" v-if="showTableFiledsValue.includes('code')" />-->
+<!--    <el-table-column label="入库产品" min-width="320" v-if="showTableFiledsValue.includes('children')">-->
+<!--      <template #default="props">-->
+<!--        <span v-html="getTblTemplate(props.row.children)"></span>-->
+<!--      </template>-->
+<!--    </el-table-column>-->
+<!--    <el-table-column prop="date" label="入库日期" width="160" v-if="showTableFiledsValue.includes('date')" />-->
+<!--    <el-table-column prop="agentName" label="操作人" min-width="120" v-if="showTableFiledsValue.includes('agentName')" />-->
+<!--    <el-table-column prop="supplierName" label="供应商" min-width="120"-->
+<!--      v-if="showTableFiledsValue.includes('supplierName')" />-->
 
-    <el-table-column prop="totalPrice" label="总价" min-width="100" v-if="showTableFiledsValue.includes('totalPrice')" />
-    <el-table-column prop="realCo" label="已付款" min-width="100" v-if="showTableFiledsValue.includes('realCo')" />
-    <el-table-column prop="debt" label="待付款" min-width="100" sortable v-if="showTableFiledsValue.includes('debt')" />
-    <el-table-column prop="remarks" label="备注" min-width="200" v-if="showTableFiledsValue.includes('remarks')" />
+    <el-table-column prop="shouldPayPrice" label="应付" min-width="100"  />
+    <el-table-column prop="realPayPrice" label="实付" min-width="100" sortable  />
+    <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200" fixed="right">
       <template #default="scope">
         <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
@@ -435,9 +434,6 @@ export default {
       specieId: [{
         required: true, message: '请输入批次名称', trigger: 'blur',
       }],
-      categoryId: [{
-        required: true, message: '请选择入库产品', trigger: 'blur',
-      }],
       totalPriceC: [{
         required: true, message: '请输入入库成本', trigger: 'blur',
       }, {
@@ -703,7 +699,7 @@ export default {
 
         unitNameData.find(unitv => unitv.id === unitId)// state.unitData.flat(Infinity).find(unitv => unitv.id === unitId)
         const unitName = unitNameData?.[0]?.name ?? '';
-        // 入库产品id 
+        // 入库产品id
         const categoryId = Array.isArray(v.categoryId) ? v.categoryId.at(-1) : v.categoryId;
         let editParas = {}
         //修改状态下 添加批次id
@@ -739,7 +735,7 @@ export default {
           // }
           // // 选择批次价格
           // const speciCost = selSpecieData.cost;
-          // // 选择批次数量单位 
+          // // 选择批次数量单位
           // const specieUnitId = selSpecieData.unitId
           // //比较选择的批次计量单位与 选择的数量单位是否一致
           // const unit1Id = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
@@ -754,7 +750,7 @@ export default {
           // item.totalPrice = totalPrice
           //单位最后一位
           item.unitId = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
-          // 入库产品id 
+          // 入库产品id
           item.categoryId = Array.isArray(item.categoryId) ? item.categoryId.at(-1) : item.categoryId;
           index++;
         }

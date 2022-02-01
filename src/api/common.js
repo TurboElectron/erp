@@ -373,8 +373,24 @@ export const deleteGrnList = (data = {}) => {
     return httpFetch.post('grn/delete', data)
 }
 /** 获取入库表*/
-export const getGrnList = (data = {}) => {
-    return httpFetch.post('grn/list', data)
+export const getGrnList = async (data = {}) => {
+    // return httpFetch.post('grn/list', data)
+    const {pageSize, pageNo} = data
+    const [total, records] = await prisma.$transaction([
+        prisma.purchase_order.count(),
+        prisma.purchase_order.findMany({
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+            where: {}
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
 }
 
 
