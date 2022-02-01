@@ -40,7 +40,7 @@ export const removeGoods  = async (data = {}) => {
 }
 /** 客户产品 */
 export const goodsList = async (data = {}) => {
-    const {pageSize, pageNo, cid, name} = data
+    const {pageSize, pageNo, cid, name, code} = data
     let where = {}
     if (cid) {
         where.cid = cid
@@ -50,11 +50,16 @@ export const goodsList = async (data = {}) => {
             contains: name
         }
     }
+    if (code) {
+        where.code = {
+            contains: code
+        }
+    }
     const [total,records] = await prisma.$transaction([
         prisma.base_goods.count(),
         prisma.base_goods.findMany({
-            // skip: pageSize* (pageNo-1),
-            // take: pageSize,
+            skip: pageSize* (pageNo-1),
+            take: pageSize,
             where
         })
     ])
@@ -260,10 +265,17 @@ export const updateRepo = async (data = {}) => {
 /** 仓库列表 */
 export const getRepoList = async (data = {}) => {
     // return httpFetch.post('repo/list', data)
+    const {name} = data
+    let where = {}
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
     const [total, records] = await prisma.$transaction([
-        prisma.purchase_supplier.count(),
-        prisma.purchase_supplier.findMany({
-            where: prismaContains(data)
+        prisma.base_repo.count(),
+        prisma.base_repo.findMany({
+            where
         })
     ])
     return {
@@ -368,8 +380,25 @@ export const getTest = (data = {}) => {
 
 
 /** 入库*/
-export const addGrnList = (data = {}) => {
-    return httpFetch.post('grn/add', data)
+export const addGrnList = async (data = {}) => {
+    console.log(data)
+    // return httpFetch.post('grn/add', data)
+    // const res = await prisma.purchase_order.create()
+    // await prisma.$transaction(async ()=> {
+    //     const res = await prisma.purchase_order.create()
+    // })
+    await prisma.purchase_order.create({
+        data: {
+            ...omit(data,['children']),
+            itemList: {
+                create: data.children
+            },
+        },
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 //更新
 export const updateGrnList = (data = {}) => {

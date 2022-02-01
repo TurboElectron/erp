@@ -79,34 +79,18 @@ model base_repo {
 model purchase_order {
   id           Int       @id @default(autoincrement())
   itemList     purchase_order_item[]
-  goodsId      Int?
   supplierId   Int?
-  supplierName String?
-  repoId       Int?
-  orderNumber  String?
-  count        Int?
-  shouldPayPrice    Decimal?
-  realPayPrice    Decimal?
-  unitPrice    Decimal?
+  code  String?
+  payPrice    Decimal?
   totalPrice   Decimal?
-  employeeId   Int?
   userId       Int?
-  descs        String?
-  checkState   Int?
-  checkResult  String?
-  checkAccount String?
-  checktime    DateTime?
-  taketime     DateTime?
-  creater      String?
-  creatime     DateTime?
-  updater      String?
-  updatime     DateTime?
-  state        Int?
-  type         Int       @default(1)
+  descs        String
+  date DateTime?
 }
 model purchase_order_item {
   id           Int       @id @default(autoincrement())
   orderId      Int
+  repoId       Int
   purchase_order purchase_order @relation(fields: [orderId], references: [id])
   goodsId      Int?
   amount        Int?

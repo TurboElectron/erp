@@ -15,10 +15,6 @@
         type="datetime" placeholder="录入订单结束时间">
       </el-date-picker>
     </el-form-item>
-    <el-form-item label="商品类型：">
-      <el-cascader v-model="queryForm.categoryId" :options="categoryData" placeholder="选择查询商品" :props="cascaderOptions"
-        collapse-tags clearable />
-    </el-form-item>
 
     <el-form-item label="供货商：">
       <el-select v-model="queryForm.supplierId" clearable remote filterable :loading="loadignData"
@@ -35,37 +31,11 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item label="只看欠款：">
-      <el-checkbox v-model="queryForm.minDebts"></el-checkbox>
-    </el-form-item>
-
     <el-form-item>
       <el-button type="primary" @click="getTableData()" icon="Search">查询
       </el-button>
       <el-button icon="Plus" @click="handlerAdd()">新增入库单</el-button>
       <el-button icon="Download" @click="handleExport()">导出</el-button>
-    </el-form-item>
-
-    <el-form-item>
-      <el-dropdown :hide-on-click="false">
-        <el-button type="primary">
-          配置显示列
-        </el-button>
-        <template #dropdown>
-          <div class="tableFields-con">
-            <el-checkbox-group v-model="showTableFiledsValue">
-              <el-dropdown-menu>
-                <el-dropdown-item v-for="item in showTableFileds" :key="item.label">
-                  <el-checkbox class="tableFields-item" :label="item.label">
-                    {{item.value}}
-                  </el-checkbox>
-
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-checkbox-group>
-          </div>
-        </template>
-      </el-dropdown>
     </el-form-item>
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border >
@@ -93,16 +63,6 @@
 <!--      </template>-->
 <!--    </el-table-column>-->
     <el-table-column type="index" width="50" />
-<!--    <el-table-column prop="code" label="入库单号" min-width="200" v-if="showTableFiledsValue.includes('code')" />-->
-<!--    <el-table-column label="入库产品" min-width="320" v-if="showTableFiledsValue.includes('children')">-->
-<!--      <template #default="props">-->
-<!--        <span v-html="getTblTemplate(props.row.children)"></span>-->
-<!--      </template>-->
-<!--    </el-table-column>-->
-<!--    <el-table-column prop="date" label="入库日期" width="160" v-if="showTableFiledsValue.includes('date')" />-->
-<!--    <el-table-column prop="agentName" label="操作人" min-width="120" v-if="showTableFiledsValue.includes('agentName')" />-->
-<!--    <el-table-column prop="supplierName" label="供应商" min-width="120"-->
-<!--      v-if="showTableFiledsValue.includes('supplierName')" />-->
 
     <el-table-column prop="shouldPayPrice" label="应付" min-width="100"  />
     <el-table-column prop="realPayPrice" label="实付" min-width="100" sortable  />
@@ -165,12 +125,7 @@
         </el-col>
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
           <el-form-item label="供应商：" prop="supplierId">
-            <el-select v-model="dialogForm.supplierId" clearable remote filterable :loading="loadignData"
-              :remote-method="query=>remoteSupplierData(query,'supplierData','loadignData')" placeholder="选择供应商"
-              style="width:100%">
-              <el-option v-for="item in supplierData" :key="item.id" :label="item.name" :value="item.id">
-              </el-option>
-            </el-select>
+            <supplier-select v-model="dialogForm.supplierId" />
           </el-form-item>
         </el-col>
 
@@ -184,48 +139,15 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'children.'+props.$index+'.goodsId'"
                 :rules="dialogFormRules.goodsId">
-<!--                <el-cascader v-model="props.row.categoryId" filterable size="mini" :options="categoryData"-->
-<!--                  placeholder="请选择入库产品" :props="{ value: 'id', label: 'name' }" collapse-tags clearable-->
-<!--                  style="width:100%" />-->
-                <el-select-v2
-                    v-model="props.row.goodsId"
-                    style="width: 240px"
-                    multiple
-                    filterable
-                    remote
-                    :remote-method="searchGoods"
-                    clearable
-                    :options="goodsOptions"
-                    :loading="goodsLoading"
-                    placeholder="Please enter a keyword"
-                />
+                    <goods-select v-model="props.row.goodsId"/>
               </el-form-item>
             </template>
           </el-table-column>
 
-<!--          <el-table-column label="产品批次" min-width="220px">-->
-<!--            <template #default="props">-->
-<!--              <el-form-item label-width="0" :prop="'children.'+props.$index+'.specieId'"-->
-<!--                :rules="dialogFormRules.specieName">-->
-<!--                &lt;!&ndash; <el-select v-model="props.row.specieId" filterable :loading="props.row.specieData.length===0"-->
-<!--                  style="width:100%" :disabled="props.row.specieData.length===0" clearable placeholder="请选择产品批次">-->
-<!--                  <el-option v-for="item in props.row.specieData" :key="item.id" :label="item.name" :value="item.id">-->
-<!--                  </el-option>-->
-<!--                </el-select> &ndash;&gt;-->
-<!--                <span v-if="isEdit">{{props.row.specieName}}</span>-->
-<!--                <el-input v-else v-model="props.row.specieName" placeholder="请输入产品批次名称" clearable>-->
-<!--                </el-input>-->
-<!--              </el-form-item>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
-
           <el-table-column label="入库仓库" min-width="220px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'children.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
-                <el-select v-model="props.row.repoId" filterable clearable placeholder="请选择仓库地址" style="width:100%">
-                  <el-option v-for="item in repoData" :key="item.id" :label="item.name" :value="item.id">
-                  </el-option>
-                </el-select>
+                <repo-select v-model="props.row.repoId"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -239,20 +161,6 @@
               </el-form-item>
             </template>
           </el-table-column>
-
-          <el-table-column label="数量单位" min-width="160px">
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'children.'+props.$index+'.unitId'" :rules="dialogFormRules.unitId">
-<!--                <el-cascader v-model="props.row.unitId" filterable-->
-<!--                  :props="{ value: 'id', label: 'name', checkStrictly: true }" :options="unitData" clearable-->
-<!--                  placeholder="请选择数量单位" style="width:100%" />-->
-                <el-input v-model="props.row.unit"
-                             clearable
-                             placeholder="请输入数量单位" style="width:100%" />
-              </el-form-item>
-            </template>
-          </el-table-column>
-
           <el-table-column label="单价" min-width="200px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'children.'+props.$index+'.price'" :rules="dialogFormRules.price">
@@ -265,12 +173,6 @@
 
           <el-table-column label="成本" min-width="200" fixed="right">
             <template #default="props">
-              <!-- <el-form-item label-width="0" :prop="'children.'+props.$index+'.totalPrice'"
-                :rules="dialogFormRules.totalPriceC">
-                <el-input-number v-model.number="props.row.totalPrice" :precision="2" :min="0" style="width:100%"
-                  clearable placeholder="请输入成本">
-                </el-input-number>
-              </el-form-item> -->
               <el-form-item> {{props.row.totalPrice}}</el-form-item>
             </template>
           </el-table-column>
@@ -295,25 +197,21 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
           <el-form-item label="总成本：" prop="totalPrice">
             <div class="form-pre-flex">
-              <!-- <el-input-number v-model="dialogForm.totalPrice" :precision="2" :min="0" clearable placeholder="请输入总价"
-                style="width:100%">
-              </el-input-number> -->
               {{dialogForm.totalPrice}}
-              <!-- <el-button class="form-pre-flex-btn" @click="calculateTotalPrice">计算总价</el-button> -->
             </div>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
-          <el-form-item label="已付款：" prop="realCo">
-            <el-input-number v-model="dialogForm.realCo" :precision="2" :min="0" clearable placeholder="请输入已付款"
+          <el-form-item label="已付款：" prop="payPrice">
+            <el-input-number v-model="dialogForm.payPrice" :precision="2" :min="0" clearable placeholder="请输入已付款"
               style="width:100%">
             </el-input-number>
           </el-form-item>
         </el-col>
 
         <el-col :span="24">
-          <el-form-item label="备注：" prop="remarks">
-            <el-input v-model.trim="dialogForm.remarks" type="textarea" :rows="4" show-word-limit maxlength="50"
+          <el-form-item label="备注：" prop="descs">
+            <el-input v-model.trim="dialogForm.descs" type="textarea" :rows="4" show-word-limit maxlength="50"
               clearable placeholder="请输入备注信息">
             </el-input>
           </el-form-item>
@@ -355,9 +253,13 @@ import mathJs from '@/utils/math'
 //远程搜索供应商，客户
 import remoteMix from '@/mixin/remote'
 import _ from 'lodash'
+import GoodsSelect from "@temp/GoodsSelect";
+import SupplierSelect from "@temp/SupplierSelect";
+import RepoSelect from "@temp/RepoSelect";
 
 export default {
   name: 'grnManage',
+  components: {RepoSelect, SupplierSelect, GoodsSelect},
   setup(props, context) {
 
     const state = reactive({
@@ -372,35 +274,16 @@ export default {
       supplierData: [],//供应商
       unitData: [],// 数量单位
       loadignData: false,//加载 产品loading
-      goodsLoading: false,
-      goodsOptions: [],
       queryForm: {
         code: '',
         startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
-        categoryId: '',
-        userData: '',
         supplierId: '',//供货商
-        minDebts: false
       },
-      cascaderOptions: { value: 'id', label: 'name', multiple: true },
       currentPage: 1,
       pageSize: 10,
       total: 0,
       loadTable: false,
-      showTableFileds: [
-        { label: "code", value: "入库单号" },
-        { label: "children", value: "入库明细" },
-        { label: "date", value: "入库日期" },
-        { label: "agentName", value: "操作人" },
-        { label: "supplierName", value: "供应商" },
-        { label: "totalPrice", value: "总价" },
-        { label: "realCo", value: "已付款" },
-        { label: "debt", value: "待付款" },
-        { label: "remarks", value: "备注" },
-      ],
-      showTableFiledsValue: ["children", "date", "supplierName", "totalPrice", "realCo", "debt", "remarks"]
-
     })
 
     const { remoteSupplierData } = remoteMix(state)
@@ -411,18 +294,14 @@ export default {
       userId: '',// 操作人id
       supplierId: '',// 供应商id
       totalPrice: 0,// 总价
-      realCo: 0, // 已付款
-      remarks: '', // 备注信息
+      payPrice: 0, // 已付款
+      descs: '', // 备注信息
       children: [{
-        categoryId: '',
+        goodsId: '',
         repoId: '',
-        specieId: '',
-        specieName: "IN" + moment(new Date()).format('YYYYMMDDHHmmss') + "" + 0,
-        unitId: '',
         amount: 1,
         totalPrice: 0,//采购成本
         price: 0,//单价
-        // specieData: [],// 产品对应的批次数据
       }]
     })
     // 新增、修改form
@@ -452,33 +331,13 @@ export default {
         message: '入库数量最小为1',
         trigger: 'blur',
       }],
-      unitId: [{
-        required: true, message: '请选择数量单位', trigger: 'blur',
-      }],
       repoId: [{
         required: true, message: '请选择仓库', trigger: 'blur',
       }],
-      specieId: [{
-        required: true, message: '请输入批次名称', trigger: 'blur',
-      }],
-      totalPriceC: [{
-        required: true, message: '请输入入库成本', trigger: 'blur',
-      }, {
-        type: 'number',
-        min: 0,
-        message: '入库成本不能小于0',
-        trigger: 'blur',
-      }]
     }
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
-      async searchGoods(name) {
-        state.goodsLoading = true
-        const res = await goodsList({name})
-        state.goodsOptions = res.message.records
-        state.goodsLoading = false
-      },
       /**
    * 显示入库明细
    */
@@ -499,7 +358,7 @@ export default {
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款
-        dialogForm.realCo = totalPrice
+        dialogForm.payPrice = totalPrice
       },
       /**
        * 导出
@@ -606,15 +465,11 @@ export default {
         nextTick(() => {
           dialogRef.value.resetFields()
           dialogForm.children = [{
-            categoryId: '',
+            goodsId: '',
             repoId: '',
-            specieId: '',
-            specieName: "IN" + moment(new Date()).format('YYYYMMDDHHmmss') + "" + 0,
-            unitId: '',
             amount: 1,
             totalPrice: 0,//采购成本
             price: 0,//单价
-            // specieData: [],// 产品对应的批次数据
           }]
           dialogForm.code = moment(new Date()).format('YYYYMMDDHHmmss')
           dialogForm.date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
@@ -654,36 +509,29 @@ export default {
       handlerSave() {
         dialogRef.value.validate(async (valid) => {
           if (valid) {
-            //新增批次
-            const specieList = getGrnSpecieData()
-            // const res = await addSpecieList(specieList);
-            // if (res.code !== 200) {
-            //   showMessage('error', res.message)
-            //   return
-            // }
             //入库产品明细修改单位id ，产品id
-            await setGrnDetailTotalPrice()
+            // await setGrnDetailTotalPrice()
             const params = Object.assign({}, dialogForm)
-            //添加操作人姓名
-            params.agentName = state.userData.find(v => v.id === params.userId).name
-            //供应商
-            params.supplierName = state.supplierData.find(v => v.id === params.supplierId).name
-            //欠款
-            params.debt = mathJs.subtract(params.totalPrice, params.realCo)
-            //修改参数添加id
-            state.isEdit && (params.id = state.currentEditData.id)
-            //删除批次数据
-            params.children.forEach(v => {
-              delete v.specieData
-            })
-            // state.saveLoading = true
-
-            // 添加批次
-            const grnInParams = {
-              grnData: params,
-              specieList
-            }
-            const responseData = state.isEdit ? await updateGrnList(grnInParams) : await addGrnList(grnInParams);
+            // //添加操作人姓名
+            // params.agentName = state.userData.find(v => v.id === params.userId).name
+            // //供应商
+            // params.supplierName = state.supplierData.find(v => v.id === params.supplierId).name
+            // //欠款
+            // params.debt = mathJs.subtract(params.totalPrice, params.payPrice)
+            // //修改参数添加id
+            // state.isEdit && (params.id = state.currentEditData.id)
+            // //删除批次数据
+            // params.children.forEach(v => {
+            //   delete v.specieData
+            // })
+            // // state.saveLoading = true
+            //
+            // // 添加批次
+            // const grnInParams = {
+            //   grnData: params,
+            //   specieList
+            // }
+            const responseData = state.isEdit ? await updateGrnList(params) : await addGrnList(params);
             state.saveLoading = false
             // 刷新表格
             responseData.code === 200 && this.getTableData()
@@ -794,14 +642,12 @@ export default {
     //查询产品树、用户列表、供应商
     const getUnitAndCategoryData = async () => {
       state.loadignData = true
-      const res = await Promise.all([getCategoryTree(), userList(), getSupplierList({ pageSize: 20, pageNo: 1 }), getRepoList({ name: '' })]).finally(() => {
+      const res = await Promise.all([getCategoryTree(), userList()]).finally(() => {
         state.loadignData = false
       })
 
       res[0].code === 200 && (state.categoryData = res[0].message)// 产品
       res[1].code === 200 && (state.userData = res[1].message.records)// 用户
-      res[2].code === 200 && (state.supplierData = res[2].message.records)// 供应商
-      res[3].code === 200 && (state.repoData = res[3].message.records)// 仓库
       state.loadignData = false
     }
     //查询产品树
