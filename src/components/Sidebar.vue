@@ -82,11 +82,11 @@ export default {
         index: "/category",
         title: "商品管理"
       },
-      {
-        icon: "Shop",
-        index: "/specie",
-        title: "批次管理"
-      },
+      // {
+      //   icon: "Shop",
+      //   index: "/specie",
+      //   title: "批次管理"
+      // },
       // {
       //   icon: "Coin",
       //   index: "/unitManager",
