@@ -35,8 +35,8 @@
     </el-pagination>
   </div>
 
-  <!-- 新增客户 dialog -->
-  <el-dialog v-model="goodsDailog" width="500px" :title="isEditGoods?'修改客户：'+goodsDialogForm.name:'新增客户'"
+  <!-- 新增产品 dialog -->
+  <el-dialog v-model="goodsDailog" width="500px" :title="isEditGoods?'修改产品：'+goodsDialogForm.name:'新增产品'"
              :before-close="resetDialogForm">
     <el-form size="small" ref="goodsDialogRef" :model="goodsDialogForm" :rules="goodsDialogFormRules"
              class="demo-form-inline">
@@ -100,7 +100,7 @@ export default {
     cid:Number
   },
   setup(props) {
-    //新增客户数据
+    //新增产品数据
     const getGoodsDialogFormValues = () => {
       return {
         cid: props.cid,
@@ -135,16 +135,16 @@ export default {
       pageSize: 10,
       total: 0,
       loadingTbl: true,
-      goodsDailog: false,//操作客户dialog
+      goodsDailog: false,//操作产品dialog
 
       goodsDialogForm: getGoodsDialogFormValues(),
-      editGoodsId: '',//当前修改客户id
+      editGoodsId: '',//当前修改产品id
       isEditGoods: false,
       saveLoading: false//保存时确定按钮的loading
     });
 
     /**
-     * 新增客户 rules
+     * 新增产品 rules
      */
     const goodsDialogRules = reactive({
       goodsDialogFormRules: {
@@ -179,8 +179,8 @@ export default {
         data.loadingTbl = false
       },
       /**
-       * 编辑客户
-       * @param {*} goodsData 当前客户数据
+       * 编辑产品
+       * @param {*} goodsData 当前产品数据
        */
       editGoods(goodsData) {
         data.isEditGoods = true
@@ -189,7 +189,7 @@ export default {
         data.goodsDailog = true;
       },
       /**
-       * 删除客户
+       * 删除产品
        */
       async deleteGoods(goodsData) {
         const loading = globalLoading()
@@ -200,7 +200,7 @@ export default {
         res.code === 200 && this.onQuery()
       },
       /**
-       * 新增客户
+       * 新增产品
        */
       addGoods() {
         data.goodsDailog = true;
@@ -215,7 +215,7 @@ export default {
         done()
       },
       /**
-       * 保存客户
+       * 保存产品
        */
       saveGoods() {
         goodsDialogRef.value.validate((valid) => {
@@ -244,7 +244,7 @@ export default {
       }
     }
     /**
-     * 保存客户信息
+     * 保存产品信息
      */
     const handlerSaveGoods = async () => {
       data.saveLoading = true
@@ -270,7 +270,7 @@ export default {
       })
     }
     onMounted(() => {
-      //查询客户数据
+      //查询产品数据
       methods.onQuery()
 
     })

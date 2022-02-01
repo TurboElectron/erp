@@ -27,7 +27,7 @@
   </div>
 
   <!-- 新增产品分类 dialog -->
-  <el-dialog v-model="dialogVisible" width="500px" :title="isEdit?'修改产品类别':'新增产品类别'" :before-close="resetDialogForm">
+  <el-dialog v-model="dialogVisible" width="500px" :title="isEdit?'修改产品类别':'新增产品分类'" :before-close="resetDialogForm">
     <el-form size="small" ref="dialogRef" :model="dialogForm" :rules="dialogFormRules" class="demo-form-inline">
       <el-form-item label="产品分类：" prop="label">
         <el-input v-model="dialogForm.label" clearable placeholder="请输入产品名称"></el-input>

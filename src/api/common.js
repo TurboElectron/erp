@@ -108,6 +108,31 @@ export const updateCategory = async (data = {}) => {
 /** 删除类别*/
 export const deleteCategory = async id => {
     // return httpFetch.post('category/deleteCategory?id=' + id)
+
+    const list = await prisma.category.findMany({
+        where: {id},
+    })
+    let count = 0
+    const n = await prisma.base_goods.count({where: {cid: id}})
+    count = count + n
+    async function iter(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            const _ = arr[i]
+            const n = await prisma.base_goods.count({where: {cid: _.id}})
+            count = count + n
+            _.children = await prisma.category.findMany({
+                where: {pid: _.id},
+            })
+            await iter(_.children)
+        }
+    }
+    await iter(list)
+    if (count) {
+        return {
+            code: 500,
+            message: '分类下还有产品，请先删除产品'
+        }
+    }
     const res = await prisma.category.delete({
         where: {id},
     })
