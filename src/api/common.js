@@ -40,8 +40,11 @@ export const removeGoods  = async (data = {}) => {
 }
 /** 客户产品 */
 export const goodsList = async (data = {}) => {
-    const {pageSize, pageNo, cid, name, code} = data
+    const {pageSize, pageNo,id, cid, name, code} = data
     let where = {}
+    if (id) {
+        where.id = id
+    }
     if (cid) {
         where.cid = cid
     }
@@ -265,8 +268,11 @@ export const updateRepo = async (data = {}) => {
 /** 仓库列表 */
 export const getRepoList = async (data = {}) => {
     // return httpFetch.post('repo/list', data)
-    const {name} = data
+    const {id,name} = data
     let where = {}
+    if (id) {
+        where.id = id
+    }
     if (name) {
         where.name = {
             contains: name
@@ -381,15 +387,10 @@ export const getTest = (data = {}) => {
 
 /** 入库*/
 export const addGrnList = async (data = {}) => {
-    console.log(data)
     // return httpFetch.post('grn/add', data)
-    // const res = await prisma.purchase_order.create()
-    // await prisma.$transaction(async ()=> {
-    //     const res = await prisma.purchase_order.create()
-    // })
     await prisma.purchase_order.create({
         data: {
-            ...omit(data,['children']),
+            ...omit(data,['itemList']),
             date: new Date(data.date),
             itemList: {
                 create: data.children
@@ -402,23 +403,82 @@ export const addGrnList = async (data = {}) => {
     }
 }
 //更新
-export const updateGrnList = (data = {}) => {
-    return httpFetch.post('grn/update', data)
+export const updateGrnList = async (data = {}) => {
+    // return httpFetch.post('grn/update', data)
+    await prisma.$transaction(async () => {
+        await prisma.purchase_order.update({
+            where: {
+                id: data.id
+            },
+            data: {
+                ...omit(data, ['itemList', 'id']),
+                date: new Date(data.date),
+                // itemList: {
+                //     deleteMany: data.itemList.map(_ => _.id),
+                // }
+            },
+        })
+        await prisma.purchase_order_item.deleteMany({where: {
+            orderId: data.id
+            }})
+        await Promise.all(data.itemList.map(async _ => {
+            await prisma.purchase_order_item.create({
+                data: {
+                    ...omit(_, ['id', 'repo', 'goods']),
+                    orderId: data.id
+                }
+            })
+        }))
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 // 删除 入库单
-export const deleteGrnList = (data = {}) => {
-    return httpFetch.post('grn/delete', data)
+export const deleteGrnList = async (data = {}) => {
+    // return httpFetch.post('grn/delete', data)
+    await prisma.$transaction(async () => {
+        await prisma.purchase_order_item.deleteMany({
+            where: {
+                orderId: data.id
+            }
+        })
+        await prisma.purchase_order.delete({
+            where: {
+                id: data.id
+            },
+        })
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 /** 获取入库表*/
 export const getGrnList = async (data = {}) => {
     // return httpFetch.post('grn/list', data)
-    const {pageSize, pageNo} = data
+    const {pageSize, pageNo, code , supplierId} = data
+    let where = {}
+    if (
+        code
+    ) {
+        where.code = {
+            contains: code
+        }
+    }
+    if (supplierId) {
+        where.supplierId = supplierId
+    }
+    if (userId) {
+        where.userId = userId
+    }
     const [total, records] = await prisma.$transaction([
         prisma.purchase_order.count(),
         prisma.purchase_order.findMany({
             skip: pageSize * (pageNo - 1),
             take: pageSize,
-            where: {},
+            where,
             include: {
                 itemList: {
                     include: {

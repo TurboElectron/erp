@@ -6,6 +6,7 @@
       placeholder="请输入产品编号"
       :remote-method="searchGoods"
       :loading="loading"
+      @focus="()=> searchGoods()"
   >
     <el-option
         v-for="item in data?.message?.records??[]"
@@ -27,14 +28,14 @@ export default {
 }
 </script>
 <script setup>
-import {defineProps, ref, defineEmits, unref} from "vue";
+import {defineProps, ref, defineEmits, unref, watch} from "vue";
 import {useVModel} from '@vueuse/core'
 import {goodsList} from "@api/common";
 import {useRequest} from 'vue-request'
 
 const props = defineProps({
   modelValue: {
-    type: Number
+    type: [Number, String]
   }
 })
 const emit = defineEmits(['update:modelValue'])
@@ -44,7 +45,14 @@ const params = ref({
   pageNo: 1,
 })
 const {data, loading, run} =useRequest(()=> goodsList(unref(params)), {manual:true})
+watch(goodsId, (val)=> {
+  if (val) {
+    params.value.id = val
+    run()
+  }
+})
 const searchGoods = (name)=> {
+  params.value.id = undefined
   params.value.code = name
   run()
 }
