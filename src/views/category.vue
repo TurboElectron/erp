@@ -8,20 +8,19 @@
   <el-form :inline="true" size="small" class="demo-form-inline">
     <el-form-item>
       <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
+      <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()">新增产品</el-button>
     </el-form-item>
   </el-form>
   <div style="display: flex;gap: 20px">
     <el-tree
         :data="treeData"
-        show-checkbox
         node-key="id"
         default-expand-all
         :expand-on-click-node="false"
+        @node-click="handleClickNode"
     >
       <template #default="{ node, data }">
-          <span class="custom-tree-node">
-            <span v-contextmenu:contextmenu @contextmenu="currentEditData = node" @click="handleClickNode(node)">{{ node.label }}</span>
-          </span>
+        <div v-contextmenu:contextmenu @contextmenu="currentEditData = node">{{ node.label }}</div>
       </template>
     </el-tree>
     <goods :cid="currentEditData.id" ref="goodsRef"/>
@@ -78,7 +77,7 @@ export default {
     const methods = {
       handleClickNode(node){
         state.currentEditData = node
-        goodsRef.value.onQuery()
+        goodsRef.value.onQuery({cid: node.id})
       },
       /**
        * 修改产品

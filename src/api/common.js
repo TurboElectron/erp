@@ -46,7 +46,9 @@ export const goodsList = async (data = {}) => {
         prisma.base_goods.findMany({
             skip: pageSize* (pageNo-1),
             take: pageSize,
-            where: prismaEquals({cid})
+            where:{
+                cid,
+            }
         })
     ])
     return {

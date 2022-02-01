@@ -37,8 +37,8 @@ model base_goods {
   id        Int       @id @default(autoincrement())
   name      String
   code      String
-  category   category @relation(fields: [cid], references: [id])
-  cid Int
+  category   category? @relation(fields: [cid], references: [id])
+  cid       Int?
   type      String?
   brand     String?
   unit      String?

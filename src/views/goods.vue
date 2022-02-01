@@ -48,6 +48,10 @@
         <el-input v-model="goodsDialogForm.code" show-word-limit clearable placeholder="请输入产品编号">
         </el-input>
       </el-form-item>
+      <el-form-item label="产品型号：" prop="type">
+        <el-input v-model="goodsDialogForm.type" show-word-limit clearable placeholder="请输入产品型号">
+        </el-input>
+      </el-form-item>
       <el-form-item label="品牌名称：" prop="brand">
         <el-input v-model="goodsDialogForm.brand"  clearable placeholder="请输入品牌名称"></el-input>
       </el-form-item>
@@ -101,6 +105,7 @@ export default {
       return {
         cid: props.cid,
         name: '',
+        type: '',
         code: '',
         brand: '',
         unit: '',
@@ -161,11 +166,12 @@ export default {
       /**
        * 查询
        */
-      async onQuery() {
+      async onQuery(p={}) {
         const params = Object.assign({}, data.formInline, {
           pageSize: data.pageSize,
           pageNo: data.currentPage,
-          cid: props.cid
+          cid: props.cid,
+          ...p
         })
         data.loadingTbl = true
         const responseData = await goodsList(params)
@@ -259,6 +265,7 @@ export default {
     const handlerResetDialogForm = () => {
       nextTick(() => {
         goodsDialogRef.value.resetFields()
+        Object.assign(data.goodsDialogForm, {cid: props.cid})
         data.saveLoading = false
       })
     }
