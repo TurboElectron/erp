@@ -29,8 +29,8 @@
     </el-form-item>
 
     <el-form-item label="操作人：">
-      <el-select v-model="queryForm.agentId" clearable filterable placeholder="选择入库单录入人员">
-        <el-option v-for="item in agentData" :key="item.id" :label="item.name" :value="item.id">
+      <el-select v-model="queryForm.userId" clearable filterable placeholder="选择入库单录入人员">
+        <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
         </el-option>
       </el-select>
     </el-form-item>
@@ -156,9 +156,9 @@
         </el-col>
 
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
-          <el-form-item label="操作人：" prop="agentId">
-            <el-select v-model="dialogForm.agentId" filterable clearable placeholder="选择入库单录入人员" style="width:100%">
-              <el-option v-for="item in agentData" :key="item.id" :label="item.name" :value="item.id">
+          <el-form-item label="操作人：" prop="userId">
+            <el-select v-model="dialogForm.userId" filterable clearable placeholder="选择入库单录入人员" style="width:100%">
+              <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
@@ -182,11 +182,23 @@
         <el-table :data="dialogForm.children">
           <el-table-column label="入库产品" min-width="220px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'children.'+props.$index+'.categoryId'"
-                :rules="dialogFormRules.categoryId">
-                <el-cascader v-model="props.row.categoryId" filterable size="mini" :options="categoryData"
-                  placeholder="请选择入库产品" :props="{ value: 'id', label: 'name' }" collapse-tags clearable
-                  style="width:100%" />
+              <el-form-item label-width="0" :prop="'children.'+props.$index+'.goodsId'"
+                :rules="dialogFormRules.goodsId">
+<!--                <el-cascader v-model="props.row.categoryId" filterable size="mini" :options="categoryData"-->
+<!--                  placeholder="请选择入库产品" :props="{ value: 'id', label: 'name' }" collapse-tags clearable-->
+<!--                  style="width:100%" />-->
+                <el-select-v2
+                    v-model="props.row.goodsId"
+                    style="width: 240px"
+                    multiple
+                    filterable
+                    remote
+                    :remote-method="searchGoods"
+                    clearable
+                    :options="goodsOptions"
+                    :loading="goodsLoading"
+                    placeholder="Please enter a keyword"
+                />
               </el-form-item>
             </template>
           </el-table-column>
@@ -231,9 +243,12 @@
           <el-table-column label="数量单位" min-width="160px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'children.'+props.$index+'.unitId'" :rules="dialogFormRules.unitId">
-                <el-cascader v-model="props.row.unitId" filterable
-                  :props="{ value: 'id', label: 'name', checkStrictly: true }" :options="unitData" clearable
-                  placeholder="请选择数量单位" style="width:100%" />
+<!--                <el-cascader v-model="props.row.unitId" filterable-->
+<!--                  :props="{ value: 'id', label: 'name', checkStrictly: true }" :options="unitData" clearable-->
+<!--                  placeholder="请选择数量单位" style="width:100%" />-->
+                <el-input v-model="props.row.unit"
+                             clearable
+                             placeholder="请输入数量单位" style="width:100%" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -321,8 +336,18 @@
 import { reactive, toRefs, ref, nextTick, toRaw } from 'vue'
 import moment from 'moment'
 import {
-  getGrnList, updateGrnList, addGrnList, deleteGrnList, getSupplierList, getRepoList, getListByCategoryId, getCategoryTree, getUnitList
-  , addSpecieList
+  getGrnList,
+  updateGrnList,
+  addGrnList,
+  deleteGrnList,
+  getSupplierList,
+  getRepoList,
+  getListByCategoryId,
+  getCategoryTree,
+  getUnitList
+  ,
+  addSpecieList,
+  goodsList
 } from '@/api/common'
 import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
@@ -342,17 +367,19 @@ export default {
       saveLoading: false,
       currentEditData: {},// 当前修改数据
       categoryData: [],// 产品数据
-      agentData: [],//用户
+      userData: [],//用户
       repoData: [],//仓库
       supplierData: [],//供应商
       unitData: [],// 数量单位
       loadignData: false,//加载 产品loading
+      goodsLoading: false,
+      goodsOptions: [],
       queryForm: {
         code: '',
         startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
         categoryId: '',
-        agentData: '',
+        userData: '',
         supplierId: '',//供货商
         minDebts: false
       },
@@ -381,7 +408,7 @@ export default {
     const getSupplierFormData = () => ({
       code: '' + moment(new Date()).format('YYYYMMDDHHmmss'),//入库单编号
       date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),//入库日期
-      agentId: '',// 操作人id
+      userId: '',// 操作人id
       supplierId: '',// 供应商id
       totalPrice: 0,// 总价
       realCo: 0, // 已付款
@@ -408,13 +435,13 @@ export default {
       date: [{
         required: true, message: '请选择入库日期', trigger: 'change',
       }],
-      agentId: [{
+      userId: [{
         required: true, message: '请选择操作人', trigger: 'change',
       }],
       supplierId: [{
         required: true, message: '请选择供应商', trigger: 'change',
       }],
-      categoryId: [{
+      goodsId: [{
         required: true, message: '请选择入库产品', trigger: 'blur',
       }],
       amount: [{
@@ -446,6 +473,12 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
+      async searchGoods(name) {
+        state.goodsLoading = true
+        const res = await goodsList({name})
+        state.goodsOptions = res.message.records
+        state.goodsLoading = false
+      },
       /**
    * 显示入库明细
    */
@@ -632,7 +665,7 @@ export default {
             await setGrnDetailTotalPrice()
             const params = Object.assign({}, dialogForm)
             //添加操作人姓名
-            params.agentName = state.agentData.find(v => v.id === params.agentId).name
+            params.agentName = state.userData.find(v => v.id === params.userId).name
             //供应商
             params.supplierName = state.supplierData.find(v => v.id === params.supplierId).name
             //欠款
@@ -766,7 +799,7 @@ export default {
       })
 
       res[0].code === 200 && (state.categoryData = res[0].message)// 产品
-      res[1].code === 200 && (state.agentData = res[1].message.data)// 用户
+      res[1].code === 200 && (state.userData = res[1].message.records)// 用户
       res[2].code === 200 && (state.supplierData = res[2].message.records)// 供应商
       res[3].code === 200 && (state.repoData = res[3].message.records)// 仓库
       state.loadignData = false

@@ -29,10 +29,10 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
-                   layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-                   @current-change="handleCurrentChange">
-    </el-pagination>
+<!--    <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"-->
+<!--                   layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"-->
+<!--                   @current-change="handleCurrentChange">-->
+<!--    </el-pagination>-->
   </div>
 
   <!-- 新增产品 dialog -->

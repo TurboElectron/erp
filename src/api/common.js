@@ -40,15 +40,22 @@ export const removeGoods  = async (data = {}) => {
 }
 /** 客户产品 */
 export const goodsList = async (data = {}) => {
-    const {pageSize, pageNo, cid} = data
+    const {pageSize, pageNo, cid, name} = data
+    let where = {}
+    if (cid) {
+        where.cid = cid
+    }
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
     const [total,records] = await prisma.$transaction([
         prisma.base_goods.count(),
         prisma.base_goods.findMany({
-            skip: pageSize* (pageNo-1),
-            take: pageSize,
-            where:{
-                cid,
-            }
+            // skip: pageSize* (pageNo-1),
+            // take: pageSize,
+            where
         })
     ])
     return {

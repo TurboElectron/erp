@@ -109,10 +109,9 @@ model purchase_order_item {
   orderId      Int
   purchase_order purchase_order @relation(fields: [orderId], references: [id])
   goodsId      Int?
-  count        Int?
-  unitPrice    Decimal?
+  amount        Int?
+  price    Decimal?
   totalPrice   Decimal?
-  descs        String?
 }
 model purchase_supplier {
   id       Int       @id @default(autoincrement())
