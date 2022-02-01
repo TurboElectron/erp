@@ -3,11 +3,11 @@
     <el-table :data="tableData" v-loading="loadingTbl"  border empty-text="暂无数据">
       <el-table-column prop="name" label="名称" width="100" />
       <el-table-column prop="code" label="编号" width="120" />
-      <el-table-column prop="type" label="分类" />
+      <el-table-column prop="type" label="型号" />
       <el-table-column prop="brand" label="品牌" />
       <el-table-column prop="unit" label="单位" />
       <el-table-column prop="color" label="颜色" />
-      <el-table-column prop="standard" label="标准" />
+      <el-table-column prop="standard" label="规格" />
       <el-table-column prop="material" label="材质" />
       <el-table-column prop="buyPrice" label="预设进价" />
       <el-table-column prop="salePrice" label="预设售价" />
@@ -57,8 +57,8 @@
       <el-form-item label="颜色：" prop="color">
         <el-input v-model="goodsDialogForm.color"  clearable placeholder="请输入颜色"></el-input>
       </el-form-item>
-      <el-form-item label="标准：" prop="standard">
-        <el-input v-model="goodsDialogForm.standard"  clearable placeholder="请输入标准"></el-input>
+      <el-form-item label="规格：" prop="standard">
+        <el-input v-model="goodsDialogForm.standard"  clearable placeholder="请输入规格"></el-input>
       </el-form-item>
       <el-form-item label="材质：" prop="material">
         <el-input v-model="goodsDialogForm.material"  clearable placeholder="请输入材质"></el-input>
