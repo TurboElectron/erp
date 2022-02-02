@@ -45,22 +45,6 @@ const routes = [
       component: () => import(/* webpackChunkName: "category" */ '../views/category.vue')
     },
       {
-      path: '/specie',
-      name: 'specie',
-      meta: {
-        title: '批次管理',
-      },
-      component: () => import(/* webpackChunkName: "specie" */ '../views/specie.vue')
-    },
-      {
-      path: '/unitManager',
-      name: 'unitManager',
-      meta: {
-        title: '单位管理',
-      },
-      component: () => import(/* webpackChunkName: "uit" */ '../views/unit.vue')
-    },
-      {
       path: '/repoManager',
       name: 'repoManager',
       meta: {

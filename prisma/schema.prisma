@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions","selectRelationCount","groupBy"]
+  previewFeatures = ["interactiveTransactions", "selectRelationCount", "groupBy"]
   binaryTargets   = ["native", "windows"]
   engineType      = "library"
 }
@@ -53,7 +53,8 @@ model base_goods {
   state               Int                   @default(1)
   picture             String?
   purchase_order_item purchase_order_item[]
-  sale_order_item sale_order_item[]
+  sale_order_item     sale_order_item[]
+  stock               stock[]
 }
 
 model base_param {
@@ -77,7 +78,8 @@ model base_repo {
   updatime            DateTime?
   state               Int                   @default(1)
   purchase_order_item purchase_order_item[]
-  sale_order_item sale_order_item[]
+  sale_order_item     sale_order_item[]
+  stock               stock[]
 }
 
 model purchase_order {
@@ -130,32 +132,36 @@ model sale_customer {
 }
 
 model sale_order {
-   id         Int                   @id @default(autoincrement())
-   itemList   sale_order_item[]
-   customerId Int?
-   code       String?
-   payPrice   Decimal?
-   totalPrice Decimal?
-   userId     Int?
-   descs      String
-   date       DateTime?
+  id         Int               @id @default(autoincrement())
+  itemList   sale_order_item[]
+  customerId Int?
+  code       String?
+  payPrice   Decimal?
+  totalPrice Decimal?
+  userId     Int?
+  descs      String
+  date       DateTime?
 }
+
 model sale_order_item {
-  id             Int            @id @default(autoincrement())
-  orderId        Int
-  repoId         Int
-  repo           base_repo      @relation(fields: [repoId], references: [id])
-  sale_order sale_order @relation(fields: [orderId], references: [id])
-  goodsId        Int?
-  goods          base_goods?    @relation(fields: [goodsId], references: [id])
-  amount         Int?
-  price          Decimal?
-  totalPrice     Decimal?
+  id         Int         @id @default(autoincrement())
+  orderId    Int
+  repoId     Int
+  repo       base_repo   @relation(fields: [repoId], references: [id])
+  sale_order sale_order  @relation(fields: [orderId], references: [id])
+  goodsId    Int?
+  goods      base_goods? @relation(fields: [goodsId], references: [id])
+  amount     Int?
+  price      Decimal?
+  totalPrice Decimal?
 }
+
 model stock {
-  id             Int       @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   goodsId        Int
+  goods          base_goods? @relation(fields: [goodsId], references: [id])
   repoId         Int
+  repo           base_repo   @relation(fields: [repoId], references: [id])
   totalCount     Int?
   saleCount      Int?
   buyPrice       Decimal?
@@ -164,7 +170,7 @@ model stock {
   totalBuyPrice  Decimal?
   totalSalePrice Decimal?
   updatime       DateTime?
-  state          Int       @default(1)
+  state          Int         @default(1)
 }
 
 model sys_user {
