@@ -32,7 +32,7 @@
     <el-table-column prop="totalPrice" label="总价"></el-table-column>
     <el-table-column prop="purchase_order.date" label="时间">
       <template #default="scope">
-        {{moment(scope.row.purchase_order.data).format('YYYY-MM-DD HH:mm:ss')}}
+        {{moment(scope.row.purchase_order.date).format('YYYY-MM-DD HH:mm:ss')}}
       </template>
     </el-table-column>
   </el-table>

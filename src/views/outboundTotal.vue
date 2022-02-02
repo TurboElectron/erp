@@ -1,53 +1,59 @@
 <!--  -->
- <template>
-  <el-form :inline="true" size="small" :model="formInline" class="demo-form-inline">
+<template>
+  <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="商品：">
-      <el-cascader v-model="formInline.categoryId" size="mini" :options="categoryData" placeholder="请选择入库产品"
-        :props="{ value: 'id', label: 'name', multiple: true  }" collapse-tags clearable style="width:100%" />
+      <goods-select-v2  v-model="queryForm.goodsId" :repo-id="queryForm.repoId"/>
     </el-form-item>
     <el-form-item label="仓库">
-      <el-select v-model="formInline.repoId" clearable placeholder="请选择仓库地址" style="width:100%">
-        <el-option v-for="item in repoData" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
+      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId"/>
     </el-form-item>
 
     <el-form-item label="开始时间：" prop="startDate">
-      <el-date-picker v-model="formInline.startDate" type="datetime" format="YYYY-MM-DD HH:mm:ss"
-        value-format="YYYY-MM-DD HH:mm:ss" placeholder="录入订单开始时间">
+      <el-date-picker v-model="queryForm.startDate" type="datetime" format="YYYY-MM-DD HH:mm:ss"
+                      value-format="YYYY-MM-DD HH:mm:ss" placeholder="录入订单开始时间">
       </el-date-picker>
     </el-form-item>
     <el-form-item label="结束时间：" prop="endDate">
-      <el-date-picker v-model="formInline.endDate" format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss"
-        type="datetime" placeholder="录入订单结束时间">
+      <el-date-picker v-model="queryForm.endDate" format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss"
+                      type="datetime" placeholder="录入订单结束时间">
       </el-date-picker>
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" icon="Search" @click="onQuery()">查询</el-button>
+      <el-button type="primary" icon="Search" @click="getTableData">查询</el-button>
     </el-form-item>
 
   </el-form>
   <!-- 表格 -->
-  <el-table :data="tableData" v-loading="loadingTbl" show-summary style="width: 100%" border empty-text="暂无数据">
-    <el-table-column prop="repoName" label="仓库名称" />
-    <el-table-column prop="categoryName" label="商品名称" />
-    <el-table-column prop="amounts" label="总数量">
+  <el-table :data="tableData" v-loading="loadTable" show-summary style="width: 100%" border empty-text="暂无数据">
+    <el-table-column prop="repo.name" label="仓库名称" />
+    <el-table-column prop="goods.name" label="商品名称" />
+    <el-table-column prop="amount" label="数量"></el-table-column>
+    <el-table-column prop="totalPrice" label="总价"></el-table-column>
+    <el-table-column prop="sale_order.date" label="时间">
       <template #default="scope">
-        {{scope.row.amounts}} / {{scope.row.unitName}}
+        {{moment(scope.row.sale_order.date).format('YYYY-MM-DD HH:mm:ss')}}
       </template>
     </el-table-column>
-    <el-table-column prop="allProfits" label="总利润" />
   </el-table>
+  <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
+                 layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="v=>handleSizeChange(v)"
+                 @current-change="v=>handleCurrentChange(v)">
+  </el-pagination>
 
 </template>
 
-  <script>
-import { reactive, toRefs, onMounted } from 'vue';
+<script>
+import { reactive, toRefs, ref, onMounted, readonly, toRaw } from 'vue';
 import moment from 'moment'
-import { geOutboundClassify, getCategoryTree, getRepoList } from '@/api/common'
+import {geGrnClassify, geOutboundClassify} from '@/api/common'
+import RepoSelect from "@temp/RepoSelect";
+import GoodsSelect from "@temp/GoodsSelect";
+import RepoSelectV2 from "@temp/RepoSelectV2";
+import GoodsSelectV2 from "@temp/GoodsSelectV2";
 export default {
-  name: 'outboundTotal',
+  name: 'grnTotal',
+  components: {GoodsSelectV2, RepoSelectV2, GoodsSelect, RepoSelect},
   setup() {
 
     /**
@@ -57,14 +63,17 @@ export default {
       /**
        * 查询数据
        */
-      formInline: {
-        categoryId: [],
+      queryForm: {
+        goodsId: '',
         repoId: '',
         startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
       },
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
       tableData: [],
-      loadingTbl: true,
+      loadTable: true,
       categoryData: [],
       repoData: []
     });
@@ -73,51 +82,49 @@ export default {
      */
     const methods = {
       /**
-       * 查询
+       * 获取列表
        */
-      async onQuery() {
-        const params = Object.assign({}, state.formInline)
-        params.categoryId = params.categoryId.join(",")
-        state.loadingTbl = true
-        //产品id
-        const categoryId = params.categoryId
-        params.categoryId = Array.isArray(categoryId) ? categoryId.at(-1) : categoryId;
-        //仓库
-        const repoId = params.repoId;
-        params.repoId = Array.isArray(repoId) ? repoId.at(-1) : repoId;
-
-        const responseData = await geOutboundClassify(params)
-        responseData.code === 200 && (state.tableData = responseData.message)
-
-        state.loadingTbl = false
+      async getTableData() {
+        state.loadTable = true
+        const params = Object.assign({}, state.queryForm, {
+          pageSize: state.pageSize,
+          pageNo: state.currentPage
+        })
+        console.log(params)
+        const res = await geOutboundClassify(params)
+        res.code === 200 && (state.tableData = res.message.records) && (state.total = res.message.total)
+        state.loadTable = false
       },
+      /**
+       * 分页记录数改变
+       */
+      handleSizeChange(value) {
+        state.pageSize = value
+        this.getTableData()
+      },
+      /**
+       * 分页页数改变
+       */
+      handleCurrentChange(value) {
+        state.currentPage = value
+        this.getTableData()
+      }
 
     }
-    //查询产品树、用户列表、供应商
-    const getUnitAndCategoryData = async () => {
-      state.loadignData = true
-      const res = await Promise.all([getCategoryTree(), getRepoList({ name: '' })])
-
-      res[0].code === 200 && (state.categoryData = res[0].message)// 产品
-      res[1].code === 200 && (state.repoData = res[1].message)// 仓库
-
-
-    }
-    //查询产品树
-    getUnitAndCategoryData()
     onMounted(() => {
       //查询客户数据
-      methods.onQuery()
+      methods.getTableData()
 
     })
     return {
       ...toRefs(state),
-      ...methods
+      ...methods,
+      moment
     }
   }
 }
-  </script>
-  <style lang='scss' scoped>
+</script>
+<style lang='scss' scoped>
 .charts-line-con {
   width: 100%;
   height: 300px;
