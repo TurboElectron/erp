@@ -136,10 +136,10 @@ export default {
             index: "/outboundTotal",
             title: "出库统计",
           },
-          {
-            index: "/outboundSumarry",
-            title: "出库汇总",
-          },
+          // {
+          //   index: "/outboundSumarry",
+          //   title: "出库汇总",
+          // },
         ],
       },
       {
