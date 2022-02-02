@@ -31,7 +31,6 @@
       <el-button type="primary" @click="getTableData()" icon="Search">查询
       </el-button>
       <el-button icon="Plus" @click="handlerAdd()">新增入库单</el-button>
-      <el-button icon="Download" @click="handleExport()">导出</el-button>
     </el-form-item>
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border>
@@ -329,13 +328,6 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
-      /**
-   * 显示入库明细
-   */
-      getTblTemplate(tblItems) {
-        return tblItems.map(v => v.repoName + ' 入库 <span class="category-name">' + v.categoryName + '</span> ' + v.amount + '/' + v.unitName + '【进价：' + v.price + ' / ' + v.unitName + '】').join('<br />')
-
-      },
       getTotalPrice(index) {
         const curGrnDetail = dialogForm.itemList[index]
         dialogForm.itemList[index].totalPrice = mathJs.multiply(curGrnDetail.amount, curGrnDetail.price)

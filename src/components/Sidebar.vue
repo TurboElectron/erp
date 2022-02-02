@@ -117,11 +117,11 @@ export default {
             index: "/grnTotal",
             title: "入库统计",
           },
-          {
-            icon: "Grid",
-            index: "/grnSumarry",
-            title: "入库总汇",
-          },
+          // {
+          //   icon: "Grid",
+          //   index: "/grnSumarry",
+          //   title: "入库总汇",
+          // },
         ],
       },
       {

@@ -29,6 +29,7 @@
     <el-table-column prop="repo.name" label="仓库名称" />
     <el-table-column prop="goods.name" label="商品名称" />
     <el-table-column prop="amount" label="数量"></el-table-column>
+    <el-table-column prop="totalPrice" label="总价"></el-table-column>
     <el-table-column prop="purchase_order.date" label="时间">
       <template #default="scope">
         {{moment(scope.row.purchase_order.data).format('YYYY-MM-DD HH:mm:ss')}}
