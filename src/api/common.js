@@ -593,18 +593,72 @@ export const geGrnClassify = async (data = {}) => {
 
 
 /** 出库*/
-export const addOutbound = (data = {}) => {
+export const addOutboundList = (data = {}) => {
     return httpFetch.post('outbound/add', data)
 }
 
 /** 出库*/
-export const updateOutbound = (data = {}) => {
+export const updateOutboundList = (data = {}) => {
     return httpFetch.post('outbound/update', data)
 }
 /** 出库明细*/
-export const getOutboundList = (data = {}) => {
-    return httpFetch.post('outbound/list', data)
+export const getOutboundList = async (data = {}) => {
+    // return httpFetch.post('outbound/list', data)
+    const {pageSize, pageNo, code, customerId, userId, startDate, endDate} = data
+    let where = {}
+    if (startDate) {
+        where.date = {
+            gte: new Date(startDate)
+        }
+    }
+    if (endDate) {
+        where.date = {
+            ...where.date,
+            lte: new Date(endDate)
+        }
+    }
+    if (
+        code
+    ) {
+        where.code = {
+            contains: code
+        }
+    }
+    if (customerId) {
+        where.customerId = customerId
+    }
+    if (userId) {
+        where.userId = userId
+    }
+    const [total, records] = await prisma.$transaction([
+        prisma.sale_order.count({where}),
+        prisma.sale_order.findMany({
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+            where,
+            include: {
+                itemList: {
+                    include: {
+                        goods: true,
+                        repo: true
+                    }
+                }
+            }
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records,
+            total
+        }
+    }
 }
+/** 出库*/
+export const deleteOutboundList = (data = {}) => {
+    return httpFetch.post('outbound/add', data)
+}
+
 /**出库统计 */
 export const getOutboundTotal = (data = {}) => {
     return httpFetch.post('outbound/total', data)
