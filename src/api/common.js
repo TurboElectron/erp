@@ -59,7 +59,7 @@ export const goodsList = async (data = {}) => {
         }
     }
     const [total,records] = await prisma.$transaction([
-        prisma.base_goods.count(),
+        prisma.base_goods.count({where}),
         prisma.base_goods.findMany({
             skip: pageSize* (pageNo-1),
             take: pageSize,
@@ -223,12 +223,23 @@ export const removeCustomer = async (data = {}) => {
 export const customerList = async (data = {}) => {
     // return httpFetch.post('customer/list', data)
     const {pageSize, pageNo, name, mobile} = data
+    let where = {}
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
+    if (mobile) {
+        where.mobile = {
+            contains: mobile
+        }
+    }
     const [total,records] = await prisma.$transaction([
-         prisma.sale_customer.count(),
+         prisma.sale_customer.count({where}),
          prisma.sale_customer.findMany({
             skip: pageSize* (pageNo-1),
             take: pageSize,
-            where: prismaContains({name, mobile})
+            where
         })
     ])
     return {
@@ -279,7 +290,7 @@ export const getRepoList = async (data = {}) => {
         }
     }
     const [total, records] = await prisma.$transaction([
-        prisma.base_repo.count(),
+        prisma.base_repo.count({where}),
         prisma.base_repo.findMany({
             where
         })
@@ -335,12 +346,22 @@ export const updateSupplier = async (data = {}) => {
 export const getSupplierList = async (data = {}) => {
     // return httpFetch.post('supplier/list', data)
     const {pageSize, pageNo, name, mobile} = data
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
+    if (mobile) {
+        where.mobile = {
+            contains: mobile
+        }
+    }
     const [total, records] = await prisma.$transaction([
-        prisma.purchase_supplier.count(),
+        prisma.purchase_supplier.count({where}),
         prisma.purchase_supplier.findMany({
             skip: pageSize * (pageNo - 1),
             take: pageSize,
-            where: prismaContains({name, mobile})
+            where
         })
     ])
     return {
@@ -482,7 +503,7 @@ export const getGrnList = async (data = {}) => {
         where.userId = userId
     }
     const [total, records] = await prisma.$transaction([
-        prisma.purchase_order.count(),
+        prisma.purchase_order.count({where}),
         prisma.purchase_order.findMany({
             skip: pageSize * (pageNo - 1),
             take: pageSize,
@@ -522,8 +543,51 @@ export const geGrnTotal = (data = {}) => {
     return httpFetch.post('grn/total', data)
 }
 /** 入库按照 商品 最小单位、仓库进行数量统计*/
-export const geGrnClassify = (data = {}) => {
-    return httpFetch.post('grn/classify', data)
+export const geGrnClassify = async (data = {}) => {
+    // return httpFetch.post('grn/classify', data)
+    const {pageSize, pageNo, goodsId , repoId, startDate, endDate} = data
+    let isDate = {}
+    if (startDate) {
+        isDate.gte = new Date(startDate)
+    }
+    if (endDate) {
+        isDate.lte = new Date(endDate)
+    }
+    let where = {
+        purchase_order: {
+            is: {
+                date: isDate
+            }
+        }
+    }
+    if (goodsId) {
+        where.goodsId = goodsId
+    }
+    if (repoId) {
+        where.repoId = repoId
+    }
+    const [total, records] = await prisma.$transaction([
+        prisma.purchase_order_item.count({
+            where,
+        }),
+        prisma.purchase_order_item.findMany({
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+            where,
+            include: {
+                goods: true,
+                repo: true,
+                purchase_order: true
+            }
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            total,
+            records
+        }
+    }
 }
 
 
