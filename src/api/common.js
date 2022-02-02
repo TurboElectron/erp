@@ -74,6 +74,44 @@ export const goodsList = async (data = {}) => {
         }
     }
 }
+export const goodsListV2 = async (data = {}) => {
+    const {pageSize, pageNo,id, repoId, name, code} = data
+    let where = {}
+    if (id) {
+        where.id = id
+    }
+    if (repoId) {
+        where.repoId = repoId
+    }
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
+    if (code) {
+        where.code = {
+            contains: code
+        }
+    }
+    const [total,records] = await prisma.$transaction([
+        prisma.stock.count({where}),
+        prisma.stock.findMany({
+            skip: pageSize* (pageNo-1),
+            take: pageSize,
+            where,
+            select: {
+                goods: true
+            },
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records: records.map(_ => _.goods),
+            total
+        }
+    }
+}
 /** 注册分类 */
 export const addCategory = async (data = {}) => {
     // return httpFetch.post('category/addCategory', data)
@@ -417,7 +455,7 @@ export const deleteSupplier = async id => {
     }
 }
 // 添加库存
-const updateStock = async (_) => {
+const grnUpdateStock = async (_) => {
     const stock = await prisma.stock.findFirst({
         where: {
             goodsId: _.goodsId,
@@ -453,8 +491,29 @@ const updateStock = async (_) => {
         })
     }
 }
+const outboundUpdateStock = async (_) => {
+    const stock = await prisma.stock.findFirst({
+        where: {
+            goodsId: _.goodsId,
+            repoId: _.repoId
+        }
+    })
+    if (stock) {
+        await prisma.stock.update({
+            where: {
+                id: stock.id
+            },
+            data: {
+                totalCount: stock.totalCount - _.amount,
+                saleCount: stock.saleCount + _.amount,
+                salePrice:  _.price,
+                totalSalePrice: stock.totalSalePrice + _.totalPrice
+            }
+        })
+    }
+}
 // 减少库存
-const deleteStock = async (_) => {
+const grnDeleteStock = async (_) => {
     const stock = await prisma.stock.findFirst({
         where: {
             goodsId: _.goodsId,
@@ -474,6 +533,47 @@ const deleteStock = async (_) => {
         })
     }
 }
+const outboundDeleteStock = async  (_) => {
+    const stock = await prisma.stock.findFirst({
+        where: {
+            goodsId: _.goodsId,
+            repoId: _.repoId
+        }
+    })
+    if (stock) {
+        await prisma.stock.update({
+            where: {
+                id: stock.id
+            },
+            data: {
+                totalCount: stock.totalCount + _.amount,
+                salePrice:  _.price,
+                totalSalePrice: stock.totalSalePrice - _.totalPrice,
+            }
+        })
+    }
+}
+export const stockDetail = async (data = {}) => {
+    const {repoId, goodsId} = data
+    let where = {}
+    if (
+        repoId
+    ) {
+        where.repoId = repoId
+    }
+    if (
+        goodsId
+    ) {
+        where.goodsId = goodsId
+    }
+    const res = await prisma.stock.findFirst({
+        where
+    })
+    return {
+        code: 200,
+        message: res
+    }
+}
 /** 入库*/
 export const addGrnList = async (data = {}) => {
     // return httpFetch.post('grn/add', data)
@@ -488,7 +588,7 @@ export const addGrnList = async (data = {}) => {
             },
         })
         await Promise.all(data.itemList.map(async _ => {
-            await updateStock(_)
+            await grnUpdateStock(_)
         }))
     })
     return {
@@ -547,7 +647,7 @@ export const updateGrnList = async (data = {}) => {
                         orderId: data.id
                     }
                 })
-                await updateStock(_)
+                await grnUpdateStock(_)
             }
         }))
     })
@@ -566,7 +666,7 @@ export const deleteGrnList = async (data = {}) => {
             }
         })
         await Promise.all(exists.map(async _ => {
-            await deleteStock(_)
+            await grnDeleteStock(_)
         }))
         await prisma.purchase_order_item.deleteMany({
             where: {
@@ -704,13 +804,90 @@ export const geGrnClassify = async (data = {}) => {
 
 
 /** 出库*/
-export const addOutboundList = (data = {}) => {
-    return httpFetch.post('outbound/add', data)
+export const addOutboundList = async (data = {}) => {
+    // return httpFetch.post('outbound/add', data)
+    await prisma.$transaction(async () => {
+        await prisma.sale_order.create({
+            data: {
+                ...omit(data, ['itemList']),
+                date: new Date(data.date),
+                itemList: {
+                    create: data.itemList.map(_ => {
+                        return omit(_, ['stock'])
+                    })
+                },
+            },
+        })
+        await Promise.all(data.itemList.map(async _ => {
+            await outboundUpdateStock(_)
+        }))
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /** 出库*/
-export const updateOutboundList = (data = {}) => {
-    return httpFetch.post('outbound/update', data)
+export const updateOutboundList = async (data = {}) => {
+    // return httpFetch.post('outbound/update', data)
+    await prisma.$transaction(async () => {
+        await prisma.sale_order.update({
+            where: {
+                id: data.id
+            },
+            data: {
+                ...omit(data, ['itemList', 'id']),
+                date: new Date(data.date),
+            },
+        })
+        const exists = await prisma.sale_order_item.findMany({
+            where: {
+                orderId: data.id
+            }
+        })
+        await Promise.all(data.itemList.map(async _ => {
+            const soi = exists.find(e => e.id === _.id)
+            if (soi) {
+                const stock = await prisma.stock.findFirst({
+                    where: {
+                        goodsId: _.goodsId,
+                        repoId: _.repoId
+                    }
+                })
+                await prisma.stock.update({
+                    where: {
+                        id: stock.id
+                    },
+                    data: {
+                        totalCount: stock.totalCount + soi.amount - _.amount,
+                        salePrice: _.price,
+                        totalSalePrice: stock.totalSalePrice + soi.totalPrice - _.totalPrice,
+                    }
+                })
+                await prisma.sale_order_item.update({
+                    where: {
+                        id: _.id
+                    },
+                    data: {
+                        ...omit(_, ['id', 'repo', 'goods']),
+                    }
+                })
+            } else {
+                await prisma.sale_order_item.create({
+                    data: {
+                        ...omit(_, ['id', 'repo', 'goods']),
+                        orderId: data.id
+                    }
+                })
+                await outboundUpdateStock(_)
+            }
+        }))
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 /** 出库明细*/
 export const getOutboundList = async (data = {}) => {
@@ -766,8 +943,32 @@ export const getOutboundList = async (data = {}) => {
     }
 }
 /** 出库*/
-export const deleteOutboundList = (data = {}) => {
-    return httpFetch.post('outbound/add', data)
+export const deleteOutboundList = async (data = {}) => {
+    // return httpFetch.post('outbound/add', data)
+    await prisma.$transaction(async () => {
+        const exists = await prisma.sale_order_item.findMany({
+            where: {
+                orderId: data.id
+            }
+        })
+        await Promise.all(exists.map(async _ => {
+            await outboundDeleteStock(_)
+        }))
+        await prisma.sale_order_item.deleteMany({
+            where: {
+                orderId: data.id
+            }
+        })
+        await prisma.sale_order.delete({
+            where: {
+                id: data.id
+            },
+        })
+    })
+    return {
+        code: 200,
+        message: '成功'
+    }
 }
 
 /**出库统计 */

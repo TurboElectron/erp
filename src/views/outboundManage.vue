@@ -41,7 +41,7 @@
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
-            <el-table-column prop="price" label="进价"/>
+            <el-table-column prop="price" label="售价"/>
             <el-table-column prop="totalPrice" label="总价"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
@@ -135,7 +135,14 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
                             :rules="dialogFormRules.goodsId">
-                <goods-select v-model="props.row.goodsId" :repo-id="props.row.repoId"/>
+                <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)"/>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="库存数量" min-width="160px">
+            <template #default="props">
+              <el-form-item >
+                <el-input :model-value="props.row.stock?.totalCount??0" disabled/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -144,8 +151,26 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
-                                 style="width:100%" clearable placeholder="请输入出库数量">
+                                 :max="props.row.stock?.totalCount"
+                                 style="width:100%" clearable placeholder="请输入出库数量"
+                :disabled="!(props.row.goodsId && props.row.repoId)"
+                >
                 </el-input-number>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="上次买入价" min-width="160px">
+            <template #default="props">
+              <el-form-item>
+                <el-input :model-value="props.row.stock?.buyPrice??0" disabled/>
+              </el-form-item>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="平均买入价" min-width="160px">
+            <template #default="props">
+              <el-form-item>
+                <el-input :model-value="props.row.stock?.avgBuyPrice??0" disabled/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -153,13 +178,15 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
-                                 style="width:100%" clearable placeholder="请输入单价">
+                                 style="width:100%" clearable placeholder="请输入单价"
+                                 :disabled="!(props.row.goodsId && props.row.repoId)"
+                >
                 </el-input-number>
               </el-form-item>
             </template>
           </el-table-column>
 
-          <el-table-column label="成本" min-width="200" fixed="right">
+          <el-table-column label="总售价" min-width="200" fixed="right">
             <template #default="props">
               <el-form-item> {{props.row.totalPrice}}</el-form-item>
             </template>
@@ -226,7 +253,7 @@ import {
   updateOutboundList,
   addOutboundList,
   deleteOutboundList,
-  getCategoryTree,
+  getCategoryTree, stockDetail,
 } from '@/api/common'
 import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
@@ -234,14 +261,13 @@ import mathJs from '@/utils/math'
 //远程搜索客户，客户
 import remoteMix from '@/mixin/remote'
 import _ from 'lodash'
-import GoodsSelect from "@temp/GoodsSelect";
-import RepoSelect from "@temp/RepoSelect";
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
+import GoodsSelectV2 from "@temp/GoodsSelectV2";
 
 export default {
   name: 'outboundManage',
-  components: {RepoSelectV2, CustomerSelect, RepoSelect, GoodsSelect},
+  components: {GoodsSelectV2, RepoSelectV2, CustomerSelect},
   setup(props, context) {
 
     const state = reactive({
@@ -325,6 +351,16 @@ export default {
         const curOutboundDetail = dialogForm.itemList[index]
         dialogForm.itemList[index].totalPrice = mathJs.multiply(curOutboundDetail.amount, curOutboundDetail.price)
         this.calculateTotalPrice()
+      },
+      async getReferInfo(index) {
+        const curOutboundDetail = dialogForm.itemList[index]
+        const {repoId, goodsId} = curOutboundDetail
+        if (repoId && goodsId) {
+          const {code, message} = await stockDetail(curOutboundDetail)
+          if (code === 200) {
+            dialogForm.itemList[index].stock = message
+          }
+        }
       },
       /**
        * 计算总价格
