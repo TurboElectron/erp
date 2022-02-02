@@ -425,6 +425,7 @@ const updateStock = async (_) => {
         }
     })
     if (stock) {
+        console.log(mathJs.divide(stock.totalBuyPrice + _.totalPrice,stock.totalCount + _.amount))
         await prisma.stock.update({
             where: {
                 id: stock.id
@@ -437,6 +438,7 @@ const updateStock = async (_) => {
             }
         })
     } else {
+        console.log(mathJs.divide( _.totalPrice, _.amount))
         await prisma.stock.create({
             data: {
                 goodsId: _.goodsId,
@@ -526,7 +528,8 @@ export const updateGrnList = async (data = {}) => {
                     data: {
                         totalCount:  stock.totalCount - poi.amount + _.amount,
                         buyPrice: _.price,
-                        totalBuyPrice: stock.totalBuyPrice -poi.totalPrice + _.totalPrice
+                        totalBuyPrice: stock.totalBuyPrice -poi.totalPrice + _.totalPrice,
+                        avgBuyPrice: mathJs.divide(stock.totalBuyPrice -poi.totalPrice + _.totalPrice, stock.totalCount - poi.amount + _.amount),
                     }
                 })
                 await prisma.purchase_order_item.update({
@@ -562,9 +565,9 @@ export const deleteGrnList = async (data = {}) => {
                 orderId: data.id
             }
         })
-        exists.map(async _ => {
+        await Promise.all(exists.map(async _ => {
             await deleteStock(_)
-        })
+        }))
         await prisma.purchase_order_item.deleteMany({
             where: {
                 orderId: data.id
