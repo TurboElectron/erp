@@ -27,9 +27,9 @@
   </el-form>
 
   <el-table :data="allRakingData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
-    <el-table-column prop="userName" label="姓名" />
-    <el-table-column prop="allPrice" label="总金额" sortable />
-    <el-table-column prop="allRealCo" label="总支付" sortable />
+    <el-table-column prop="customer.name" label="姓名" />
+    <el-table-column prop="totalPrice" label="总金额" sortable />
+    <el-table-column prop="payPrice" label="总支付" sortable />
     <el-table-column prop="allDebt" label="总欠款" sortable />
   </el-table>
   <div>
@@ -37,18 +37,18 @@
     <BaseCharts :chartsData="rakingData" charts-type="bar" style="height:410px" v-loading="loadingTbl" />
   </div>
 
-  <div>
-    <el-divider>购买商品离散图</el-divider>
-    <div class="total-item-layout">
-      <label for=""> 统计维度：</label>
-      <el-radio-group v-model="scatterType" @change="getCategorySalesData" size="small">
-        <el-radio-button label="day">日</el-radio-button>
-        <el-radio-button label="month">月</el-radio-button>
-        <el-radio-button label="year">年</el-radio-button>
-      </el-radio-group>
-    </div>
-    <BaseCharts :chartsData="scatterData" charts-type="scatter" style="height:410px" v-loading="loadingScatter" />
-  </div>
+<!--  <div>-->
+<!--    <el-divider>购买商品离散图</el-divider>-->
+<!--    <div class="total-item-layout">-->
+<!--      <label for=""> 统计维度：</label>-->
+<!--      <el-radio-group v-model="scatterType" @change="getCategorySalesData" size="small">-->
+<!--        <el-radio-button label="day">日</el-radio-button>-->
+<!--        <el-radio-button label="month">月</el-radio-button>-->
+<!--        <el-radio-button label="year">年</el-radio-button>-->
+<!--      </el-radio-group>-->
+<!--    </div>-->
+<!--    <BaseCharts :chartsData="scatterData" charts-type="scatter" style="height:410px" v-loading="loadingScatter" />-->
+<!--  </div>-->
 
 </template>
 
@@ -91,8 +91,8 @@ export default {
       loadingScatter: false
     })
     /**
-   
-   
+
+
 
 /**
  * 获取客户数据
@@ -112,19 +112,19 @@ export default {
           if (res.code === 200) {
             const resData = res.message;
             state.allRakingData = res.message;
-            state.rakingData.xAxisData = resData.map(v => v.userName)
+            state.rakingData.xAxisData = resData.map(v => v.customer.name)
             state.rakingData.data = [{
               name: '购买力',
               color: '#2184e7',
               data: resData.map(v => ({
-                value: v.allPrice,
+                value: v.totalPrice,
                 unitName: '元'
               }))
             }, {
               name: '支付力',
               color: '#34bfa3',
               data: resData.map(v => ({
-                value: v.allRealCo,
+                value: v.payPrice,
                 unitName: '元'
               }))
             }, {
@@ -141,7 +141,7 @@ export default {
         })
 
         //商品分布
-        this.getCategorySalesData()
+        // this.getCategorySalesData()
       },
       /**
        *  按照时间 商品 客户 统计 年月日 内各个商品的销售分布

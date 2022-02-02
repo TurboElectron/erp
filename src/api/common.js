@@ -1079,8 +1079,29 @@ export const getCustomersByName = (data = {}) => {
  * endDate ?: Date 结束日期
  * @returns
  */
-export const getCustomerRaking = (data = {}) => {
-    return httpFetch.post('outbound/customerRaking', data)
+export const getCustomerRaking = async (data = {}) => {
+    // return httpFetch.post('outbound/customerRaking', data)
+    const res = await prisma.sale_order.groupBy({
+        by: ['customerId'],
+        _sum: {
+            totalPrice: true,
+            payPrice: true
+        }
+    })
+    return {
+        code: 200,
+        message: await Promise.all(res.map(async _ => {
+            return {
+                customer: await prisma.sale_customer.findUnique({
+                    where: {
+                        id: _.customerId
+                    }
+                }),
+                ..._._sum,
+                allDebt: mathJs.subtract(_._sum.totalPrice,  _._sum.payPrice)
+            }
+        }))
+    }
 }
 
 

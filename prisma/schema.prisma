@@ -120,21 +120,23 @@ model purchase_supplier {
 }
 
 model sale_customer {
-  id       Int       @id @default(autoincrement())
-  name     String
-  linkman  String
-  mobile   String?
-  address  String?
-  descs    String?
-  state    Int       @default(1)
-  updater  String?
-  updatime DateTime?
+  id         Int          @id @default(autoincrement())
+  name       String
+  linkman    String
+  mobile     String?
+  address    String?
+  descs      String?
+  state      Int          @default(1)
+  updater    String?
+  updatime   DateTime?
+  sale_order sale_order[]
 }
 
 model sale_order {
   id         Int               @id @default(autoincrement())
   itemList   sale_order_item[]
   customerId Int?
+  customer   sale_customer?    @relation(fields: [customerId], references: [id])
   code       String?
   payPrice   Decimal?
   totalPrice Decimal?
