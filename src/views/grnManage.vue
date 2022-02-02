@@ -44,6 +44,7 @@
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
             <el-table-column prop="price" label="进价"/>
             <el-table-column prop="totalPrice" label="总价"/>
+            <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
         </div>
       </template>
@@ -467,28 +468,7 @@ export default {
       handlerSave() {
         dialogRef.value.validate(async (valid) => {
           if (valid) {
-            //入库产品明细修改单位id ，产品id
-            // await setGrnDetailTotalPrice()
             const params = Object.assign({}, dialogForm)
-            // //添加操作人姓名
-            // params.agentName = state.userData.find(v => v.id === params.userId).name
-            // //供应商
-            // params.supplierName = state.supplierData.find(v => v.id === params.supplierId).name
-            // //欠款
-            // params.debt = mathJs.subtract(params.totalPrice, params.payPrice)
-            // //修改参数添加id
-            // state.isEdit && (params.id = state.currentEditData.id)
-            // //删除批次数据
-            // params.itemList.forEach(v => {
-            //   delete v.specieData
-            // })
-            // // state.saveLoading = true
-            //
-            // // 添加批次
-            // const grnInParams = {
-            //   grnData: params,
-            //   specieList
-            // }
             const responseData = state.isEdit ? await updateGrnList(params) : await addGrnList(params);
             state.saveLoading = false
             // 刷新表格
