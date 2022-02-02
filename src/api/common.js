@@ -303,6 +303,38 @@ export const getRepoList = async (data = {}) => {
         }
     }
 }
+export const getRepoListV2 = async (data = {}) => {
+    // return httpFetch.post('repo/list', data)
+    const {id,name, goodsId} = data
+    let where = {}
+    if (id) {
+        where.id = id
+    }
+    if (goodsId) {
+        where.goodsId = goodsId
+    }
+    if (name) {
+        where.name = {
+            contains: name
+        }
+    }
+    const [total, records] = await prisma.$transaction([
+        prisma.purchase_order_item.count({where}),
+        prisma.purchase_order_item.findMany({
+            select: {
+                repo: true
+            },
+            where
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            records: records.map(_ => _.repo),
+            total
+        }
+    }
+}
 
 /** 删除仓库 */
 export const deleteRepo = async id => {

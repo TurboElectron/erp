@@ -124,19 +124,18 @@
       </el-form-item>
       <el-form-item label-width='0'>
         <el-table :data="dialogForm.itemList">
+          <el-table-column label="出库仓库" min-width="220px">
+            <template #default="props">
+              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
+                <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId"/>
+              </el-form-item>
+            </template>
+          </el-table-column>
           <el-table-column label="出库产品" min-width="220px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
                             :rules="dialogFormRules.goodsId">
-                <goods-select v-model="props.row.goodsId"/>
-              </el-form-item>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="出库仓库" min-width="220px">
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
-                <repo-select v-model="props.row.repoId"/>
+                <goods-select v-model="props.row.goodsId" :repo-id="props.row.repoId"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -238,10 +237,11 @@ import _ from 'lodash'
 import GoodsSelect from "@temp/GoodsSelect";
 import RepoSelect from "@temp/RepoSelect";
 import CustomerSelect from "@temp/CustomerSelect";
+import RepoSelectV2 from "@temp/RepoSelectV2";
 
 export default {
   name: 'outboundManage',
-  components: {CustomerSelect, RepoSelect, GoodsSelect},
+  components: {RepoSelectV2, CustomerSelect, RepoSelect, GoodsSelect},
   setup(props, context) {
 
     const state = reactive({
