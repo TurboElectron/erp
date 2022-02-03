@@ -1,6 +1,6 @@
 <template>
   <router-view />
-  <el-button style="position: absolute;left: 0;top: 0" @click="handleRefresh">刷新({{$route.fullPath}})</el-button>
+  <el-button style="position: absolute;left: 50%;top: 0;z-index: 99999;opacity: .8" @click="handleRefresh">刷新({{$route.fullPath}})</el-button>
 </template>
 <script setup>
 const handleRefresh = () => {
