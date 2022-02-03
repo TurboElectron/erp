@@ -54,6 +54,7 @@
       </template>
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
+    <el-table-column prop="supplier.name" label="供应商" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
     <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />

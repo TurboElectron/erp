@@ -112,8 +112,8 @@ export default {
         color: '',
         material:'',
         standard: '',
-        buyPrice: '',
-        salePrice: '',
+        buyPrice: null,
+        salePrice: null,
         descs: '',
       }
     }

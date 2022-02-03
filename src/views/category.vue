@@ -8,7 +8,7 @@
   <el-form :inline="true" size="small" class="demo-form-inline">
     <el-form-item>
       <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
-      <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()">新增产品</el-button>
+      <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()" :disabled="!currentEditData.id">新增产品</el-button>
     </el-form-item>
   </el-form>
   <div style="display: flex;gap: 20px">
@@ -17,6 +17,7 @@
         node-key="id"
         default-expand-all
         :expand-on-click-node="false"
+        :highlight-current="true"
         @node-click="handleClickNode"
     >
       <template #default="{ node, data }">

@@ -747,6 +747,13 @@ export const getGrnList = async (data = {}) => {
             }
         })
     ])
+    await Promise.all(records.map(async _ => {
+        _.supplier = await prisma.purchase_supplier.findUnique({
+            where: {
+                id: _.supplierId
+            }
+        })
+    }))
     return {
         code: 200,
         message: {

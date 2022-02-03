@@ -86,13 +86,13 @@ model purchase_order {
   id                  Int                   @id @default(autoincrement())
   itemList            purchase_order_item[]
   supplierId          Int?
+  supplier            purchase_supplier?    @relation(fields: [supplierId], references: [id])
   code                String?
   payPrice            Decimal?
   totalPrice          Decimal?
   userId              Int?
   descs               String
   date                DateTime?
-  supplier   purchase_supplier?    @relation(fields: [supplierId], references: [id])
 }
 
 model purchase_order_item {
