@@ -128,7 +128,7 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
                 :rules="dialogFormRules.goodsId">
-                    <goods-select v-model="props.row.goodsId"/>
+                    <goods-select v-model="props.row.goodsId"  @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -136,7 +136,7 @@
           <el-table-column label="入库仓库" min-width="220px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
-                <repo-select v-model="props.row.repoId"/>
+                <repo-select v-model="props.row.repoId" :is-edit="props.row.isEdit"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -145,8 +145,18 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
-                  style="width:100%" clearable placeholder="请输入入库数量">
+                  style="width:100%" clearable placeholder="请输入入库数量"
+                                 v-if="props.row.isEdit"
+                >
                 </el-input-number>
+                <span v-else>{{props.row.amount}}</span>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column label="预设进价" min-width="160px">
+            <template #default="props">
+              <el-form-item>
+                <span>{{props.row.goods?.buyPrice??0}}</span>
               </el-form-item>
             </template>
           </el-table-column>
@@ -154,8 +164,11 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
-                  style="width:100%" clearable placeholder="请输入单价">
+                  style="width:100%" clearable placeholder="请输入单价"
+                                 v-if="props.row.isEdit"
+                >
                 </el-input-number>
+                <span v-else>{{props.row.price}}</span>
               </el-form-item>
             </template>
           </el-table-column>
@@ -166,10 +179,11 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="120" fixed="right">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="props">
-              <el-form-item label-width="0" v-if="props.$index!==0">
-                <el-button size="mini" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)">删除</el-button>
+              <el-form-item label-width="0" >
+                <el-button size="mini" type="primary" @click="props.row.isEdit=!props.row.isEdit">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
+                <el-button size="mini" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
               </el-form-item>
             </template>
           </el-table-column>
@@ -234,7 +248,7 @@ import {
   getUnitList
   ,
   addSpecieList,
-  goodsList
+  goodsList, stockDetail, goodsDetail
 } from '@/api/common'
 import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
@@ -245,6 +259,7 @@ import _ from 'lodash'
 import GoodsSelect from "@temp/GoodsSelect";
 import SupplierSelect from "@temp/SupplierSelect";
 import RepoSelect from "@temp/RepoSelect";
+import {Decimal} from "decimal.js";
 
 export default {
   name: 'grnManage',
@@ -289,7 +304,7 @@ export default {
       itemList: [{
         goodsId: '',
         repoId: '',
-        amount: 1,
+        amount: 0,
         totalPrice: 0,//采购成本
         price: 0,//单价
       }]
@@ -333,6 +348,17 @@ export default {
         dialogForm.itemList[index].totalPrice = mathJs.multiply(curGrnDetail.amount, curGrnDetail.price)
         this.calculateTotalPrice()
       },
+      async getReferInfo(index) {
+        const curGrnDetail = dialogForm.itemList[index]
+        const {goodsId} = curGrnDetail
+        if (goodsId) {
+          const {code, message} = await goodsDetail({id: goodsId})
+          if (code === 200) {
+            dialogForm.itemList[index].goods = message
+            dialogForm.itemList[index].price = new Decimal(message.buyPrice).toNumber()
+          }
+        }
+      },
       /**
        * 计算总价格
        */
@@ -367,9 +393,10 @@ export default {
       addGrnDetailList() {
         dialogForm.itemList.push({
           repoId: '',
-          amount: 1,
+          amount: 0,
           totalPrice: 0,//采购成本
           price: 0,//单价
+          isEdit: true
         })
       },
       /**
@@ -418,9 +445,10 @@ export default {
           dialogForm.itemList = [{
             goodsId: '',
             repoId: '',
-            amount: 1,
+            amount: 0,
             totalPrice: 0,//采购成本
             price: 0,//单价
+            isEdit: true
           }]
           dialogForm.code = moment(new Date()).format('YYYYMMDDHHmmss')
           dialogForm.date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')

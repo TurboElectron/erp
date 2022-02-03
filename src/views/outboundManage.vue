@@ -394,9 +394,10 @@ export default {
       addOutboundDetailList() {
         dialogForm.itemList.push({
           repoId: '',
-          amount: 1,
+          amount: 0,
           totalPrice: 0,//采购成本
           price: 0,//单价
+          isEdit: true
         })
       },
       /**
@@ -445,9 +446,10 @@ export default {
           dialogForm.itemList = [{
             goodsId: '',
             repoId: '',
-            amount: 1,
+            amount: 0,
             totalPrice: 0,//采购成本
             price: 0,//单价
+            isEdit: true
           }]
           dialogForm.code = moment(new Date()).format('YYYYMMDDHHmmss')
           dialogForm.date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
@@ -553,46 +555,6 @@ export default {
           selling: 0,
           ...editParas
         }
-      })
-    }
-
-    /**
-     * 出库产品添加总价
-     */
-    const setOutboundDetailTotalPrice = () => {
-      return new Promise((resolve, reject) => {
-        let index = 1;
-        for (const item of dialogForm.itemList) {
-          // 选择批次id
-          // const curSpecieId = item.specieId;
-          // const selSpecieData = item.specieData.find(v => v.id === curSpecieId)
-          // if (!selSpecieData) {
-          //   showMessage('error', `出库库产品第${index}项。批次不存在！`)
-          //   reject("批次不存在")
-          //   break
-          // }
-          // // 选择批次价格
-          // const speciCost = selSpecieData.cost;
-          // // 选择批次数量单位
-          // const specieUnitId = selSpecieData.unitId
-          // //比较选择的批次计量单位与 选择的数量单位是否一致
-          // const unit1Id = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
-
-          // const { equal, totalPrice } = equalUnitRoot(state.unitData, unit1Id, specieUnitId, speciCost, item.amount)
-          // if (!equal) {
-          //   showMessage('error', `出库产品第${index}项。批次数量单位与出库数量单位不一致！`)
-          //   reject("批次数量单位与出库数量单位不一致，无法转换 不可出库")
-          //   break
-          // }
-          //计算总价（总成本改为计算）
-          // item.totalPrice = totalPrice
-          //单位最后一位
-          item.unitId = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
-          // 出库产品id
-          item.categoryId = Array.isArray(item.categoryId) ? item.categoryId.at(-1) : item.categoryId;
-          index++;
-        }
-        resolve()
       })
     }
 

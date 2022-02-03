@@ -8,6 +8,7 @@
       :remote-method="search"
       :loading="loading"
       @focus="()=> search()"
+      v-if="isEdit"
   >
     <el-option
         v-for="item in data?.message?.records??[]"
@@ -17,6 +18,7 @@
     >
     </el-option>
   </el-select>
+  <span v-else>{{data?.message?.records?.find(_=> _.id === repoId)?.name}}</span>
 </template>
 <script>
 export default {
@@ -32,6 +34,9 @@ import {useRequest} from 'vue-request'
 const props = defineProps({
   modelValue: {
     type: [Number, String]
+  },
+  isEdit: {
+    type: Boolean
   }
 })
 const emit = defineEmits(['update:modelValue'])

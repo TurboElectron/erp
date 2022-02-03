@@ -8,6 +8,7 @@
       :remote-method="searchGoods"
       :loading="loading"
       @focus="()=> searchGoods()"
+      v-if="isEdit"
   >
     <el-option
         v-for="item in data?.message?.records??[]"
@@ -22,6 +23,7 @@
                    @current-change="run">
     </el-pagination>
   </el-select>
+  <span v-else>{{data?.message?.records?.find(_ => _.id === goodsId)?.name}}</span>
 </template>
 <script>
 export default {
@@ -37,9 +39,12 @@ import {useRequest} from 'vue-request'
 const props = defineProps({
   modelValue: {
     type: [Number, String]
+  },
+  isEdit: {
+    type: Boolean
   }
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue','change'])
 const goodsId = useVModel(props,'modelValue', emit )
 const params = ref({
   pageSize: 10,
@@ -49,6 +54,7 @@ const {data, loading, run} =useRequest(()=> goodsList(unref(params)), {manual:tr
 watch(goodsId, (val)=> {
   if (val) {
     params.value.id = val
+    emit('change')
     run()
   }
 })

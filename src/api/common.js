@@ -38,6 +38,18 @@ export const removeGoods  = async (data = {}) => {
         message: '成功'
     }
 }
+export const goodsDetail = async (data={}) => {
+    const {id} = data
+    const res = await prisma.base_goods.findUnique({
+        where: {
+            id
+        }
+    })
+    return {
+        code: 200,
+        message: res
+    }
+}
 /** 客户产品 */
 export const goodsList = async (data = {}) => {
     const {pageSize, pageNo,id, cid, name, code} = data
@@ -643,13 +655,13 @@ export const updateGrnList = async (data = {}) => {
                         id: _.id
                     },
                     data: {
-                        ...omit(_, ['id', 'repo', 'goods']),
+                        ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
                     }
                 })
             } else {
                 await prisma.purchase_order_item.create({
                     data: {
-                        ...omit(_, ['id', 'repo', 'goods']),
+                        ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
                         orderId: data.id
                     }
                 })
@@ -819,7 +831,7 @@ export const addOutboundList = async (data = {}) => {
                 date: new Date(data.date),
                 itemList: {
                     create: data.itemList.map(_ => {
-                        return omit(_, ['stock'])
+                        return omit(_, ['stock','isEdit'])
                     })
                 },
             },
@@ -876,13 +888,13 @@ export const updateOutboundList = async (data = {}) => {
                         id: _.id
                     },
                     data: {
-                        ...omit(_, ['id', 'repo', 'goods']),
+                        ...omit(_, ['id', 'repo', 'goods','isEdit']),
                     }
                 })
             } else {
                 await prisma.sale_order_item.create({
                     data: {
-                        ...omit(_, ['id', 'repo', 'goods']),
+                        ...omit(_, ['id', 'repo', 'goods','isEdit']),
                         orderId: data.id
                     }
                 })
