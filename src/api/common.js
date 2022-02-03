@@ -1157,7 +1157,46 @@ export const getCustomerRaking = async (data = {}) => {
     }
 }
 
-
+export const getProfit = async (data={}) => {
+    const {startDate, endDate} = data
+    let where = {}
+    if (startDate) {
+        where.date = {
+            gte: new Date(startDate)
+        }
+    }
+    if (endDate) {
+        where.date = {
+            ...where.date,
+            lte: new Date(endDate)
+        }
+    }
+    const purchase = await prisma.purchase_order.aggregate({
+        _sum: {
+            totalPrice: true,
+            payPrice: true,
+        },
+        where
+    })
+    const sale = await prisma.sale_order.aggregate({
+        _sum: {
+            totalPrice: true,
+            payPrice: true,
+        },
+        where
+    })
+    return {
+        code: 200,
+        message: {
+            purchase,
+            sale,
+            overdraftPurchase: mathJs.subtract(purchase._sum.totalPrice, purchase._sum.payPrice),
+            overdraftSale: mathJs.subtract(sale._sum.totalPrice, sale._sum.payPrice),
+            profit: mathJs.subtract(sale._sum.totalPrice, purchase._sum.totalPrice),
+            realProfit: mathJs.subtract(sale._sum.payPrice, purchase._sum.payPrice)
+        }
+    }
+}
 
 
 
