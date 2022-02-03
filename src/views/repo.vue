@@ -2,8 +2,7 @@
  <template>
   <el-form :inline="true" :model="queryForm" size="small" class="demo-form-inline">
     <el-form-item label="仓库名称：" prop="name">
-      <el-input v-model="queryForm.name" @keyup.enter.native="getTableData()" clearable placeholder="请输入仓库名称查询">
-      </el-input>
+      <repo-select v-model="queryForm.id"/>
     </el-form-item>
 
     <el-form-item>
@@ -66,8 +65,10 @@
 import { reactive, toRefs, ref, toRaw } from 'vue'
 import { addRepo, updateRepo, getRepoList, deleteRepo } from '@/api/common'
 import { globalLoading, showMessage } from '@/utils'
+import RepoSelect from "@temp/RepoSelect";
 export default {
   name: 'repoManager',
+  components: {RepoSelect},
   setup(props, context) {
     const state = reactive({
       tableData: [],
@@ -76,7 +77,7 @@ export default {
       saveLoading: false,
       currentEditData: {},// 当前修改数据
       queryForm: {
-        name: ''
+        id: ''
       },
       loadTable: false
     })
@@ -89,9 +90,12 @@ export default {
     // 新增、修改formRules
     const dialogFormRules = {
       name: [{
-        required: true, message: '请输入产品名称', trigger: 'blur',
+        required: true, message: '请输入仓库名称', trigger: 'blur',
       }],
       code: [{
+        required: true, message: '请输入仓库编号', trigger: 'blur',
+      }],
+      address: [{
         required: true, message: '请输入仓库地址', trigger: 'blur',
       }],
 

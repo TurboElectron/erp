@@ -330,7 +330,10 @@ export const getRepoList = async (data = {}) => {
     const [total, records] = await prisma.$transaction([
         prisma.base_repo.count({where}),
         prisma.base_repo.findMany({
-            where
+            where,
+            orderBy: {
+                updatime: 'desc',
+            },
         })
     ])
     return {
