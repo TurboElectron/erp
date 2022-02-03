@@ -58,7 +58,7 @@ import BaseCharts from '@temp/BaseCharts.vue'
 import { getCustomerRaking, customerList, getCategorySales } from '@/api/common'
 import remoteMix from '@/mixin/remote'
 import { globalLoading, showMessage } from '@/utils'
-
+import {Decimal} from 'decimal.js'
 export default {
   name: 'customerAnalysis',
   components: {
@@ -117,24 +117,25 @@ export default {
               name: '购买力',
               color: '#2184e7',
               data: resData.map(v => ({
-                value: v.totalPrice,
+                value: new Decimal(v.totalPrice).toNumber(),
                 unitName: '元'
               }))
             }, {
               name: '支付力',
               color: '#34bfa3',
               data: resData.map(v => ({
-                value: v.payPrice,
+                value: new Decimal(v.payPrice).toNumber(),
                 unitName: '元'
               }))
             }, {
               name: '欠款',
               color: '#f4516c',
               data: resData.map(v => ({
-                value: v.allDebt,
+                value: new Decimal(v.allDebt).toNumber(),
                 unitName: '元'
               }))
             }]
+            console.log(state.rakingData.data)
           }
         }).finally(() => {
           state.loadingTbl = false

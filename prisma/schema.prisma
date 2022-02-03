@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions", "selectRelationCount", "groupBy"]
+  previewFeatures = ["interactiveTransactions"]
   binaryTargets   = ["native", "windows"]
   engineType      = "library"
 }
@@ -45,8 +45,8 @@ model base_goods {
   color               String?
   standard            String?
   material            String?
-  buyPrice            String?
-  salePrice           String?
+  buyPrice            Decimal?
+  salePrice           Decimal?
   descs               String?
   updater             String?
   updatime            DateTime?
