@@ -20,7 +20,7 @@
         @node-click="handleClickNode"
     >
       <template #default="{ node, data }">
-        <div v-contextmenu:contextmenu @contextmenu="currentEditData = node">{{ node.label }}</div>
+        <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label }}</div>
       </template>
     </el-tree>
     <goods :cid="currentEditData.id" ref="goodsRef"/>

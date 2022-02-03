@@ -1047,9 +1047,42 @@ export const getCategorySales = (data = {}) => {
 
 
 /** 库存分页列表*/
-export const getInventoryList = (data = {}) => {
-    return httpFetch.post('inventory/list', data)
-    // return httpFetch.post('inventory/allList', data)
+export const getInventoryList = async (data = {}) => {
+    // return httpFetch.post('inventory/list', data)
+    const {pageSize, pageNo, goodsId, repoId} = data
+    let where = {}
+    if (goodsId) {
+        where.goodsId = goodsId
+    }
+    if (repoId) {
+        where.repoId = repoId
+    }
+    const [total, records] = await prisma.$transaction([
+        prisma.stock.count({
+            where,
+        }),
+        prisma.stock.findMany({
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+            where,
+            include: {
+                goods: true,
+                repo: true,
+            }
+        })
+    ])
+    return {
+        code: 200,
+        message: {
+            total,
+            records: records.map(_ => {
+                return {
+                    ..._,
+                    profit: mathJs.subtract(_.totalSalePrice, _.totalBuyPrice)
+                }
+            })
+        }
+    }
 }
 
 /** 库存不分页列表*/
