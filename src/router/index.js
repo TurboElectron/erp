@@ -107,7 +107,15 @@ const routes = [
         title: '库存盘点',
       },
       component: () => import(/* webpackChunkName: "inventory" */ '../views/inventory.vue')
-    }]
+    },
+      {
+        path: '/profit',
+        name: 'profit',
+        meta: {
+          title: '收益统计',
+        },
+        component: () => import(/* webpackChunkName: "inventory" */ '../views/profit.vue')
+      }]
   },
 
   {

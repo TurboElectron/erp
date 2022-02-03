@@ -147,6 +147,11 @@ export default {
         index: "/inventory",
         title: "库存盘点"
       },
+      {
+        icon: "Collection",
+        index: "/profit",
+        title: "收益统计"
+      },
     ]);
 
     const route = useRoute();
