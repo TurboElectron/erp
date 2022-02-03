@@ -1081,12 +1081,29 @@ export const getCustomersByName = (data = {}) => {
  */
 export const getCustomerRaking = async (data = {}) => {
     // return httpFetch.post('outbound/customerRaking', data)
+    const {customerId, startDate, endDate} = data
+    let where = {}
+    if (customerId) {
+        where.customerId = customerId
+    }
+    if (startDate) {
+        where.date = {
+            gte: new Date(startDate)
+        }
+    }
+    if (endDate) {
+        where.date = {
+            ...where.date,
+            lte: new Date(endDate)
+        }
+    }
     const res = await prisma.sale_order.groupBy({
         by: ['customerId'],
         _sum: {
             totalPrice: true,
             payPrice: true
-        }
+        },
+        where
     })
     return {
         code: 200,

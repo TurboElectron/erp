@@ -31,6 +31,11 @@
     <el-table-column prop="totalPrice" label="总金额" sortable />
     <el-table-column prop="payPrice" label="总支付" sortable />
     <el-table-column prop="allDebt" label="总欠款" sortable />
+    <el-table-column prop="date" label="时间">
+      <template #default="scope">
+        {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
+      </template>
+    </el-table-column>
   </el-table>
   <div>
     <el-divider>客户购买力柱状图</el-divider>
@@ -59,6 +64,7 @@ import { getCustomerRaking, customerList, getCategorySales } from '@/api/common'
 import remoteMix from '@/mixin/remote'
 import { globalLoading, showMessage } from '@/utils'
 import {Decimal} from 'decimal.js'
+import moment from "moment";
 export default {
   name: 'customerAnalysis',
   components: {
@@ -198,7 +204,8 @@ export default {
     return {
       ...toRefs(state), //抛出
       ...methods,
-      remoteCustomeData
+      remoteCustomeData,
+      moment
     }
   },
 }
