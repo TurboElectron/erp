@@ -75,7 +75,7 @@ model base_repo {
   descs               String?
   adminId             Int?
   updater             String?
-  updatime            DateTime? @updateAt
+  updatime            DateTime?             @updatedAt
   state               Int                   @default(1)
   purchase_order_item purchase_order_item[]
   sale_order_item     sale_order_item[]
@@ -108,15 +108,16 @@ model purchase_order_item {
 }
 
 model purchase_supplier {
-  id       Int       @id @default(autoincrement())
-  name     String
-  linkman  String
-  mobile   String?
-  address  String?
-  descs    String?
-  state    Int       @default(1)
-  updater  String?
-  updatime DateTime?
+  id             Int              @id @default(autoincrement())
+  name           String
+  linkman        String
+  mobile         String?
+  address        String?
+  descs          String?
+  state          Int              @default(1)
+  updater        String?
+  updatime       DateTime?
+  purchase_order purchase_order[]
 }
 
 model sale_customer {
@@ -171,7 +172,7 @@ model stock {
   salePrice      Decimal?
   totalBuyPrice  Decimal?
   totalSalePrice Decimal?
-  updatime       DateTime? @updatedAt
+  updatime       DateTime?   @updatedAt
   state          Int         @default(1)
 }
 

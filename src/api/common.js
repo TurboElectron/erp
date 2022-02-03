@@ -741,7 +741,7 @@ export const getGrnList = async (data = {}) => {
                 itemList: {
                     include: {
                         goods: true,
-                        repo: true
+                        repo: true,
                     }
                 }
             }
