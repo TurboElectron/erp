@@ -83,15 +83,16 @@ model base_repo {
 }
 
 model purchase_order {
-  id         Int                   @id @default(autoincrement())
-  itemList   purchase_order_item[]
-  supplierId Int?
-  code       String?
-  payPrice   Decimal?
-  totalPrice Decimal?
-  userId     Int?
-  descs      String
-  date       DateTime?
+  id                  Int                   @id @default(autoincrement())
+  itemList            purchase_order_item[]
+  supplierId          Int?
+  code                String?
+  payPrice            Decimal?
+  totalPrice          Decimal?
+  userId              Int?
+  descs               String
+  date                DateTime?
+  supplier   purchase_supplier?    @relation(fields: [supplierId], references: [id])
 }
 
 model purchase_order_item {
