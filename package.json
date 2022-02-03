@@ -5,8 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build --mode prod",
-    "electron:build": "vue-cli-service electron:build --mode dev",
-    "electron:serve": "vue-cli-service electron:serve --mode dev",
+    "electron:build": "vue-cli-service electron:build -w --mode prod",
+    "electron:serve": "vue-cli-service electron:serve -w --mode dev",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "prisma:chain": "npm run prisma:db:push:force && npm run prisma:introspect && npm run prisma:generate && npm run serve",
@@ -51,6 +51,7 @@
     "node-sass": "^4.12.0",
     "prisma": "^3.8.1",
     "sass-loader": "^8.0.2",
+    "terser-webpack-plugin": "^5.3.1",
     "vue-cli-plugin-electron-builder": "~2.1.1",
     "webpack-bundle-analyzer": "^4.4.2"
   },

@@ -78,7 +78,7 @@ export const goodsListV2 = async (data = {}) => {
     const {pageSize, pageNo,id, repoId, name, code} = data
     let where = {}
     if (id) {
-        where.id = id
+        where.goodsId = id
     }
     if (repoId) {
         where.repoId = repoId
@@ -349,7 +349,7 @@ export const getRepoListV2 = async (data = {}) => {
     const {id,name, goodsId} = data
     let where = {}
     if (id) {
-        where.id = id
+        where.repoId = id
     }
     if (goodsId) {
         where.goodsId = goodsId
@@ -570,7 +570,10 @@ export const stockDetail = async (data = {}) => {
         where.goodsId = goodsId
     }
     const res = await prisma.stock.findFirst({
-        where
+        where,
+        include: {
+            goods: true
+        }
     })
     return {
         code: 200,

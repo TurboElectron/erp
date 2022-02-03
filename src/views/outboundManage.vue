@@ -127,7 +127,7 @@
           <el-table-column label="出库仓库" min-width="220px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
-                <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId"/>
+                <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId" :is-edit="props.row.isEdit"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -135,14 +135,14 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
                             :rules="dialogFormRules.goodsId">
-                <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)"/>
+                <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit"/>
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="库存数量" min-width="160px">
             <template #default="props">
               <el-form-item >
-                <el-input :model-value="props.row.stock?.totalCount??0" disabled/>
+                <span>{{props.row.stock?.totalCount??0}}</span>
               </el-form-item>
             </template>
           </el-table-column>
@@ -154,23 +154,17 @@
                                  :max="props.row.stock?.totalCount"
                                  style="width:100%" clearable placeholder="请输入出库数量"
                 :disabled="!(props.row.goodsId && props.row.repoId)"
+                                 v-if="props.row.isEdit"
                 >
                 </el-input-number>
+                <span v-else>{{props.row.amount}}</span>
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="上次买入价" min-width="160px">
+          <el-table-column label="预设售价" min-width="160px">
             <template #default="props">
               <el-form-item>
-                <el-input :model-value="props.row.stock?.buyPrice??0" disabled/>
-              </el-form-item>
-            </template>
-          </el-table-column>
-
-          <el-table-column label="平均买入价" min-width="160px">
-            <template #default="props">
-              <el-form-item>
-                <el-input :model-value="props.row.stock?.avgBuyPrice??0" disabled/>
+                <span>{{props.row.stock?.goods?.salePrice??0}}</span>
               </el-form-item>
             </template>
           </el-table-column>
@@ -180,22 +174,25 @@
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
                                  style="width:100%" clearable placeholder="请输入单价"
                                  :disabled="!(props.row.goodsId && props.row.repoId)"
+                                 v-if="props.row.isEdit"
                 >
                 </el-input-number>
+                <span v-else>{{props.row.price}}</span>
               </el-form-item>
             </template>
           </el-table-column>
 
-          <el-table-column label="总售价" min-width="200" fixed="right">
+          <el-table-column label="总售价" min-width="100" fixed="right">
             <template #default="props">
               <el-form-item> {{props.row.totalPrice}}</el-form-item>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="120" fixed="right">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="props">
-              <el-form-item label-width="0" v-if="props.$index!==0">
-                <el-button size="mini" type="danger" icon="Delete" @click="removeOutboundDetail(props.$index)">删除</el-button>
+              <el-form-item label-width="0">
+                <el-button size="mini" type="primary" @click="props.row.isEdit=!props.row.isEdit">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
+                <el-button size="mini" type="danger" icon="Delete" @click="removeOutboundDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
               </el-form-item>
             </template>
           </el-table-column>
@@ -264,7 +261,7 @@ import _ from 'lodash'
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
-
+import {Decimal} from 'decimal.js'
 export default {
   name: 'outboundManage',
   components: {GoodsSelectV2, RepoSelectV2, CustomerSelect},
@@ -308,7 +305,7 @@ export default {
       itemList: [{
         goodsId: '',
         repoId: '',
-        amount: 1,
+        amount: 0,
         totalPrice: 0,//采购成本
         price: 0,//单价
       }]
@@ -359,6 +356,7 @@ export default {
           const {code, message} = await stockDetail(curOutboundDetail)
           if (code === 200) {
             dialogForm.itemList[index].stock = message
+            dialogForm.itemList[index].price = new Decimal(message.goods.salePrice).toNumber()
           }
         }
       },

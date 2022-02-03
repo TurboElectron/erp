@@ -8,6 +8,7 @@
       :remote-method="searchGoods"
       :loading="loading"
       @focus="()=> searchGoods()"
+      v-if="isEdit"
   >
     <el-option
         v-for="item in data?.message?.records??[]"
@@ -22,6 +23,7 @@
                    @current-change="run">
     </el-pagination>
   </el-select>
+  <span v-else>{{data?.message?.records?.find(_ => _.id === goodsId)?.name}}</span>
 </template>
 <script>
 export default {
@@ -40,6 +42,9 @@ const props = defineProps({
   },
   repoId: {
     type: [Number, String]
+  },
+  isEdit: {
+    type: Boolean
   }
 })
 const emit = defineEmits(['update:modelValue', 'change'])
