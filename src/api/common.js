@@ -1,6 +1,6 @@
 import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
-import {omit} from "lodash";
+import {intersection, omit} from "lodash";
 import * as math from "mathjs";
 /** 添加产品 */
 export const addGoods = async (data = {}) => {
@@ -607,43 +607,54 @@ export const updateGrnList = async (data = {}) => {
         const exists = await prisma.purchase_order_item.findMany({where: {
             orderId: data.id
             }})
-        await Promise.all(data.purchase_order_item.map(async _ => {
+        const existIds = 	intersection(exists.map(_ => _.id),data.purchase_order_item.map(_ => _.id) );
+        const deletes = exists.filter(_ => !existIds.includes(_.id))
+        const updates = data.purchase_order_item.filter(_ => existIds.includes(_.id))
+        const adds = data.purchase_order_item.filter(_ => !existIds.includes(_.id))
+        await Promise.all(deletes.map(async _ => {
+            await prisma.purchase_order_item.delete({
+                where: {
+                    id: _.id
+                }
+            })
+            await grnDeleteStock(_)
+        }))
+        await Promise.all(adds.map(async  _ => {
+            await prisma.purchase_order_item.create({
+                data: {
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                    orderId: data.id
+                }
+            })
+            await grnUpdateStock(_)
+        }))
+        await Promise.all(updates.map(async _ => {
             const poi = exists.find(e=> e.id === _.id)
-            if (poi) {
-                const stock = await prisma.stock.findFirst({
-                    where: {
-                        goodsId: _.goodsId,
-                        repoId: _.repoId
-                    }
-                })
-                await prisma.stock.update({
-                    where: {
-                        id: stock.id
-                    },
-                    data: {
-                        totalCount:  stock.totalCount - poi.amount + _.amount,
-                        buyPrice: _.price,
-                        totalBuyPrice:  math.evaluate(`${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}`),
-                        avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}) / (${stock.totalCount} - ${poi.amount} + ${_.amount})`) ,
-                    }
-                })
-                await prisma.purchase_order_item.update({
-                    where: {
-                        id: _.id
-                    },
-                    data: {
-                        ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
-                    }
-                })
-            } else {
-                await prisma.purchase_order_item.create({
-                    data: {
-                        ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
-                        orderId: data.id
-                    }
-                })
-                await grnUpdateStock(_)
-            }
+            const stock = await prisma.stock.findFirst({
+                where: {
+                    goodsId: _.goodsId,
+                    repoId: _.repoId
+                }
+            })
+            await prisma.stock.update({
+                where: {
+                    id: stock.id
+                },
+                data: {
+                    totalCount:  stock.totalCount - poi.amount + _.amount,
+                    buyPrice: _.price,
+                    totalBuyPrice:  math.evaluate(`${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}`),
+                    avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}) / (${stock.totalCount} - ${poi.amount} + ${_.amount})`) ,
+                }
+            })
+            await prisma.purchase_order_item.update({
+                where: {
+                    id: _.id
+                },
+                data: {
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                }
+            })
         }))
     })
     return {
@@ -836,42 +847,53 @@ export const updateOutboundList = async (data = {}) => {
                 orderId: data.id
             }
         })
-        await Promise.all(data.sale_order_item.map(async _ => {
+        const existIds = 	intersection(exists.map(_ => _.id),data.sale_order_item.map(_ => _.id) );
+        const deletes = exists.filter(_ => !existIds.includes(_.id))
+        const updates = data.sale_order_item.filter(_ => existIds.includes(_.id))
+        const adds = data.sale_order_item.filter(_ => !existIds.includes(_.id))
+        await Promise.all(deletes.map(async _ => {
+            await prisma.sale_order_item.delete({
+                where: {
+                    id: _.id
+                }
+            })
+            await outboundDeleteStock(_)
+        }))
+        await Promise.all(adds.map(async _ => {
+            await prisma.sale_order_item.create({
+                data: {
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                    orderId: data.id
+                }
+            })
+            await outboundUpdateStock(_)
+        }))
+        await Promise.all(updates.map(async _ => {
             const soi = exists.find(e => e.id === _.id)
-            if (soi) {
-                const stock = await prisma.stock.findFirst({
-                    where: {
-                        goodsId: _.goodsId,
-                        repoId: _.repoId
-                    }
-                })
-                await prisma.stock.update({
-                    where: {
-                        id: stock.id
-                    },
-                    data: {
-                        totalCount: math.evaluate(`${stock.totalCount} + ${soi.amount} - ${_.amount}`),
-                        salePrice: _.price,
-                        totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${soi.totalPrice} - ${_.totalPrice}`),
-                    }
-                })
-                await prisma.sale_order_item.update({
-                    where: {
-                        id: _.id
-                    },
-                    data: {
-                        ...omit(_, ['id', 'repo', 'goods','isEdit']),
-                    }
-                })
-            } else {
-                await prisma.sale_order_item.create({
-                    data: {
-                        ...omit(_, ['id', 'repo', 'goods','isEdit']),
-                        orderId: data.id
-                    }
-                })
-                await outboundUpdateStock(_)
-            }
+            const stock = await prisma.stock.findFirst({
+                where: {
+                    goodsId: _.goodsId,
+                    repoId: _.repoId
+                }
+            })
+            await prisma.stock.update({
+                where: {
+                    id: stock.id
+                },
+                data: {
+                    totalCount: math.evaluate(`${stock.totalCount} + ${soi.amount} - ${_.amount}`),
+                    salePrice: _.price,
+                    totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${soi.totalPrice} - ${_.totalPrice}`),
+                }
+            })
+            await prisma.sale_order_item.update({
+                where: {
+                    id: _.id
+                },
+                data: {
+                    ...omit(_, ['id', 'repo', 'goods','isEdit']),
+                }
+            })
         }))
     })
     return {

@@ -459,10 +459,6 @@ export default {
       async handlerDelete(item) {
         const loading = globalLoading()
         const updateGrn = _.cloneDeep(item); //JSON.parse(JSON.stringify(toRaw(item)))
-        //将库存清零
-        for (const itemc of updateGrn.purchase_order_item) {
-          itemc.amount = 0
-        }
         // 状态置为编辑--目的为添加批次id
         state.isEdit = true
         state.isEdit = false
