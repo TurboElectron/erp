@@ -28,8 +28,8 @@ model goods {
   color               String?
   standard            String?
   material            String?
-  buyPrice            Decimal?
-  salePrice           Decimal?
+  buyPrice            Float?
+  salePrice           Float?
   descs               String?
   updater             String?
   updatime            DateTime?
@@ -45,8 +45,8 @@ model purchase_order {
   id                  Int                   @id @default(autoincrement())
   supplierId          Int?
   code                String?
-  payPrice            Decimal?
-  totalPrice          Decimal?
+  payPrice            Float?
+  totalPrice          Float?
   userId              Int?
   descs               String
   date                DateTime?
@@ -60,8 +60,8 @@ model purchase_order_item {
   repoId         Int
   goodsId        Int?
   amount         Int?
-  price          Decimal?
-  totalPrice     Decimal?
+  price          Float?
+  totalPrice     Float?
   goods          goods?         @relation(fields: [goodsId], references: [id])
   purchase_order purchase_order @relation(fields: [orderId], references: [id])
   repo           repo           @relation(fields: [repoId], references: [id])
@@ -112,8 +112,8 @@ model sale_order {
   id              Int               @id @default(autoincrement())
   customerId      Int?
   code            String?
-  payPrice        Decimal?
-  totalPrice      Decimal?
+  payPrice        Float?
+  totalPrice      Float?
   userId          Int?
   descs           String
   date            DateTime?
@@ -127,8 +127,8 @@ model sale_order_item {
   repoId     Int
   goodsId    Int?
   amount     Int?
-  price      Decimal?
-  totalPrice Decimal?
+  price      Float?
+  totalPrice Float?
   goods      goods?     @relation(fields: [goodsId], references: [id])
   sale_order sale_order @relation(fields: [orderId], references: [id])
   repo       repo       @relation(fields: [repoId], references: [id])
@@ -140,11 +140,11 @@ model stock {
   repoId         Int
   totalCount     Int?
   saleCount      Int?
-  buyPrice       Decimal?
-  avgBuyPrice    Decimal?
-  salePrice      Decimal?
-  totalBuyPrice  Decimal?
-  totalSalePrice Decimal?
+  buyPrice       Float?
+  avgBuyPrice    Float?
+  salePrice      Float?
+  totalBuyPrice  Float?
+  totalSalePrice Float?
   updatime       DateTime?
   state          Int       @default(1)
   goods          goods     @relation(fields: [goodsId], references: [id])

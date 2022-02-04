@@ -43,7 +43,6 @@
 import { reactive, toRefs } from 'vue'
 import BaseCharts from '@temp/BaseCharts.vue'
 import { getSupplierRaking} from '@/api/common'
-import {Decimal} from 'decimal.js'
 import moment from "moment";
 import SupplierSelect from "@temp/SupplierSelect";
 export default {
@@ -91,21 +90,21 @@ export default {
               name: '购买力',
               color: '#2184e7',
               data: resData.map(v => ({
-                value: new Decimal(v.totalPrice).toNumber(),
+                value: v.totalPrice,
                 unitName: '元'
               }))
             }, {
               name: '支付力',
               color: '#34bfa3',
               data: resData.map(v => ({
-                value: new Decimal(v.payPrice).toNumber(),
+                value: v.payPrice,
                 unitName: '元'
               }))
             }, {
               name: '欠款',
               color: '#f4516c',
               data: resData.map(v => ({
-                value: new Decimal(v.allDebt).toNumber(),
+                value: v.allDebt,
                 unitName: '元'
               }))
             }]

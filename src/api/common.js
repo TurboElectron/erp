@@ -1,7 +1,7 @@
 import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
 import {omit} from "lodash";
-import mathJs from '@/utils/math'
+import * as math from "mathjs";
 /** 添加产品 */
 export const addGoods = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
@@ -207,29 +207,6 @@ export const deleteCategory = async id => {
     }
 }
 
-/** 新增批次 */
-export const addSpecie = (data = {}) => {
-    return httpFetch.post('specie/add', data)
-}
-
-/** 批量新增批次*/
-export const addSpecieList = (data = {}) => {
-    return httpFetch.post('specie/addList', data)
-}
-
-/** 更新批次*/
-export const updateSpecie = (data = {}) => {
-    return httpFetch.post('specie/update', data)
-}
-
-/** 批次列表*/
-export const getSpecieList = (data = {}) => {
-    return httpFetch.post('specie/list', data)
-}
-/** 根据产品id获取对应批次*/
-export const getListByCategoryId = (data = {}) => {
-    return httpFetch.post('specie/listByCategoryId', data)
-}
 
 
 
@@ -478,7 +455,6 @@ const grnUpdateStock = async (_) => {
         }
     })
     if (stock) {
-        console.log(mathJs.divide(stock.totalBuyPrice + _.totalPrice,stock.totalCount + _.amount))
         await prisma.stock.update({
             where: {
                 id: stock.id
@@ -486,12 +462,11 @@ const grnUpdateStock = async (_) => {
             data: {
                 totalCount: stock.totalCount + _.amount,
                 buyPrice: _.price,
-                avgBuyPrice: mathJs.divide(stock.totalBuyPrice + _.totalPrice,stock.totalCount + _.amount),
-                totalBuyPrice: stock.totalBuyPrice + _.totalPrice
+                avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} + ${_.totalPrice}) / ${stock.totalCount} + ${_.amount}`),
+                totalBuyPrice: math.evaluate(`${stock.totalBuyPrice} + ${_.totalPrice}`)
             }
         })
     } else {
-        console.log(mathJs.divide( _.totalPrice, _.amount))
         await prisma.stock.create({
             data: {
                 goodsId: _.goodsId,
@@ -500,7 +475,7 @@ const grnUpdateStock = async (_) => {
                 saleCount: 0,
                 totalSalePrice: 0,
                 buyPrice: _.price,
-                avgBuyPrice: mathJs.divide( _.totalPrice, _.amount),
+                avgBuyPrice: math.evaluate(`${_.totalPrice} / ${_.amount}`),
                 totalBuyPrice: _.totalPrice
             }
         })
@@ -522,7 +497,7 @@ const outboundUpdateStock = async (_) => {
                 totalCount: stock.totalCount - _.amount,
                 saleCount: stock.saleCount + _.amount,
                 salePrice:  _.price,
-                totalSalePrice: stock.totalSalePrice + _.totalPrice
+                totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${_.totalPrice}`)
             }
         })
     }
@@ -542,8 +517,8 @@ const grnDeleteStock = async (_) => {
             },
             data: {
                 totalCount: stock.totalCount - _.amount,
-                totalBuyPrice: stock.totalBuyPrice - _.totalPrice,
-                avgBuyPrice: mathJs.divide(stock.totalBuyPrice - _.totalPrice, stock.totalCount - _.amount),
+                totalBuyPrice: math.evaluate(`${stock.totalBuyPrice} - ${_.totalPrice}`),
+                avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} -  ${_.totalPrice}) / (${stock.totalCount} - ${_.amount})`),
             }
         })
     }
@@ -563,7 +538,7 @@ const outboundDeleteStock = async  (_) => {
             data: {
                 totalCount: stock.totalCount + _.amount,
                 salePrice:  _.price,
-                totalSalePrice: stock.totalSalePrice - _.totalPrice,
+                totalSalePrice: math.evaluate(`${stock.totalSalePrice} - ${_.totalPrice}`),
             }
         })
     }
@@ -648,8 +623,8 @@ export const updateGrnList = async (data = {}) => {
                     data: {
                         totalCount:  stock.totalCount - poi.amount + _.amount,
                         buyPrice: _.price,
-                        totalBuyPrice: stock.totalBuyPrice -poi.totalPrice + _.totalPrice,
-                        avgBuyPrice: mathJs.divide(stock.totalBuyPrice -poi.totalPrice + _.totalPrice, stock.totalCount - poi.amount + _.amount),
+                        totalBuyPrice:  math.evaluate(`${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}`),
+                        avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}) / (${stock.totalCount} - ${poi.amount} + ${_.amount})`) ,
                     }
                 })
                 await prisma.purchase_order_item.update({
@@ -875,9 +850,9 @@ export const updateOutboundList = async (data = {}) => {
                         id: stock.id
                     },
                     data: {
-                        totalCount: stock.totalCount + soi.amount - _.amount,
+                        totalCount: math.evaluate(`${stock.totalCount} + ${soi.amount} - ${_.amount}`),
                         salePrice: _.price,
-                        totalSalePrice: stock.totalSalePrice + soi.totalPrice - _.totalPrice,
+                        totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${soi.totalPrice} - ${_.totalPrice}`),
                     }
                 })
                 await prisma.sale_order_item.update({
@@ -1094,7 +1069,7 @@ export const getInventoryList = async (data = {}) => {
             records: records.map(_ => {
                 return {
                     ..._,
-                    profit: mathJs.subtract(_.totalSalePrice, _.totalBuyPrice)
+                    profit: math.evaluate(`${_.totalSalePrice} - ${_.totalBuyPrice}`)
                 }
             })
         }
@@ -1164,7 +1139,7 @@ export const getCustomerRaking = async (data = {}) => {
                     }
                 }),
                 ..._._sum,
-                allDebt: mathJs.subtract(_._sum.totalPrice,  _._sum.payPrice)
+                allDebt: math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`)
             }
         }))
     }
@@ -1213,7 +1188,7 @@ export const getSupplierRaking = async (data = {}) => {
                     }
                 }),
                 ..._._sum,
-                allDebt: mathJs.subtract(_._sum.totalPrice,  _._sum.payPrice)
+                allDebt: math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`)
             }
         }))
     }
@@ -1252,10 +1227,10 @@ export const getProfit = async (data={}) => {
         message: {
             purchase,
             sale,
-            overdraftPurchase: mathJs.subtract(purchase._sum.totalPrice, purchase._sum.payPrice),
-            overdraftSale: mathJs.subtract(sale._sum.totalPrice, sale._sum.payPrice),
-            profit: mathJs.subtract(sale._sum.totalPrice, purchase._sum.totalPrice),
-            realProfit: mathJs.subtract(sale._sum.payPrice, purchase._sum.payPrice)
+            overdraftPurchase: math.evaluate(`${purchase._sum.totalPrice??0} - ${purchase._sum.payPrice??0}`),
+            overdraftSale: math.evaluate(`${sale._sum.totalPrice??0} - ${sale._sum.payPrice??0}`),
+            profit: math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0}`),
+            realProfit: math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0}`)
         }
     }
 }

@@ -33,7 +33,7 @@
 
   <script>
 import { reactive, toRefs, onMounted } from 'vue';
-import { getInventoryList, getCategoryTree, getRepoList, getListByCategoryId } from '@/api/common'
+import { getInventoryList } from '@/api/common'
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 export default {

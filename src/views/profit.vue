@@ -19,12 +19,12 @@
   <el-row v-if="data">
       <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
         <el-form-item label="总进价：">
-          {{data.message.purchase._sum.totalPrice}}
+          {{data.message.purchase._sum.totalPrice??0}}
         </el-form-item>
       </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="总售价：">
-        {{data.message.sale._sum.totalPrice}}
+        {{data.message.sale._sum.totalPrice??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">

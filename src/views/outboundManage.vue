@@ -140,19 +140,11 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="库存数量" min-width="160px">
-            <template #default="props">
-              <el-form-item >
-                <span>{{props.row.stock?.totalCount??0}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
 
           <el-table-column label="出库数量" min-width="160px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
-                                 :max="props.row.stock?.totalCount"
                                  style="width:100%" clearable placeholder="请输入出库数量"
                 :disabled="!(props.row.goodsId && props.row.repoId)"
                                  v-if="props.row.isEdit"
@@ -210,7 +202,7 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
           <el-form-item label="总成本：" prop="totalPrice">
             <div class="form-pre-flex">
-              {{dialogForm.totalPrice}}
+              {{parseFloat(dialogForm.totalPrice)}}
             </div>
           </el-form-item>
         </el-col>
@@ -255,14 +247,12 @@ import {
 } from '@/api/common'
 import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
-import mathJs from '@/utils/math'
 //远程搜索客户，客户
 import remoteMix from '@/mixin/remote'
 import _ from 'lodash'
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
-import {Decimal} from 'decimal.js'
 export default {
   name: 'outboundManage',
   components: {GoodsSelectV2, RepoSelectV2, CustomerSelect},
@@ -347,7 +337,7 @@ export default {
     const methods = {
       getTotalPrice(index) {
         const curOutboundDetail = dialogForm.sale_order_item[index]
-        dialogForm.sale_order_item[index].totalPrice = mathJs.multiply(curOutboundDetail.amount, curOutboundDetail.price)
+        dialogForm.sale_order_item[index].totalPrice = math.evaluate(`${curOutboundDetail.amount} * ${curOutboundDetail.price}`)
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
@@ -357,7 +347,7 @@ export default {
           const {code, message} = await stockDetail(curOutboundDetail)
           if (code === 200) {
             dialogForm.sale_order_item[index].stock = message
-            dialogForm.sale_order_item[index].price = new Decimal(message.goods.salePrice).toNumber()
+            dialogForm.sale_order_item[index].price = message.goods.salePrice
           }
         }
       },
@@ -469,16 +459,7 @@ export default {
         }
         // 状态置为编辑--目的为添加批次id
         state.isEdit = true
-
-        //组装批次
-        const specieList = getOutboundSpecieData(updateOutbound.sale_order_item)
         state.isEdit = false
-        const prams = {
-          outboundData: updateOutbound,
-          outboundId: item.id,
-          outboundDetailIds: item.sale_order_item.map(v => v.id),
-          specieList
-        }
         const resDel = await deleteOutboundList(updateOutbound).finally(() => {
           loading.close()
         })

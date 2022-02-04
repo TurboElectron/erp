@@ -55,7 +55,11 @@
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
     <el-table-column prop="purchase_supplier.name" label="供应商" min-width="100"  />
-    <el-table-column prop="totalPrice" label="应付" min-width="100"  />
+    <el-table-column prop="totalPrice" label="应付" min-width="100"  >
+      <template #default="scope">
+        {{scope.row.totalPrice}}
+      </template>
+    </el-table-column>
     <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200">
@@ -242,25 +246,18 @@ import {
   updateGrnList,
   addGrnList,
   deleteGrnList,
-  getSupplierList,
-  getRepoList,
-  getListByCategoryId,
-  getCategoryTree,
-  getUnitList
-  ,
-  addSpecieList,
-  goodsList, stockDetail, goodsDetail
+  getCategoryTree
+  , goodsDetail
 } from '@/api/common'
 import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
-import mathJs from '@/utils/math'
 //远程搜索供应商，客户
 import remoteMix from '@/mixin/remote'
 import _ from 'lodash'
 import GoodsSelect from "@temp/GoodsSelect";
 import SupplierSelect from "@temp/SupplierSelect";
 import RepoSelect from "@temp/RepoSelect";
-import {Decimal} from "decimal.js";
+import * as math from "mathjs";
 
 export default {
   name: 'grnManage',
@@ -346,7 +343,7 @@ export default {
     const methods = {
       getTotalPrice(index) {
         const curGrnDetail = dialogForm.purchase_order_item[index]
-        dialogForm.purchase_order_item[index].totalPrice = mathJs.multiply(curGrnDetail.amount, curGrnDetail.price)
+        dialogForm.purchase_order_item[index].totalPrice =  math.evaluate(`${curGrnDetail.amount} * ${curGrnDetail.price}`)
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
@@ -356,7 +353,7 @@ export default {
           const {code, message} = await goodsDetail({id: goodsId})
           if (code === 200) {
             dialogForm.purchase_order_item[index].goods = message
-            dialogForm.purchase_order_item[index].price = new Decimal(message.buyPrice).toNumber()
+            dialogForm.purchase_order_item[index].price = message.buyPrice
           }
         }
       },
@@ -364,7 +361,7 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = dialogForm.purchase_order_item.reduce((total, c) => total += c.totalPrice, 0)
+        const totalPrice = dialogForm.purchase_order_item.reduce((total, c) => math.evaluate(`${total} + ${c.totalPrice}`), 0)
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款
@@ -468,16 +465,7 @@ export default {
         }
         // 状态置为编辑--目的为添加批次id
         state.isEdit = true
-
-        //组装批次
-        const specieList = getGrnSpecieData(updateGrn.purchase_order_item)
         state.isEdit = false
-        const prams = {
-          grnData: updateGrn,
-          grnId: item.id,
-          grnDetailIds: item.purchase_order_item.map(v => v.id),
-          specieList
-        }
         const resDel = await deleteGrnList(updateGrn).finally(() => {
           loading.close()
         })
@@ -525,77 +513,6 @@ export default {
         state.currentPage = value
         this.getTableData()
       }
-    }
-
-    /**
-     * 获取入库产品批次
-     */
-    const getGrnSpecieData = (grnDetailData) => {
-      if (!grnDetailData) grnDetailData = dialogForm.purchase_order_item;
-      return grnDetailData.map(v => {
-        const unitId = Array.isArray(v.unitId) ? v.unitId.at(-1) : v.unitId;
-        // 数量单位名称
-        let unitNameData = getDataById(state.unitData, unitId)
-
-        unitNameData.find(unitv => unitv.id === unitId)// state.unitData.flat(Infinity).find(unitv => unitv.id === unitId)
-        const unitName = unitNameData?.[0]?.name ?? '';
-        // 入库产品id
-        const categoryId = Array.isArray(v.categoryId) ? v.categoryId.at(-1) : v.categoryId;
-        let editParas = {}
-        //修改状态下 添加批次id
-        if (state.isEdit) {
-          editParas.id = v.specieId;
-        }
-        return {
-          name: v.specieName,
-          categoryId,
-          unitId,
-          unitName,
-          cost: v.price,// mathJs.divide(v.totalPrice, v.amount),//成本 = 总成 / 数量
-          selling: 0,
-          ...editParas
-        }
-      })
-    }
-
-    /**
-     * 入库产品添加总价
-     */
-    const setGrnDetailTotalPrice = () => {
-      return new Promise((resolve, reject) => {
-        let index = 1;
-        for (const item of dialogForm.purchase_order_item) {
-          // 选择批次id
-          // const curSpecieId = item.specieId;
-          // const selSpecieData = item.specieData.find(v => v.id === curSpecieId)
-          // if (!selSpecieData) {
-          //   showMessage('error', `入库库产品第${index}项。批次不存在！`)
-          //   reject("批次不存在")
-          //   break
-          // }
-          // // 选择批次价格
-          // const speciCost = selSpecieData.cost;
-          // // 选择批次数量单位
-          // const specieUnitId = selSpecieData.unitId
-          // //比较选择的批次计量单位与 选择的数量单位是否一致
-          // const unit1Id = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
-
-          // const { equal, totalPrice } = equalUnitRoot(state.unitData, unit1Id, specieUnitId, speciCost, item.amount)
-          // if (!equal) {
-          //   showMessage('error', `入库产品第${index}项。批次数量单位与入库数量单位不一致！`)
-          //   reject("批次数量单位与入库数量单位不一致，无法转换 不可入库")
-          //   break
-          // }
-          //计算总价（总成本改为计算）
-          // item.totalPrice = totalPrice
-          //单位最后一位
-          item.unitId = Array.isArray(item.unitId) ? item.unitId.at(-1) : item.unitId;
-          // 入库产品id
-          item.categoryId = Array.isArray(item.categoryId) ? item.categoryId.at(-1) : item.categoryId;
-          index++;
-        }
-        resolve()
-      })
     }
 
     //查询产品树、用户列表、供应商
