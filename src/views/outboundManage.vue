@@ -253,6 +253,7 @@ import _ from 'lodash'
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
+import * as math from "mathjs";
 export default {
   name: 'outboundManage',
   components: {GoodsSelectV2, RepoSelectV2, CustomerSelect},

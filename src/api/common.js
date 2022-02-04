@@ -862,7 +862,7 @@ export const updateOutboundList = async (data = {}) => {
         await Promise.all(adds.map(async _ => {
             await prisma.sale_order_item.create({
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock']),
                     orderId: data.id
                 }
             })
@@ -891,7 +891,7 @@ export const updateOutboundList = async (data = {}) => {
                     id: _.id
                 },
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods','isEdit']),
+                    ...omit(_, ['id', 'repo', 'goods','isEdit', 'stock']),
                 }
             })
         }))
