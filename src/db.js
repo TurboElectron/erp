@@ -10,6 +10,7 @@ console.log('llega', dbPath)
 console.log('llega', app)
 
 export const prisma = new PrismaClient({
+  log: ['query'],
   datasources: {
     db: {
       url: `file:${dbPath}`,

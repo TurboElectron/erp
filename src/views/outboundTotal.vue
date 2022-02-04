@@ -2,10 +2,10 @@
 <template>
   <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="商品：">
-      <goods-select-v2  v-model="queryForm.goodsId" :repo-id="queryForm.repoId"/>
+      <goods-select-v2  v-model="queryForm.goodsId" :repo-id="queryForm.repoId" is-edit/>
     </el-form-item>
     <el-form-item label="仓库">
-      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId"/>
+      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId" is-edit/>
     </el-form-item>
 
     <el-form-item label="开始时间：" prop="startDate">
@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, onMounted, readonly, toRaw } from 'vue';
+import { reactive, toRefs, onMounted } from 'vue';
 import moment from 'moment'
-import {geGrnClassify, geOutboundClassify} from '@/api/common'
+import {geOutboundClassify} from '@/api/common'
 import RepoSelect from "@temp/RepoSelect";
 import GoodsSelect from "@temp/GoodsSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";

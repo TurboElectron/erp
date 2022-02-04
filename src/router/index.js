@@ -59,6 +59,13 @@ const routes = [
       },
       component: () => import(/* webpackChunkName: "supplier" */ '../views/supplier.vue')
     }, {
+        path: '/supplierAnalysis',
+        name: 'supplierAnalysis',
+        meta: {
+          title: '采购行为统计',
+        },
+        component: () => import(/* webpackChunkName: "customer" */ '../views/supplierAnalysis.vue')
+      }, {
       path: '/grnManage',
       name: 'grnManage',
       meta: {

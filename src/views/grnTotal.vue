@@ -2,10 +2,10 @@
  <template>
   <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="商品：">
-      <goods-select  v-model="queryForm.goodsId"/>
+      <goods-select-v2  v-model="queryForm.goodsId" :repo-id="queryForm.repoId" is-edit/>
     </el-form-item>
     <el-form-item label="仓库">
-      <repo-select v-model="queryForm.repoId"/>
+      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId" is-edit/>
     </el-form-item>
 
     <el-form-item label="开始时间：" prop="startDate">
@@ -44,14 +44,14 @@
 </template>
 
   <script>
-import { reactive, toRefs, ref, onMounted, readonly, toRaw } from 'vue';
+import { reactive, toRefs, onMounted } from 'vue';
 import moment from 'moment'
 import {geGrnClassify} from '@/api/common'
-import RepoSelect from "@temp/RepoSelect";
-import GoodsSelect from "@temp/GoodsSelect";
+import GoodsSelectV2 from "@temp/GoodsSelectV2";
+import RepoSelectV2 from "@temp/RepoSelectV2";
 export default {
   name: 'grnTotal',
-  components: {GoodsSelect, RepoSelect},
+  components: {RepoSelectV2, GoodsSelectV2},
   setup() {
 
     /**
@@ -88,7 +88,6 @@ export default {
           pageSize: state.pageSize,
           pageNo: state.currentPage
         })
-        console.log(params)
         const res = await geGrnClassify(params)
         res.code === 200 && (state.tableData = res.message.records) && (state.total = res.message.total)
         state.loadTable = false

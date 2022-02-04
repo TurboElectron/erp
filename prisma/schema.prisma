@@ -10,34 +10,17 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model base_employee {
-  id       Int       @id @default(autoincrement())
-  name     String
-  code     String?
-  idCard   String?
-  mobile   String?
-  sex      Int?      @default(0)
-  birthday DateTime?
-  address  String?
-  email    String?
-  type     String?
-  updater  String?
-  updatime DateTime?
-  state    Int       @default(1)
-}
-
 model category {
-  id    Int          @id @default(autoincrement())
+  id    Int     @id @default(autoincrement())
   label String
   pid   Int?
-  goods base_goods[]
+  goods goods[]
 }
 
-model base_goods {
+model goods {
   id                  Int                   @id @default(autoincrement())
   name                String
   code                String
-  category            category?             @relation(fields: [cid], references: [id])
   cid                 Int?
   type                String?
   brand               String?
@@ -52,31 +35,7 @@ model base_goods {
   updatime            DateTime?
   state               Int                   @default(1)
   picture             String?
-  purchase_order_item purchase_order_item[]
-  sale_order_item     sale_order_item[]
-  stock               stock[]
-}
-
-model base_param {
-  id       Int       @id @default(autoincrement())
-  name     String
-  descs    String?
-  state    Int       @default(1)
-  type     String
-  creater  String?
-  creatime DateTime?
-}
-
-model base_repo {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  code                String
-  address             String?
-  descs               String?
-  adminId             Int?
-  updater             String?
-  updatime            DateTime?             @updatedAt
-  state               Int                   @default(1)
+  category            category?             @relation(fields: [cid], references: [id])
   purchase_order_item purchase_order_item[]
   sale_order_item     sale_order_item[]
   stock               stock[]
@@ -84,28 +43,28 @@ model base_repo {
 
 model purchase_order {
   id                  Int                   @id @default(autoincrement())
-  itemList            purchase_order_item[]
   supplierId          Int?
-  supplier            purchase_supplier?    @relation(fields: [supplierId], references: [id])
   code                String?
   payPrice            Decimal?
   totalPrice          Decimal?
   userId              Int?
   descs               String
   date                DateTime?
+  purchase_supplier   purchase_supplier?    @relation(fields: [supplierId], references: [id])
+  purchase_order_item purchase_order_item[]
 }
 
 model purchase_order_item {
   id             Int            @id @default(autoincrement())
   orderId        Int
   repoId         Int
-  repo           base_repo      @relation(fields: [repoId], references: [id])
-  purchase_order purchase_order @relation(fields: [orderId], references: [id])
   goodsId        Int?
-  goods          base_goods?    @relation(fields: [goodsId], references: [id])
   amount         Int?
   price          Decimal?
   totalPrice     Decimal?
+  goods          goods?         @relation(fields: [goodsId], references: [id])
+  purchase_order purchase_order @relation(fields: [orderId], references: [id])
+  repo           repo           @relation(fields: [repoId], references: [id])
 }
 
 model purchase_supplier {
@@ -119,6 +78,21 @@ model purchase_supplier {
   updater        String?
   updatime       DateTime?
   purchase_order purchase_order[]
+}
+
+model repo {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String
+  address             String?
+  descs               String?
+  adminId             Int?
+  updater             String?
+  updatime            DateTime?
+  state               Int                   @default(1)
+  purchase_order_item purchase_order_item[]
+  sale_order_item     sale_order_item[]
+  stock               stock[]
 }
 
 model sale_customer {
@@ -135,37 +109,35 @@ model sale_customer {
 }
 
 model sale_order {
-  id         Int               @id @default(autoincrement())
-  itemList   sale_order_item[]
-  customerId Int?
-  customer   sale_customer?    @relation(fields: [customerId], references: [id])
-  code       String?
-  payPrice   Decimal?
-  totalPrice Decimal?
-  userId     Int?
-  descs      String
-  date       DateTime?
+  id              Int               @id @default(autoincrement())
+  customerId      Int?
+  code            String?
+  payPrice        Decimal?
+  totalPrice      Decimal?
+  userId          Int?
+  descs           String
+  date            DateTime?
+  sale_customer   sale_customer?    @relation(fields: [customerId], references: [id])
+  sale_order_item sale_order_item[]
 }
 
 model sale_order_item {
-  id         Int         @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   orderId    Int
   repoId     Int
-  repo       base_repo   @relation(fields: [repoId], references: [id])
-  sale_order sale_order  @relation(fields: [orderId], references: [id])
   goodsId    Int?
-  goods      base_goods? @relation(fields: [goodsId], references: [id])
   amount     Int?
   price      Decimal?
   totalPrice Decimal?
+  goods      goods?     @relation(fields: [goodsId], references: [id])
+  sale_order sale_order @relation(fields: [orderId], references: [id])
+  repo       repo       @relation(fields: [repoId], references: [id])
 }
 
 model stock {
-  id             Int         @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   goodsId        Int
-  goods          base_goods? @relation(fields: [goodsId], references: [id])
   repoId         Int
-  repo           base_repo   @relation(fields: [repoId], references: [id])
   totalCount     Int?
   saleCount      Int?
   buyPrice       Decimal?
@@ -173,11 +145,13 @@ model stock {
   salePrice      Decimal?
   totalBuyPrice  Decimal?
   totalSalePrice Decimal?
-  updatime       DateTime?   @updatedAt
-  state          Int         @default(1)
+  updatime       DateTime?
+  state          Int       @default(1)
+  goods          goods     @relation(fields: [goodsId], references: [id])
+  repo           repo      @relation(fields: [repoId], references: [id])
 }
 
-model sys_user {
+model user {
   id         Int       @id @default(autoincrement())
   account    String
   password   String
@@ -189,6 +163,4 @@ model sys_user {
   state      Int       @default(1)
   isLocked   Int?      @default(0)
   lockTime   DateTime?
-
-  @@index([account, password], map: "idx_sys_user_idx_user_account")
 }

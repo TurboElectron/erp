@@ -61,6 +61,16 @@ export default {
         title: "用户管理",
       },
       {
+        icon: "Goods",
+        index: "/category",
+        title: "商品管理"
+      },
+      {
+        icon: "OfficeBuilding",
+        index: "/repoManager",
+        title: "仓库管理"
+      },
+      {
         icon: "UserFilled",
         title: "客户管理",
         index: "customerCom",
@@ -73,34 +83,26 @@ export default {
           {
             icon: "Grid",
             index: "/customerAnalysis",
-            title: "购买统计",
+            title: "销售统计",
           }
         ]
       },
       {
-        icon: "Goods",
-        index: "/category",
-        title: "商品管理"
-      },
-      // {
-      //   icon: "Shop",
-      //   index: "/specie",
-      //   title: "批次管理"
-      // },
-      // {
-      //   icon: "Coin",
-      //   index: "/unitManager",
-      //   title: "单位管理"
-      // },
-      {
-        icon: "OfficeBuilding",
-        index: "/repoManager",
-        title: "仓库管理"
-      },
-      {
         icon: "Van",
-        index: "/supplierManage",
-        title: "供应商管理"
+        index: "supplierManage",
+        title: "供应商管理",
+        subs: [
+          {
+            icon: "List",
+            index: "/supplierManage",
+            title: "供应商管理",
+          },
+          {
+            icon: "Grid",
+            index: "/supplierAnalysis",
+            title: "采购统计",
+          }
+        ]
       },
       {
         icon: "SoldOut",

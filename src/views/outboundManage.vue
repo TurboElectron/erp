@@ -37,7 +37,7 @@
     <el-table-column type="expand">
       <template #default="props">
         <div class="outbound-detail-list">
-          <el-table :data="props.row.itemList">
+          <el-table :data="props.row.sale_order_item">
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
@@ -124,17 +124,17 @@
         <el-divider> <span class="outbound-detail-title">出库产品明细</span> </el-divider>
       </el-form-item>
       <el-form-item label-width='0'>
-        <el-table :data="dialogForm.itemList">
+        <el-table :data="dialogForm.sale_order_item">
           <el-table-column label="出库仓库" min-width="220px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
+              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
                 <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId" :is-edit="props.row.isEdit"/>
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="出库产品" min-width="220px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
+              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.goodsId'"
                             :rules="dialogFormRules.goodsId">
                 <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit"/>
               </el-form-item>
@@ -150,7 +150,7 @@
 
           <el-table-column label="出库数量" min-width="160px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
+              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
                                  :max="props.row.stock?.totalCount"
                                  style="width:100%" clearable placeholder="请输入出库数量"
@@ -171,7 +171,7 @@
           </el-table-column>
           <el-table-column label="单价" min-width="200px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.price'" :rules="dialogFormRules.price">
+              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
                                  style="width:100%" clearable placeholder="请输入单价"
                                  :disabled="!(props.row.goodsId && props.row.repoId)"
@@ -303,7 +303,7 @@ export default {
       totalPrice: 0,// 总价
       payPrice: 0, // 已付款
       descs: '', // 备注信息
-      itemList: [{
+      sale_order_item: [{
         goodsId: '',
         repoId: '',
         amount: 0,
@@ -346,18 +346,18 @@ export default {
     const dialogRef = ref(null)
     const methods = {
       getTotalPrice(index) {
-        const curOutboundDetail = dialogForm.itemList[index]
-        dialogForm.itemList[index].totalPrice = mathJs.multiply(curOutboundDetail.amount, curOutboundDetail.price)
+        const curOutboundDetail = dialogForm.sale_order_item[index]
+        dialogForm.sale_order_item[index].totalPrice = mathJs.multiply(curOutboundDetail.amount, curOutboundDetail.price)
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
-        const curOutboundDetail = dialogForm.itemList[index]
+        const curOutboundDetail = dialogForm.sale_order_item[index]
         const {repoId, goodsId} = curOutboundDetail
         if (repoId && goodsId) {
           const {code, message} = await stockDetail(curOutboundDetail)
           if (code === 200) {
-            dialogForm.itemList[index].stock = message
-            dialogForm.itemList[index].price = new Decimal(message.goods.salePrice).toNumber()
+            dialogForm.sale_order_item[index].stock = message
+            dialogForm.sale_order_item[index].price = new Decimal(message.goods.salePrice).toNumber()
           }
         }
       },
@@ -365,7 +365,7 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = dialogForm.itemList.reduce((total, c) => total += c.totalPrice, 0)
+        const totalPrice = dialogForm.sale_order_item.reduce((total, c) => total += c.totalPrice, 0)
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款
@@ -386,14 +386,14 @@ export default {
        * 移除出库明细
        */
       removeOutboundDetail(index) {
-        dialogForm.itemList.splice(index, 1)
+        dialogForm.sale_order_item.splice(index, 1)
       },
       /**
        * 新增出库产品明细
        * 添加一个子级明细
        */
       addOutboundDetailList() {
-        dialogForm.itemList.push({
+        dialogForm.sale_order_item.push({
           repoId: '',
           amount: 0,
           totalPrice: 0,//采购成本
@@ -444,7 +444,7 @@ export default {
         state.isEdit = false
         nextTick(() => {
           dialogRef.value.resetFields()
-          dialogForm.itemList = [{
+          dialogForm.sale_order_item = [{
             goodsId: '',
             repoId: '',
             amount: 0,
@@ -464,19 +464,19 @@ export default {
         const loading = globalLoading()
         const updateOutbound = _.cloneDeep(item); //JSON.parse(JSON.stringify(toRaw(item)))
         //将库存清零
-        for (const itemc of updateOutbound.itemList) {
+        for (const itemc of updateOutbound.sale_order_item) {
           itemc.amount = 0
         }
         // 状态置为编辑--目的为添加批次id
         state.isEdit = true
 
         //组装批次
-        const specieList = getOutboundSpecieData(updateOutbound.itemList)
+        const specieList = getOutboundSpecieData(updateOutbound.sale_order_item)
         state.isEdit = false
         const prams = {
           outboundData: updateOutbound,
           outboundId: item.id,
-          outboundDetailIds: item.itemList.map(v => v.id),
+          outboundDetailIds: item.sale_order_item.map(v => v.id),
           specieList
         }
         const resDel = await deleteOutboundList(updateOutbound).finally(() => {
@@ -532,7 +532,7 @@ export default {
      * 获取出库产品批次
      */
     const getOutboundSpecieData = (outboundDetailData) => {
-      if (!outboundDetailData) outboundDetailData = dialogForm.itemList;
+      if (!outboundDetailData) outboundDetailData = dialogForm.sale_order_item;
       return outboundDetailData.map(v => {
         const unitId = Array.isArray(v.unitId) ? v.unitId.at(-1) : v.unitId;
         // 数量单位名称

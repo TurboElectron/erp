@@ -37,7 +37,7 @@
     <el-table-column type="expand">
       <template #default="props">
         <div class="grn-detail-list">
-          <el-table :data="props.row.itemList">
+          <el-table :data="props.row.purchase_order_item">
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
@@ -54,7 +54,7 @@
       </template>
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
-    <el-table-column prop="supplier.name" label="供应商" min-width="100"  />
+    <el-table-column prop="purchase_supplier.name" label="供应商" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
     <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
@@ -124,10 +124,10 @@
         <el-divider> <span class="grn-detail-title">入库产品明细</span> </el-divider>
       </el-form-item>
       <el-form-item label-width='0'>
-        <el-table :data="dialogForm.itemList">
+        <el-table :data="dialogForm.purchase_order_item">
           <el-table-column label="入库产品" min-width="220px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.goodsId'"
+              <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.goodsId'"
                 :rules="dialogFormRules.goodsId">
                     <goods-select v-model="props.row.goodsId"  @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit" />
               </el-form-item>
@@ -136,7 +136,7 @@
 
           <el-table-column label="入库仓库" min-width="220px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
+              <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
                 <repo-select v-model="props.row.repoId" :is-edit="props.row.isEdit"/>
               </el-form-item>
             </template>
@@ -144,7 +144,7 @@
 
           <el-table-column label="入库数量" min-width="160px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
+              <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
                   style="width:100%" clearable placeholder="请输入入库数量"
                                  v-if="props.row.isEdit"
@@ -163,7 +163,7 @@
           </el-table-column>
           <el-table-column label="单价" min-width="200px">
             <template #default="props">
-              <el-form-item label-width="0" :prop="'itemList.'+props.$index+'.price'" :rules="dialogFormRules.price">
+              <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
                   style="width:100%" clearable placeholder="请输入单价"
                                  v-if="props.row.isEdit"
@@ -302,7 +302,7 @@ export default {
       totalPrice: 0,// 总价
       payPrice: 0, // 已付款
       descs: '', // 备注信息
-      itemList: [{
+      purchase_order_item: [{
         goodsId: '',
         repoId: '',
         amount: 0,
@@ -345,18 +345,18 @@ export default {
     const dialogRef = ref(null)
     const methods = {
       getTotalPrice(index) {
-        const curGrnDetail = dialogForm.itemList[index]
-        dialogForm.itemList[index].totalPrice = mathJs.multiply(curGrnDetail.amount, curGrnDetail.price)
+        const curGrnDetail = dialogForm.purchase_order_item[index]
+        dialogForm.purchase_order_item[index].totalPrice = mathJs.multiply(curGrnDetail.amount, curGrnDetail.price)
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
-        const curGrnDetail = dialogForm.itemList[index]
+        const curGrnDetail = dialogForm.purchase_order_item[index]
         const {goodsId} = curGrnDetail
         if (goodsId) {
           const {code, message} = await goodsDetail({id: goodsId})
           if (code === 200) {
-            dialogForm.itemList[index].goods = message
-            dialogForm.itemList[index].price = new Decimal(message.buyPrice).toNumber()
+            dialogForm.purchase_order_item[index].goods = message
+            dialogForm.purchase_order_item[index].price = new Decimal(message.buyPrice).toNumber()
           }
         }
       },
@@ -364,7 +364,7 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = dialogForm.itemList.reduce((total, c) => total += c.totalPrice, 0)
+        const totalPrice = dialogForm.purchase_order_item.reduce((total, c) => total += c.totalPrice, 0)
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款
@@ -385,14 +385,14 @@ export default {
        * 移除入库明细
        */
       removeGrnDetail(index) {
-        dialogForm.itemList.splice(index, 1)
+        dialogForm.purchase_order_item.splice(index, 1)
       },
       /**
        * 新增入库产品明细
        * 添加一个子级明细
        */
       addGrnDetailList() {
-        dialogForm.itemList.push({
+        dialogForm.purchase_order_item.push({
           repoId: '',
           amount: 0,
           totalPrice: 0,//采购成本
@@ -443,7 +443,7 @@ export default {
         state.isEdit = false
         nextTick(() => {
           dialogRef.value.resetFields()
-          dialogForm.itemList = [{
+          dialogForm.purchase_order_item = [{
             goodsId: '',
             repoId: '',
             amount: 0,
@@ -463,19 +463,19 @@ export default {
         const loading = globalLoading()
         const updateGrn = _.cloneDeep(item); //JSON.parse(JSON.stringify(toRaw(item)))
         //将库存清零
-        for (const itemc of updateGrn.itemList) {
+        for (const itemc of updateGrn.purchase_order_item) {
           itemc.amount = 0
         }
         // 状态置为编辑--目的为添加批次id
         state.isEdit = true
 
         //组装批次
-        const specieList = getGrnSpecieData(updateGrn.itemList)
+        const specieList = getGrnSpecieData(updateGrn.purchase_order_item)
         state.isEdit = false
         const prams = {
           grnData: updateGrn,
           grnId: item.id,
-          grnDetailIds: item.itemList.map(v => v.id),
+          grnDetailIds: item.purchase_order_item.map(v => v.id),
           specieList
         }
         const resDel = await deleteGrnList(updateGrn).finally(() => {
@@ -531,7 +531,7 @@ export default {
      * 获取入库产品批次
      */
     const getGrnSpecieData = (grnDetailData) => {
-      if (!grnDetailData) grnDetailData = dialogForm.itemList;
+      if (!grnDetailData) grnDetailData = dialogForm.purchase_order_item;
       return grnDetailData.map(v => {
         const unitId = Array.isArray(v.unitId) ? v.unitId.at(-1) : v.unitId;
         // 数量单位名称
@@ -564,7 +564,7 @@ export default {
     const setGrnDetailTotalPrice = () => {
       return new Promise((resolve, reject) => {
         let index = 1;
-        for (const item of dialogForm.itemList) {
+        for (const item of dialogForm.purchase_order_item) {
           // 选择批次id
           // const curSpecieId = item.specieId;
           // const selSpecieData = item.specieData.find(v => v.id === curSpecieId)

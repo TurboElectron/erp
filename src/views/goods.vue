@@ -48,6 +48,12 @@
         <el-input v-model="goodsDialogForm.code" show-word-limit clearable placeholder="请输入产品编号">
         </el-input>
       </el-form-item>
+      <el-form-item label="预设进价：" prop="buyPrice">
+        <el-input v-model="goodsDialogForm.buyPrice"  clearable placeholder="请输入预设进价"></el-input>
+      </el-form-item>
+      <el-form-item label="预设售价：" prop="salePrice">
+        <el-input v-model="goodsDialogForm.salePrice"  clearable placeholder="请输入预设售价"></el-input>
+      </el-form-item>
       <el-form-item label="产品型号：" prop="type">
         <el-input v-model="goodsDialogForm.type" show-word-limit clearable placeholder="请输入产品型号">
         </el-input>
@@ -66,12 +72,6 @@
       </el-form-item>
       <el-form-item label="材质：" prop="material">
         <el-input v-model="goodsDialogForm.material"  clearable placeholder="请输入材质"></el-input>
-      </el-form-item>
-      <el-form-item label="预设进价：" prop="buyPrice">
-        <el-input v-model="goodsDialogForm.buyPrice"  clearable placeholder="请输入预设进价"></el-input>
-      </el-form-item>
-      <el-form-item label="预设售价：" prop="salePrice">
-        <el-input v-model="goodsDialogForm.salePrice"  clearable placeholder="请输入预设售价"></el-input>
       </el-form-item>
       <el-form-item label="备注信息：" prop="descs">
         <el-input v-model="goodsDialogForm.descs" maxlength="50" show-word-limit autocomplete="off" :rows="3"
@@ -151,10 +151,15 @@ export default {
         name: [{
           required: true, message: '请输入产品名称', trigger: 'blur',
         }],
-        // mobile: [
-        //   { required: true, message: '请输入手机号', trigger: "blur" },
-        //   { pattern: /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/, message: '手机号码格式错误', trigger: "blur" }
-        // ]
+        buyPrice: [{
+          required: true, message: '请输入预设进价', trigger: 'blur',
+        }],
+        salePrice: [{
+          required: true, message: '请输入预设售价', trigger: 'blur',
+        }],
+        code: [{
+          required: true, message: '请输入产品编号', trigger: 'blur',
+        }],
       }
     })
 

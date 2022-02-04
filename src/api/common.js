@@ -5,7 +5,7 @@ import mathJs from '@/utils/math'
 /** 添加产品 */
 export const addGoods = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
-    const res = await prisma.base_goods.create({
+    const res = await prisma.goods.create({
         data
     })
     return {
@@ -17,7 +17,7 @@ export const addGoods = async (data = {}) => {
 /** 修改产品 */
 export const updateGoods  = async (data = {}) => {
     // return httpFetch.post('customer/update', data)
-    const res = await prisma.base_goods.update({
+    const res = await prisma.goods.update({
         where: {id: data.id},
         data
     })
@@ -30,7 +30,7 @@ export const updateGoods  = async (data = {}) => {
 /** 删除产品 */
 export const removeGoods  = async (data = {}) => {
     // return httpFetch.post('customer/delete', data)
-    const res = await prisma.base_goods.delete({
+    const res = await prisma.goods.delete({
         where: {id: data.id},
     })
     return {
@@ -40,7 +40,7 @@ export const removeGoods  = async (data = {}) => {
 }
 export const goodsDetail = async (data={}) => {
     const {id} = data
-    const res = await prisma.base_goods.findUnique({
+    const res = await prisma.goods.findUnique({
         where: {
             id
         }
@@ -71,8 +71,8 @@ export const goodsList = async (data = {}) => {
         }
     }
     const [total,records] = await prisma.$transaction([
-        prisma.base_goods.count({where}),
-        prisma.base_goods.findMany({
+        prisma.goods.count({where}),
+        prisma.goods.findMany({
             skip: pageSize* (pageNo-1),
             take: pageSize,
             where
@@ -178,12 +178,12 @@ export const deleteCategory = async id => {
         where: {id},
     })
     let count = 0
-    const n = await prisma.base_goods.count({where: {cid: id}})
+    const n = await prisma.goods.count({where: {cid: id}})
     count = count + n
     async function iter(arr) {
         for (let i = 0; i < arr.length; i++) {
             const _ = arr[i]
-            const n = await prisma.base_goods.count({where: {cid: _.id}})
+            const n = await prisma.goods.count({where: {cid: _.id}})
             count = count + n
             _.children = await prisma.category.findMany({
                 where: {pid: _.id},
@@ -304,7 +304,7 @@ export const customerList = async (data = {}) => {
 /** 添加仓库 */
 export const addRepo = async (data = {}) => {
     // return httpFetch.post('repo/add', data)
-    const res = await prisma.base_repo.create({
+    const res = await prisma.repo.create({
         data
     })
     return {
@@ -316,7 +316,7 @@ export const addRepo = async (data = {}) => {
 /** 更新仓库 */
 export const updateRepo = async (data = {}) => {
     // return httpFetch.post('repo/update', data)
-    const res = await prisma.base_repo.update({
+    const res = await prisma.repo.update({
         where: {id: data.id},
         data
     })
@@ -340,8 +340,8 @@ export const getRepoList = async (data = {}) => {
         }
     }
     const [total, records] = await prisma.$transaction([
-        prisma.base_repo.count({where}),
-        prisma.base_repo.findMany({
+        prisma.repo.count({where}),
+        prisma.repo.findMany({
             where,
             orderBy: {
                 updatime: 'desc',
@@ -392,7 +392,7 @@ export const getRepoListV2 = async (data = {}) => {
 /** 删除仓库 */
 export const deleteRepo = async id => {
     // return httpFetch.post('repo/delete?id=' + id)
-    const res = await prisma.base_repo.delete({
+    const res = await prisma.repo.delete({
         where: {id},
     })
     return {
@@ -598,14 +598,16 @@ export const addGrnList = async (data = {}) => {
     await prisma.$transaction(async () => {
         await prisma.purchase_order.create({
             data: {
-                ...omit(data,['itemList']),
+                ...omit(data,['purchase_order_item']),
                 date: new Date(data.date),
-                itemList: {
-                    create: data.itemList
+                purchase_order_item: {
+                    create: data.purchase_order_item.map(_ => {
+                        return omit(_, ['repo','goods','isEdit'])
+                    })
                 },
             },
         })
-        await Promise.all(data.itemList.map(async _ => {
+        await Promise.all(data.purchase_order_item.map(async _ => {
             await grnUpdateStock(_)
         }))
     })
@@ -623,14 +625,14 @@ export const updateGrnList = async (data = {}) => {
                 id: data.id
             },
             data: {
-                ...omit(data, ['itemList', 'id']),
+                ...omit(data, ['purchase_order_item', 'id']),
                 date: new Date(data.date),
             },
         })
         const exists = await prisma.purchase_order_item.findMany({where: {
             orderId: data.id
             }})
-        await Promise.all(data.itemList.map(async _ => {
+        await Promise.all(data.purchase_order_item.map(async _ => {
             const poi = exists.find(e=> e.id === _.id)
             if (poi) {
                 const stock = await prisma.stock.findFirst({
@@ -738,7 +740,8 @@ export const getGrnList = async (data = {}) => {
             take: pageSize,
             where,
             include: {
-                itemList: {
+                purchase_supplier: true,
+                purchase_order_item: {
                     include: {
                         goods: true,
                         repo: true,
@@ -747,13 +750,6 @@ export const getGrnList = async (data = {}) => {
             }
         })
     ])
-    await Promise.all(records.map(async _ => {
-        _.supplier = await prisma.purchase_supplier.findUnique({
-            where: {
-                id: _.supplierId
-            }
-        })
-    }))
     return {
         code: 200,
         message: {
@@ -761,12 +757,6 @@ export const getGrnList = async (data = {}) => {
             total
         }
     }
-}
-
-
-/** 获取入库明细表*/
-export const getGrnDetailList = (data = {}) => {
-    return httpFetch.post('grnDetail/list', data)
 }
 
 /** 导出入库表*/
@@ -834,16 +824,16 @@ export const addOutboundList = async (data = {}) => {
     await prisma.$transaction(async () => {
         await prisma.sale_order.create({
             data: {
-                ...omit(data, ['itemList']),
+                ...omit(data, ['sale_order_item']),
                 date: new Date(data.date),
-                itemList: {
-                    create: data.itemList.map(_ => {
+                sale_order_item: {
+                    create: data.sale_order_item.map(_ => {
                         return omit(_, ['stock','isEdit'])
                     })
                 },
             },
         })
-        await Promise.all(data.itemList.map(async _ => {
+        await Promise.all(data.sale_order_item.map(async _ => {
             await outboundUpdateStock(_)
         }))
     })
@@ -862,7 +852,7 @@ export const updateOutboundList = async (data = {}) => {
                 id: data.id
             },
             data: {
-                ...omit(data, ['itemList', 'id']),
+                ...omit(data, ['sale_order_item', 'id']),
                 date: new Date(data.date),
             },
         })
@@ -871,7 +861,7 @@ export const updateOutboundList = async (data = {}) => {
                 orderId: data.id
             }
         })
-        await Promise.all(data.itemList.map(async _ => {
+        await Promise.all(data.sale_order_item.map(async _ => {
             const soi = exists.find(e => e.id === _.id)
             if (soi) {
                 const stock = await prisma.stock.findFirst({
@@ -950,7 +940,7 @@ export const getOutboundList = async (data = {}) => {
             take: pageSize,
             where,
             include: {
-                itemList: {
+                sale_order_item: {
                     include: {
                         goods: true,
                         repo: true
@@ -1170,6 +1160,55 @@ export const getCustomerRaking = async (data = {}) => {
                 customer: await prisma.sale_customer.findUnique({
                     where: {
                         id: _.customerId
+                    }
+                }),
+                ..._._sum,
+                allDebt: mathJs.subtract(_._sum.totalPrice,  _._sum.payPrice)
+            }
+        }))
+    }
+}
+
+/**
+ *  前五十名客户 购买 欠费  实付金额 排名
+ * @param {*} data
+ * startDate ?: Date 开始日期
+ * endDate ?: Date 结束日期
+ * @returns
+ */
+export const getSupplierRaking = async (data = {}) => {
+    // return httpFetch.post('outbound/customerRaking', data)
+    const {supplierId, startDate, endDate} = data
+    let where = {}
+    if (supplierId) {
+        where.supplierId = supplierId
+    }
+    if (startDate) {
+        where.date = {
+            gte: new Date(startDate)
+        }
+    }
+    if (endDate) {
+        where.date = {
+            ...where.date,
+            lte: new Date(endDate)
+        }
+    }
+    const res = await prisma.purchase_order.groupBy({
+        by: ['supplierId'],
+        _sum: {
+            totalPrice: true,
+            payPrice: true
+        },
+        where
+    })
+    return {
+        code: 200,
+        message: await Promise.all(res.map(async _ => {
+            return {
+                supplier: await prisma.purchase_supplier.findUnique({
+                    where: {
+                        id: _.supplierId
                     }
                 }),
                 ..._._sum,

@@ -5,7 +5,7 @@ export const login = async (data = {}) => {
     // return httpFetch.post('user/login', data, {
     //     params: data
     // })
-    const user = await prisma.sys_user.findUnique({
+    const user = await prisma.user.findUnique({
         where: {
             id: 1
         }

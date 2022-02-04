@@ -5,7 +5,7 @@ import {omit} from "lodash";
 /** 注册用户 */
 export const addUser = async (data = {}) => {
     // return httpFetch.post('user/register', data)
-    const res = await prisma.sys_user.create({
+    const res = await prisma.user.create({
         data
     })
     return {
@@ -23,8 +23,8 @@ export const updateUser = (data = {}) => {
 export const userList = async (data = {}) => {
     // return httpFetch.post('user/list', data)
     const [total, records] = await prisma.$transaction([
-        prisma.sys_user.count(),
-        prisma.sys_user.findMany({
+        prisma.user.count(),
+        prisma.user.findMany({
             where: prismaContains(data)
         })
     ])
