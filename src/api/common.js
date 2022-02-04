@@ -940,6 +940,7 @@ export const getOutboundList = async (data = {}) => {
             take: pageSize,
             where,
             include: {
+                sale_customer: true,
                 sale_order_item: {
                     include: {
                         goods: true,
