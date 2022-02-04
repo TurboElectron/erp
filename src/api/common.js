@@ -1147,7 +1147,8 @@ export const getCustomerRaking = async (data = {}) => {
         by: ['customerId'],
         _sum: {
             totalPrice: true,
-            payPrice: true
+            payPrice: true,
+            otherFee: true
         },
         where
     })

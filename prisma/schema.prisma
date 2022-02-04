@@ -114,6 +114,7 @@ model sale_order {
   code            String?
   payPrice        Float?
   totalPrice      Float?
+  otherFee        Float?
   userId          Int?
   descs           String
   date            DateTime?

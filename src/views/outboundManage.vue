@@ -45,6 +45,11 @@
             <el-table-column prop="totalPrice" label="总价"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
+          <el-form style="margin-left: 10px">
+            <el-form-item label="人工：">
+              {{props.row.otherFee}}
+            </el-form-item>
+          </el-form>
         </div>
       </template>
     </el-table-column>
@@ -196,7 +201,16 @@
       <el-form-item label-width='0'>
         <el-button type="text" size="medium" icon="CirclePlus" @click="addOutboundDetailList()">添加出库产品</el-button>
       </el-form-item>
-
+      <el-row>
+        <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+          <el-form-item label="人工费：" prop="otherFee">
+            <el-input-number v-model="dialogForm.otherFee" :precision="2" :min="0" clearable placeholder="请输入人工费用"
+                             @change="calculateTotalPrice"
+            >
+            </el-input-number>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-row>
 
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
@@ -293,6 +307,7 @@ export default {
       customerId: '',// 客户id
       totalPrice: 0,// 总价
       payPrice: 0, // 已付款
+      otherFee: 0, // 人工费
       descs: '', // 备注信息
       sale_order_item: [{
         goodsId: '',
@@ -356,7 +371,9 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = dialogForm.sale_order_item.reduce((total, c) => total += c.totalPrice, 0)
+        const totalPrice = math.evaluate(`${dialogForm.sale_order_item.reduce((total, c) => math.evaluate(
+            `${total} + ${c.totalPrice}`
+        ), 0)} + ${dialogForm.otherFee}`)
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款

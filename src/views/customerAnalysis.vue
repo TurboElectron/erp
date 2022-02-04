@@ -28,7 +28,8 @@
 
   <el-table :data="allRakingData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
     <el-table-column prop="customer.name" label="姓名" />
-    <el-table-column prop="totalPrice" label="总金额" sortable />
+    <el-table-column prop="otherFee" label="总人工费" sortable />
+    <el-table-column prop="totalPrice" label="总金额（包含人工）" sortable />
     <el-table-column prop="payPrice" label="总支付" sortable />
     <el-table-column prop="allDebt" label="总欠款" sortable />
     <el-table-column prop="date" label="时间">
