@@ -45,11 +45,6 @@
             <el-table-column prop="totalPrice" label="总价"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
-          <el-form style="margin-left: 10px">
-            <el-form-item label="人工：">
-              {{props.row.otherFee}}
-            </el-form-item>
-          </el-form>
         </div>
       </template>
     </el-table-column>
@@ -60,6 +55,7 @@
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
     <el-table-column prop="sale_customer.name" label="客户" min-width="100"  />
+    <el-table-column prop="otherFee" label="人工" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
     <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />

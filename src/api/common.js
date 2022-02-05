@@ -577,7 +577,7 @@ export const addGrnList = async (data = {}) => {
                 date: new Date(data.date),
                 purchase_order_item: {
                     create: data.purchase_order_item.map(_ => {
-                        return omit(_, ['repo','goods','isEdit'])
+                        return omit(_, ['repo','goods','isEdit', 'cid'])
                     })
                 },
             },
@@ -622,7 +622,7 @@ export const updateGrnList = async (data = {}) => {
         await Promise.all(adds.map(async  _ => {
             await prisma.purchase_order_item.create({
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'cid']),
                     orderId: data.id
                 }
             })
@@ -652,7 +652,7 @@ export const updateGrnList = async (data = {}) => {
                     id: _.id
                 },
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods', 'isEdit']),
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'cid']),
                 }
             })
         }))
@@ -814,7 +814,7 @@ export const addOutboundList = async (data = {}) => {
                 date: new Date(data.date),
                 sale_order_item: {
                     create: data.sale_order_item.map(_ => {
-                        return omit(_, ['stock','isEdit'])
+                        return omit(_, ['stock','isEdit', 'cid'])
                     })
                 },
             },
@@ -862,7 +862,7 @@ export const updateOutboundList = async (data = {}) => {
         await Promise.all(adds.map(async _ => {
             await prisma.sale_order_item.create({
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock']),
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock', 'cid']),
                     orderId: data.id
                 }
             })

@@ -40,6 +40,9 @@ const props = defineProps({
   modelValue: {
     type: [Number, String]
   },
+  cid: {
+    type: [Number, String]
+  },
   isEdit: {
     type: Boolean
   }
@@ -50,7 +53,10 @@ const params = ref({
   pageSize: 10,
   pageNo: 1,
 })
-const {data, loading, run} =useRequest(()=> goodsList(unref(params)), {manual:true})
+const {data, loading, run} =useRequest(()=> goodsList({
+  ...unref(params),
+  cid: props.cid
+}), {manual:true})
 watch(goodsId, (val)=> {
   if (val) {
     params.value.id = val

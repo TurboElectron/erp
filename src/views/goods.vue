@@ -49,10 +49,10 @@
         </el-input>
       </el-form-item>
       <el-form-item label="预设进价：" prop="buyPrice">
-        <el-input v-model="goodsDialogForm.buyPrice"  clearable placeholder="请输入预设进价"></el-input>
+        <el-input-number v-model.number="goodsDialogForm.buyPrice"  precision="2" clearable placeholder="请输入预设进价"></el-input-number>
       </el-form-item>
       <el-form-item label="预设售价：" prop="salePrice">
-        <el-input v-model="goodsDialogForm.salePrice"  clearable placeholder="请输入预设售价"></el-input>
+        <el-input-number v-model.number="goodsDialogForm.salePrice"  precision="2" clearable placeholder="请输入预设售价"></el-input-number>
       </el-form-item>
       <el-form-item label="产品型号：" prop="type">
         <el-input v-model="goodsDialogForm.type" show-word-limit clearable placeholder="请输入产品型号">

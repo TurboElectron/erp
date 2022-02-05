@@ -129,11 +129,18 @@
       </el-form-item>
       <el-form-item label-width='0'>
         <el-table :data="dialogForm.purchase_order_item">
+          <el-table-column label="入库产品分类" min-width="220px">
+            <template #default="props">
+              <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.cid'">
+                  <category-select v-model="props.row.cid" :is-edit="props.row.isEdit" />
+              </el-form-item>
+            </template>
+          </el-table-column>
           <el-table-column label="入库产品" min-width="220px">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.goodsId'"
                 :rules="dialogFormRules.goodsId">
-                    <goods-select v-model="props.row.goodsId"  @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit" />
+                    <goods-select v-model="props.row.goodsId"  @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit" :cid="props.row.cid"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -258,10 +265,11 @@ import GoodsSelect from "@temp/GoodsSelect";
 import SupplierSelect from "@temp/SupplierSelect";
 import RepoSelect from "@temp/RepoSelect";
 import * as math from "mathjs";
+import CategorySelect from "@temp/CategorySelect";
 
 export default {
   name: 'grnManage',
-  components: {RepoSelect, SupplierSelect, GoodsSelect},
+  components: {CategorySelect, RepoSelect, SupplierSelect, GoodsSelect},
   setup(props, context) {
 
     const state = reactive({
@@ -300,8 +308,9 @@ export default {
       payPrice: 0, // 已付款
       descs: '', // 备注信息
       purchase_order_item: [{
-        goodsId: '',
-        repoId: '',
+        cid: undefined,
+        goodsId: undefined,
+        repoId: undefined,
         amount: 0,
         totalPrice: 0,//采购成本
         price: 0,//单价
@@ -354,6 +363,7 @@ export default {
           if (code === 200) {
             dialogForm.purchase_order_item[index].goods = message
             dialogForm.purchase_order_item[index].price = message.buyPrice
+            dialogForm.purchase_order_item[index].cid = message.cid
           }
         }
       },
@@ -441,8 +451,9 @@ export default {
         nextTick(() => {
           dialogRef.value.resetFields()
           dialogForm.purchase_order_item = [{
-            goodsId: '',
-            repoId: '',
+            cid: undefined,
+            goodsId: undefined,
+            repoId: undefined,
             amount: 0,
             totalPrice: 0,//采购成本
             price: 0,//单价
