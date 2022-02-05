@@ -8,7 +8,7 @@ console.log(isDevelopment)
 const dbPath = isDevelopment ? join(resolve('./prisma/dev.db')) : join(app.getPath('userData'), 'database.db')
 console.log('llega', dbPath)
 console.log('llega', app)
-
+window.dbPath = dbPath
 export const prisma = new PrismaClient({
   log: ['query'],
   datasources: {

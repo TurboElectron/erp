@@ -16,6 +16,7 @@ module.exports = {
             },
             externals: ['@prisma/client'],
             nodeIntegration: true,
+            preload: 'src/preload.js',
         },
     },
     chainWebpack: config => {

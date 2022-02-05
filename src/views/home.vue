@@ -263,4 +263,12 @@
 <!--</style>-->
 <template>
   <div>待开发</div>
+  <el-form>
+    <el-form-item label="数据库地址：">
+      {{dbPath}}
+    </el-form-item>
+  </el-form>
 </template>
+<script setup>
+const dbPath = window.dbPath
+</script>
