@@ -38,6 +38,16 @@
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+      <el-form-item label="人工费总额：">
+        {{data.message.sale._sum.payOtherFee??0}}
+      </el-form-item>
+    </el-col>
+    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+      <el-form-item label="人工费欠款：">
+        {{data.message.overdraftOtherFee}}
+      </el-form-item>
+    </el-col>
+    <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="营业额：">
         {{data.message.profit}}
       </el-form-item>

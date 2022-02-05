@@ -19,6 +19,7 @@
     <el-table-column prop="goods.name" label="商品名称" />
     <el-table-column prop="goods.code" label="商品编号" />
     <el-table-column prop="totalCount" label="库存总量" />
+    <el-table-column prop="saleCount" label="销售总量" />
     <el-table-column prop="totalBuyPrice" label="总进价" />
     <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalSalePrice" label="总售价" />

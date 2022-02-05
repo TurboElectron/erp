@@ -55,7 +55,8 @@
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
     <el-table-column prop="sale_customer.name" label="客户" min-width="100"  />
-    <el-table-column prop="otherFee" label="人工" min-width="100"  />
+    <el-table-column prop="otherFee" label="人工应付" min-width="100"  />
+    <el-table-column prop="payOtherFee" label="人工实付" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
     <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
@@ -207,6 +208,13 @@
             </el-input-number>
           </el-form-item>
         </el-col>
+        <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+          <el-form-item label="已付款：" prop="payPrice">
+            <el-input-number v-model="dialogForm.payOtherFee" :precision="2" :min="0" clearable placeholder="请输入已付款"
+                             style="width:100%">
+            </el-input-number>
+          </el-form-item>
+        </el-col>
       </el-row>
       <el-row>
 
@@ -305,6 +313,7 @@ export default {
       totalPrice: 0,// 总价
       payPrice: 0, // 已付款
       otherFee: 0, // 人工费
+      payOtherFee: 0, // 人工费
       descs: '', // 备注信息
       sale_order_item: [{
         goodsId: '',
@@ -376,7 +385,7 @@ export default {
       calculateTotalPrice() {
         const totalPrice = math.evaluate(`${dialogForm.sale_order_item.reduce((total, c) => math.evaluate(
             `${total} + ${c.totalPrice}`
-        ), 0)} + ${dialogForm.otherFee}`)
+        ), 0)}`)
         // 总价格
         dialogForm.totalPrice = totalPrice
         // 已付款

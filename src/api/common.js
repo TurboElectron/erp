@@ -1247,6 +1247,8 @@ export const getProfit = async (data={}) => {
         _sum: {
             totalPrice: true,
             payPrice: true,
+            otherFee: true,
+            payOtherFee: true,
         },
         where
     })
@@ -1257,8 +1259,9 @@ export const getProfit = async (data={}) => {
             sale,
             overdraftPurchase: math.evaluate(`${purchase._sum.totalPrice??0} - ${purchase._sum.payPrice??0}`),
             overdraftSale: math.evaluate(`${sale._sum.totalPrice??0} - ${sale._sum.payPrice??0}`),
-            profit: math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0}`),
-            realProfit: math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0}`)
+            overdraftOtherFee: math.evaluate(`${sale._sum.otherFee??0} - ${sale._sum.payOtherFee??0}`),
+            profit: math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0} + ${sale._sum.otherFee??0}`),
+            realProfit: math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0} + ${sale._sum.payOtherFee??0}`)
         }
     }
 }
