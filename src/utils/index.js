@@ -1,6 +1,7 @@
 import { ElMessage, ElLoading } from "element-plus";
 import { nextTick } from "vue";
 import mathJs from './math'
+import { create, all } from 'mathjs'
 /**
  * 查找计量单位根
  * @param {*} data
@@ -143,3 +144,14 @@ export function prismaEquals (map,where={}) {
     })
     return where
 }
+
+
+const config = {
+    epsilon: 1e-12,
+    matrix: 'Matrix',
+    number: 'BigNumber',
+    precision: 2,
+    predictable: false,
+    randomSeed: null
+}
+export const math = create(all, config)

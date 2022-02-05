@@ -49,6 +49,8 @@ watch(repoId, (val)=> {
     params.value.id = val
     run()
   }
+}, {
+  immediate: true
 })
 const search = (name)=> {
   params.value.id = undefined

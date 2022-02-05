@@ -106,8 +106,12 @@ export const goodsListV2 = async (data = {}) => {
         }
     }
     const [total,records] = await prisma.$transaction([
-        prisma.stock.count({where}),
+        prisma.stock.groupBy({
+            by: ['goodsId'],
+            where,
+        }),
         prisma.stock.findMany({
+            distinct: ['goodsId'],
             skip: pageSize* (pageNo-1),
             take: pageSize,
             where,
@@ -120,7 +124,7 @@ export const goodsListV2 = async (data = {}) => {
         code: 200,
         message: {
             records: records.map(_ => _.goods),
-            total
+            total: total.length
         }
     }
 }
@@ -348,9 +352,9 @@ export const getRepoListV2 = async (data = {}) => {
             contains: name
         }
     }
-    const [total, records] = await prisma.$transaction([
-        prisma.stock.count({where}),
+    const [records] = await prisma.$transaction([
         prisma.stock.findMany({
+            distinct: ['repoId'],
             select: {
                 repo: true
             },
@@ -361,7 +365,6 @@ export const getRepoListV2 = async (data = {}) => {
         code: 200,
         message: {
             records: records.map(_ => _.repo),
-            total
         }
     }
 }
@@ -807,14 +810,14 @@ export const geGrnClassify = async (data = {}) => {
 /** 出库*/
 export const addOutboundList = async (data = {}) => {
     // return httpFetch.post('outbound/add', data)
-    await prisma.$transaction(async () => {
-        await prisma.sale_order.create({
+   const res =  await prisma.$transaction(async () => {
+        const res =  await prisma.sale_order.create({
             data: {
-                ...omit(data, ['sale_order_item']),
+                ...omit(data, ['sale_order_item', 'id']),
                 date: new Date(data.date),
                 sale_order_item: {
                     create: data.sale_order_item.map(_ => {
-                        return omit(_, ['stock','isEdit', 'cid'])
+                        return omit(_, ['stock','isEdit', 'cid', 'id'])
                     })
                 },
             },
@@ -822,9 +825,11 @@ export const addOutboundList = async (data = {}) => {
         await Promise.all(data.sale_order_item.map(async _ => {
             await outboundUpdateStock(_)
         }))
+        return res
     })
     return {
         code: 200,
+        data: res,
         message: '成功'
     }
 }

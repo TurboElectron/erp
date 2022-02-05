@@ -147,7 +147,7 @@ export default {
       {
         icon: "Collection",
         index: "/inventory",
-        title: "库存盘点"
+        title: "库存汇总"
       },
       {
         icon: "Collection",

@@ -63,6 +63,8 @@ watch(goodsId, (val)=> {
     emit('change')
     run()
   }
+}, {
+  immediate: true
 })
 const searchGoods = (name)=> {
   params.value.id = undefined

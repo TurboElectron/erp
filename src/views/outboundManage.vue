@@ -146,6 +146,7 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
+                                 :max="props.row.stock?.totalCount"
                                  style="width:100%" clearable placeholder="请输入出库数量"
                 :disabled="!(props.row.goodsId && props.row.repoId)"
                                  v-if="props.row.isEdit"
@@ -185,7 +186,7 @@
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="props">
               <el-form-item label-width="0">
-                <el-button size="mini" type="primary" @click="props.row.isEdit=!props.row.isEdit">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
+                <el-button size="mini" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
                 <el-button size="mini" type="danger" icon="Delete" @click="removeOutboundDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
               </el-form-item>
             </template>
@@ -212,7 +213,7 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
           <el-form-item label="总成本：" prop="totalPrice">
             <div class="form-pre-flex">
-              {{parseFloat(dialogForm.totalPrice)}}
+              {{dialogForm.totalPrice}}
             </div>
           </el-form-item>
         </el-col>
@@ -347,6 +348,12 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
+      async handleConfirm(row) {
+        if (row.isEdit) {
+          await methods.handlerSave(false)
+        }
+        row.isEdit = !row.isEdit
+      },
       getTotalPrice(index) {
         const curOutboundDetail = dialogForm.sale_order_item[index]
         dialogForm.sale_order_item[index].totalPrice = math.evaluate(`${curOutboundDetail.amount} * ${curOutboundDetail.price}`)
@@ -482,21 +489,38 @@ export default {
         resDel.code === 200 && this.getTableData()
       },
       //保存
-      handlerSave() {
-        dialogRef.value.validate(async (valid) => {
-          if (valid) {
-            const params = Object.assign({}, dialogForm)
-            const responseData = state.isEdit ? await updateOutboundList(params) : await addOutboundList(params);
-            state.saveLoading = false
-            // 刷新表格
-            responseData.code === 200 && this.getTableData()
-            //显示提示信息
-            showMessage(responseData.code === 200 ? 'success' : 'error', state.isEdit ? responseData.message : responseData.message)
-            responseData.code === 200 && (state.dialogVisible = false)
-          }
-          else {
-            return false
-          }
+      handlerSave(close=true) {
+        return new Promise((resolve, reject) => {
+          dialogRef.value.validate(async (valid) => {
+            if (valid) {
+              const params = Object.assign({}, dialogForm)
+              const responseData = state.isEdit ? await updateOutboundList(params) : await addOutboundList(params);
+              state.saveLoading = false
+              // 刷新表格
+              if (responseData.code === 200) {
+                this.getTableData()
+                if (!state.isEdit) {
+                  state.isEdit = true
+                  dialogForm.id = responseData.data.id
+                }
+              }
+              //显示提示信息
+              showMessage(responseData.code === 200 ? 'success' : 'error', responseData.message)
+              if (
+                  close
+              ) {
+                responseData.code === 200 && (state.dialogVisible = false)
+              }
+              if (responseData.code === 200) {
+                resolve(true)
+              } else {
+                reject(false)
+              }
+            }
+            else {
+              reject(false)
+            }
+          })
         })
       },
       /**
