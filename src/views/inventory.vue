@@ -2,10 +2,10 @@
  <template>
   <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="仓库：">
-      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId"/>
+      <repo-select-v2 v-model="queryForm.repoId" :goods-id="queryForm.goodsId" is-edit/>
     </el-form-item>
     <el-form-item label="商品：">
-      <goods-select-v2 v-model="queryForm.goodsId" :repo-id="queryForm.repoId"/>
+      <goods-select-v2 v-model="queryForm.goodsId" :repo-id="queryForm.repoId" is-edit/>
     </el-form-item>
 
     <el-form-item>
