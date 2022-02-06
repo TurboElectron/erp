@@ -5,10 +5,11 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
 import fs from "fs";
+const pkg = require('../package.json')
 require('@electron/remote/main').initialize()
 const isDevelopment = process.env.NODE_ENV !== 'production'
-const dbPath = isDevelopment ? join(__dirname, './prisma/dev.db') : path.join(app.getPath('userData'), 'database.db')
-
+export const dbPath = isDevelopment ? join(__dirname, './prisma/dev.db') : path.join(app.getPath('userData'), `${pkg.version}.db`)
+console.log('isDev:::'+ isDevelopment)
 if (!isDevelopment) {
   try {
     // database file does not exist, need to create
