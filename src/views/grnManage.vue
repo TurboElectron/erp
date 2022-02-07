@@ -188,7 +188,7 @@
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="props">
               <el-form-item label-width="0" >
-                <el-button size="mini" type="primary" @click="props.row.isEdit=!props.row.isEdit">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
+                <el-button size="mini" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
                 <el-button size="mini" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
               </el-form-item>
             </template>
@@ -246,14 +246,11 @@ import {
   getGrnList,
   updateGrnList,
   addGrnList,
-  deleteGrnList,
-  getCategoryTree
-  , goodsDetail
+  deleteGrnList
+  , goodsDetail,
 } from '@/api/common'
-import { userList } from '@/api/user'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
 //远程搜索供应商，客户
-import remoteMix from '@/mixin/remote'
 import _ from 'lodash'
 import GoodsSelect from "@temp/GoodsSelect";
 import SupplierSelect from "@temp/SupplierSelect";
@@ -286,8 +283,6 @@ export default {
       total: 0,
       loadTable: false,
     })
-
-    const { remoteSupplierData } = remoteMix(state)
     //入库单数据
     const getSupplierFormData = () => ({
       code: '' + moment(new Date()).format('YYYYMMDDHHmmss'),//入库单编号
@@ -340,6 +335,12 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
+      async handleConfirm(row) {
+        if (row.isEdit) {
+          await methods.handlerSave(false)
+        }
+        row.isEdit = !row.isEdit
+      },
       getTotalPrice(index) {
         const curGrnDetail = dialogForm.purchase_order_item[index]
         dialogForm.purchase_order_item[index].totalPrice =  math.evaluate(`${curGrnDetail.amount} * ${curGrnDetail.price}`)
@@ -471,21 +472,38 @@ export default {
         resDel.code === 200 && this.getTableData()
       },
       //保存
-      handlerSave() {
-        dialogRef.value.validate(async (valid) => {
-          if (valid) {
-            const params = Object.assign({}, dialogForm)
-            const responseData = state.isEdit ? await updateGrnList(params) : await addGrnList(params);
-            state.saveLoading = false
-            // 刷新表格
-            responseData.code === 200 && this.getTableData()
-            //显示提示信息
-            showMessage(responseData.code === 200 ? 'success' : 'error', state.isEdit ? responseData.message : responseData.message)
-            responseData.code === 200 && (state.dialogVisible = false)
-          }
-          else {
-            return false
-          }
+      handlerSave(close=true) {
+        return new Promise((resolve, reject) => {
+          dialogRef.value.validate(async (valid) => {
+            if (valid) {
+              const params = Object.assign({}, dialogForm)
+              const responseData = state.isEdit ? await updateGrnList(params) : await addGrnList(params);
+              state.saveLoading = false
+              // 刷新表格
+              if (responseData.code === 200) {
+                this.getTableData()
+                if (!state.isEdit) {
+                  state.isEdit = true
+                  dialogForm.id = responseData.data.id
+                }
+              }
+              //显示提示信息
+              showMessage(responseData.code === 200 ? 'success' : 'error', responseData.message)
+              if (
+                  close
+              ) {
+                responseData.code === 200 && (state.dialogVisible = false)
+              }
+              if (responseData.code === 200) {
+                resolve(true)
+              } else {
+                reject(false)
+              }
+            }
+            else {
+              reject(false)
+            }
+          })
         })
       },
       /**
@@ -520,7 +538,6 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
-      remoteSupplierData,
       moment
     }
   },

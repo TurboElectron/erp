@@ -508,10 +508,10 @@ const outboundUpdateStock = async (_) => {
                 id: stock.id
             },
             data: {
-                totalCount: stock.totalCount - _.amount,
-                saleCount: stock.saleCount + _.amount,
-                salePrice:  _.price,
-                totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${_.totalPrice}`)
+                totalCount: stock.totalCount??0 - _.amount??0,
+                saleCount: stock.saleCount??0 + _.amount??0,
+                salePrice:  _.price??0,
+                totalSalePrice: math.evaluate(`${stock.totalSalePrice??0} + ${_.totalPrice??0}`)
             }
         })
     }
@@ -550,10 +550,10 @@ const outboundDeleteStock = async  (_) => {
                 id: stock.id
             },
             data: {
-                totalCount: stock.totalCount + _.amount,
-                saleCount: stock.saleCount - _.amount,
-                salePrice:  _.price,
-                totalSalePrice: math.evaluate(`${stock.totalSalePrice} - ${_.totalPrice}`),
+                totalCount: stock.totalCount??0 + _.amount??0,
+                saleCount: stock.saleCount??0 - _.amount??0,
+                salePrice:  _.price??0,
+                totalSalePrice: math.evaluate(`${stock.totalSalePrice??0} - ${_.totalPrice??0}`),
             }
         })
     }
@@ -597,9 +597,9 @@ export const addGrnList = async (data = {}) => {
                 },
             },
         })
-        await Promise.all(data.purchase_order_item.map(async _ => {
+        for (const _ of data.purchase_order_item) {
             await grnUpdateStock(_)
-        }))
+        }
     })
     return {
         code: 200,
@@ -626,15 +626,15 @@ export const updateGrnList = async (data = {}) => {
         const deletes = exists.filter(_ => !existIds.includes(_.id))
         const updates = data.purchase_order_item.filter(_ => existIds.includes(_.id))
         const adds = data.purchase_order_item.filter(_ => !existIds.includes(_.id))
-        await Promise.all(deletes.map(async _ => {
+        for (const _ of deletes) {
             await prisma.purchase_order_item.delete({
                 where: {
                     id: _.id
                 }
             })
             await grnDeleteStock(_)
-        }))
-        await Promise.all(adds.map(async  _ => {
+        }
+        for (const _ of adds) {
             await prisma.purchase_order_item.create({
                 data: {
                     ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'cid']),
@@ -642,8 +642,8 @@ export const updateGrnList = async (data = {}) => {
                 }
             })
             await grnUpdateStock(_)
-        }))
-        await Promise.all(updates.map(async _ => {
+        }
+        for (const _ of updates) {
             const poi = exists.find(e=> e.id === _.id)
             const stock = await prisma.stock.findFirst({
                 where: {
@@ -670,7 +670,7 @@ export const updateGrnList = async (data = {}) => {
                     ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'cid']),
                 }
             })
-        }))
+        }
     })
     return {
         code: 200,
@@ -686,9 +686,9 @@ export const deleteGrnList = async (data = {}) => {
                 orderId: data.id
             }
         })
-        await Promise.all(exists.map(async _ => {
+        for (const _ of exists) {
             await grnDeleteStock(_)
-        }))
+        }
         await prisma.purchase_order_item.deleteMany({
             where: {
                 orderId: data.id
@@ -834,9 +834,9 @@ export const addOutboundList = async (data = {}) => {
                 },
             },
         })
-        await Promise.all(data.sale_order_item.map(async _ => {
+        for(const  _ of data.sale_order_item) {
             await outboundUpdateStock(_)
-        }))
+        }
         return res
     })
     return {
@@ -868,24 +868,24 @@ export const updateOutboundList = async (data = {}) => {
         const deletes = exists.filter(_ => !existIds.includes(_.id))
         const updates = data.sale_order_item.filter(_ => existIds.includes(_.id))
         const adds = data.sale_order_item.filter(_ => !existIds.includes(_.id))
-        await Promise.all(deletes.map(async _ => {
+        for (const _ of deletes ) {
+            await outboundDeleteStock(_)
             await prisma.sale_order_item.delete({
                 where: {
                     id: _.id
                 }
             })
-            await outboundDeleteStock(_)
-        }))
-        await Promise.all(adds.map(async _ => {
+        }
+        for (const _ of adds ) {
+            await outboundUpdateStock(_)
             await prisma.sale_order_item.create({
                 data: {
                     ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock', 'cid', 'maxAmount']),
                     orderId: data.id
                 }
             })
-            await outboundUpdateStock(_)
-        }))
-        await Promise.all(updates.map(async _ => {
+        }
+        for (const _ of updates ) {
             const soi = exists.find(e => e.id === _.id)
             const stock = await prisma.stock.findFirst({
                 where: {
@@ -911,7 +911,7 @@ export const updateOutboundList = async (data = {}) => {
                     ...omit(_, ['id', 'repo', 'goods','isEdit', 'stock', 'maxAmount']),
                 }
             })
-        }))
+        }
     })
     return {
         code: 200,
@@ -981,9 +981,9 @@ export const deleteOutboundList = async (data = {}) => {
                 orderId: data.id
             }
         })
-        await Promise.all(exists.map(async _ => {
+        for (const _ of exists) {
             await outboundDeleteStock(_)
-        }))
+        }
         await prisma.sale_order_item.deleteMany({
             where: {
                 orderId: data.id
