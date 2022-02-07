@@ -1,6 +1,6 @@
 {
   "name": "evs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
@@ -8,15 +8,7 @@
     "electron:build": "vue-cli-service electron:build -w --mode prod",
     "electron:serve": "vue-cli-service electron:serve -w --mode dev",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps",
-    "prisma:chain": "npm run prisma:db:push:force && npm run prisma:introspect && npm run prisma:generate && npm run serve",
-    "prisma:db:push": "npx prisma db push",
-    "prisma:db:pull": "npx prisma db pull",
-    "prisma:db:push:force": "npx prisma db push --accept-data-loss",
-    "prisma:db:seed": "npx prisma db seed --preview-feature",
-    "prisma:generate": "npx prisma generate",
-    "prisma:init": "npx prisma migrate dev && PRISMA_CLI_BINARY_TARGETS=darwin,darwin-arm64 npm install @prisma/engines",
-    "prisma:studio": "npx prisma studio"
+    "postuninstall": "electron-builder install-app-deps"
   },
   "main": "background.js",
   "dependencies": {
