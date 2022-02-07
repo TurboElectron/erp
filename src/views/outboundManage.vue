@@ -55,7 +55,7 @@
     <el-table-column prop="otherFee" label="人工应付" min-width="100"  />
     <el-table-column prop="payOtherFee" label="人工实付" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
-    <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
+    <el-table-column prop="payPrice" label="实付" min-width="100"  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200">
       <template #default="scope">
