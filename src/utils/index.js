@@ -2,6 +2,7 @@ import { ElMessage, ElLoading } from "element-plus";
 import { nextTick } from "vue";
 import mathJs from './math'
 import { create, all } from 'mathjs'
+import moment from "moment";
 /**
  * 查找计量单位根
  * @param {*} data
@@ -155,3 +156,16 @@ const config = {
     randomSeed: null
 }
 export const math = create(all, config)
+
+
+export const formatJson = (filterKeys, jsonData) =>
+    jsonData.map((data) => filterKeys.map((key) => {
+        if (key === 'timestamp') {
+            return moment(data[key]).format('YYYY-MM-DD HH:mm:ss')
+        } else {
+            const keys = key.split('.')
+            return keys.reduce((pre, cur) => {
+                return pre[cur]
+            } , data)
+        }
+    }))

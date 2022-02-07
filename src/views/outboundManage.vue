@@ -21,10 +21,7 @@
     </el-form-item>
 
     <el-form-item label="操作人：">
-      <el-select v-model="queryForm.userId" clearable filterable placeholder="选择出库单录入人员">
-        <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
-        </el-option>
-      </el-select>
+      <user-select v-model="queryForm.userId" is-edit/>
     </el-form-item>
 
     <el-form-item>
@@ -109,10 +106,7 @@
 
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
           <el-form-item label="操作人：" prop="userId">
-            <el-select v-model="dialogForm.userId" filterable clearable placeholder="选择出库单录入人员" style="width:100%">
-              <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
-              </el-option>
-            </el-select>
+            <user-select v-model="dialogForm.userId" is-edit/>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
@@ -147,7 +141,7 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
-                                 :max="props.row.stock?.totalCount"
+                                 :max="props.row.maxAmount"
                                  style="width:100%" clearable placeholder="请输入出库数量"
                 :disabled="!(props.row.goodsId && props.row.repoId)"
                                  v-if="props.row.isEdit"
@@ -273,9 +267,10 @@ import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import * as math from "mathjs";
+import UserSelect from "@temp/UserSelect";
 export default {
   name: 'outboundManage',
-  components: {GoodsSelectV2, RepoSelectV2, CustomerSelect},
+  components: {UserSelect, GoodsSelectV2, RepoSelectV2, CustomerSelect},
   setup(props, context) {
 
     const state = reactive({
@@ -284,11 +279,6 @@ export default {
       isEdit: false,
       saveLoading: false,
       currentEditData: {},// 当前修改数据
-      categoryData: [],// 产品数据
-      userData: [],//用户
-      repoData: [],//仓库
-      supplierData: [],//客户
-      unitData: [],// 数量单位
       loadignData: false,//加载 产品loading
       queryForm: {
         code: '',
@@ -375,6 +365,7 @@ export default {
           const {code, message} = await stockDetail(curOutboundDetail)
           if (code === 200) {
             dialogForm.sale_order_item[index].stock = message
+            dialogForm.sale_order_item[index].maxAmount = message.totalCount + curOutboundDetail.amount
             dialogForm.sale_order_item[index].price = message.goods.salePrice
           }
         }
@@ -555,51 +546,6 @@ export default {
         this.getTableData()
       }
     }
-
-    /**
-     * 获取出库产品批次
-     */
-    const getOutboundSpecieData = (outboundDetailData) => {
-      if (!outboundDetailData) outboundDetailData = dialogForm.sale_order_item;
-      return outboundDetailData.map(v => {
-        const unitId = Array.isArray(v.unitId) ? v.unitId.at(-1) : v.unitId;
-        // 数量单位名称
-        let unitNameData = getDataById(state.unitData, unitId)
-
-        unitNameData.find(unitv => unitv.id === unitId)// state.unitData.flat(Infinity).find(unitv => unitv.id === unitId)
-        const unitName = unitNameData?.[0]?.name ?? '';
-        // 出库产品id
-        const categoryId = Array.isArray(v.categoryId) ? v.categoryId.at(-1) : v.categoryId;
-        let editParas = {}
-        //修改状态下 添加批次id
-        if (state.isEdit) {
-          editParas.id = v.specieId;
-        }
-        return {
-          name: v.specieName,
-          categoryId,
-          unitId,
-          unitName,
-          cost: v.price,// mathJs.divide(v.totalPrice, v.amount),//成本 = 总成 / 数量
-          selling: 0,
-          ...editParas
-        }
-      })
-    }
-
-    //查询产品树、用户列表、客户
-    const getUnitAndCategoryData = async () => {
-      state.loadignData = true
-      const res = await Promise.all([getCategoryTree(), userList()]).finally(() => {
-        state.loadignData = false
-      })
-
-      res[0].code === 200 && (state.categoryData = res[0].message)// 产品
-      res[1].code === 200 && (state.userData = res[1].message.records)// 用户
-      state.loadignData = false
-    }
-    //查询产品树
-    getUnitAndCategoryData()
     //查询批次列表
     methods.getTableData()
 

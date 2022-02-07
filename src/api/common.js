@@ -2,6 +2,10 @@ import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
 import {intersection, omit} from "lodash";
 import * as math from "mathjs";
+const orderMap = {
+    "ascending": 'asc',
+    "descending": 'desc',
+}
 /** 添加产品 */
 export const addGoods = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
@@ -30,8 +34,15 @@ export const updateGoods  = async (data = {}) => {
 /** 删除产品 */
 export const removeGoods  = async (data = {}) => {
     // return httpFetch.post('customer/delete', data)
-    const res = await prisma.goods.delete({
-        where: {id: data.id},
+    await prisma.$transaction(async () => {
+        await prisma.stock.deleteMany({
+            where: {
+                goodsId: data.id
+            }
+        })
+        const res = await prisma.goods.delete({
+            where: {id: data.id},
+        })
     })
     return {
         code: 200,
@@ -540,6 +551,7 @@ const outboundDeleteStock = async  (_) => {
             },
             data: {
                 totalCount: stock.totalCount + _.amount,
+                saleCount: stock.saleCount - _.amount,
                 salePrice:  _.price,
                 totalSalePrice: math.evaluate(`${stock.totalSalePrice} - ${_.totalPrice}`),
             }
@@ -817,7 +829,7 @@ export const addOutboundList = async (data = {}) => {
                 date: new Date(data.date),
                 sale_order_item: {
                     create: data.sale_order_item.map(_ => {
-                        return omit(_, ['stock','isEdit', 'cid', 'id'])
+                        return omit(_, ['stock','isEdit', 'cid', 'id', 'maxAmount'])
                     })
                 },
             },
@@ -867,7 +879,7 @@ export const updateOutboundList = async (data = {}) => {
         await Promise.all(adds.map(async _ => {
             await prisma.sale_order_item.create({
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock', 'cid']),
+                    ...omit(_, ['id', 'repo', 'goods', 'isEdit', 'stock', 'cid', 'maxAmount']),
                     orderId: data.id
                 }
             })
@@ -896,7 +908,7 @@ export const updateOutboundList = async (data = {}) => {
                     id: _.id
                 },
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods','isEdit', 'stock']),
+                    ...omit(_, ['id', 'repo', 'goods','isEdit', 'stock', 'maxAmount']),
                 }
             })
         }))
@@ -1067,7 +1079,7 @@ export const getCategorySales = (data = {}) => {
 /** 库存分页列表*/
 export const getInventoryList = async (data = {}) => {
     // return httpFetch.post('inventory/list', data)
-    const {pageSize, pageNo, goodsId, repoId} = data
+    const {pageSize, pageNo, goodsId, repoId, orderBy} = data
     let where = {}
     if (goodsId) {
         where.goodsId = goodsId
@@ -1075,14 +1087,27 @@ export const getInventoryList = async (data = {}) => {
     if (repoId) {
         where.repoId = repoId
     }
+    let page = {
+
+    }
+    if (pageNo !== undefined && pageSize !== undefined) {
+        page = {
+            skip: pageSize * (pageNo - 1),
+            take: pageSize,
+        }
+    }
     const [total, records] = await prisma.$transaction([
         prisma.stock.count({
             where,
         }),
         prisma.stock.findMany({
-            skip: pageSize * (pageNo - 1),
-            take: pageSize,
+            ...page,
             where,
+            orderBy: orderBy.map(_ => {
+                return {
+                    [_.prop]: orderMap[_.order]
+                }
+            }),
             include: {
                 goods: true,
                 repo: true,

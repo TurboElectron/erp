@@ -12,14 +12,22 @@
       <el-button type="primary" icon="Search" @click="onQuery()">查询</el-button>
     </el-form-item>
 
+    <el-form-item>
+      <el-button type="primary"  @click="exportExcel()">导出</el-button>
+    </el-form-item>
+
   </el-form>
   <!-- 表格 -->
-  <el-table :data="tableData" v-loading="loadingTbl"  style="width: 100%" border empty-text="暂无数据">
+  <el-table :data="tableData" v-loading="loadingTbl"  style="width: 100%" border empty-text="暂无数据"
+  @sort-change="handleSortChange"
+  >
     <el-table-column prop="repo.name" label="仓库名称" />
     <el-table-column prop="goods.name" label="商品名称" />
     <el-table-column prop="goods.code" label="商品编号" />
-    <el-table-column prop="totalCount" label="库存总量" />
-    <el-table-column prop="saleCount" label="销售总量" />
+    <el-table-column prop="goods.buyPrice" label="预设进价" />
+    <el-table-column prop="goods.salePrice" label="预设售价" />
+    <el-table-column prop="totalCount" label="库存总量" sortable="custom" />
+    <el-table-column prop="saleCount" label="销售总量"  sortable="custom" />
     <el-table-column prop="totalBuyPrice" label="总进价" />
     <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalSalePrice" label="总售价" />
@@ -38,6 +46,8 @@ import { reactive, toRefs, onMounted } from 'vue';
 import { getInventoryList } from '@/api/common'
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import RepoSelectV2 from "@temp/RepoSelectV2";
+import {exportJson2Excel} from "@/utils/excel";
+import {formatJson} from "@/utils";
 export default {
   name: 'inventory',
   components: {RepoSelectV2, GoodsSelectV2},
@@ -53,6 +63,7 @@ export default {
       queryForm: {
         goodsId: '',
         repoId: '',
+        orderBy: []
       },
       tableData: [],
       loadingTbl: true,
@@ -65,6 +76,28 @@ export default {
      * 方法
      */
     const methods = {
+      async exportExcel() {
+        const tHeader = ['仓库名称', '商品名称', '商品编号', '库存']
+        const filterVal = ['repo.name', 'goods.name', 'goods.code', 'totalCount']
+        const params = Object.assign({}, state.queryForm)
+        const responseData = await getInventoryList(params)
+        if (responseData.code === 200) {
+          const list = responseData.message.records
+          const data = formatJson(filterVal, list)
+          exportJson2Excel(tHeader, data)
+        }
+      },
+      handleSortChange(val) {
+        if (
+            val.prop === null
+        ) {
+          state.queryForm.orderBy.length = 0
+        } else {
+          const i = state.queryForm.orderBy.findIndex(_ => _.prop === val.prop)
+          state.queryForm.orderBy.splice(i, 1, val)
+        }
+        methods.onQuery()
+      },
       /**
        * 查询
        */

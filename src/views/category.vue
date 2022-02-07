@@ -9,6 +9,8 @@
     <el-form-item>
       <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
       <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()" :disabled="!currentEditData.id">新增产品</el-button>
+      <goods-select v-model="goodsId" is-edit style="margin: 0 20px"/>
+      <el-button  type="primary"  @click="$refs.goodsRef.onQuery({id: goodsId})">查找</el-button>
     </el-form-item>
   </el-form>
   <div style="display: flex;gap: 20px">
@@ -50,9 +52,10 @@ import { reactive, toRefs, ref } from 'vue'
 import { getCategoryTree, addCategory, updateCategory, deleteCategory } from '@/api/common'
 import { globalLoading, showMessage } from '@/utils'
 import Goods from "@/views/goods";
+import GoodsSelect from "@temp/GoodsSelect";
 export default {
   name: 'category',
-  components: {Goods},
+  components: {GoodsSelect, Goods},
   setup(props, context) {
     const state = reactive({
       treeData: [],
@@ -61,6 +64,7 @@ export default {
       isEdit: false,
       saveLoading: false,
       currentEditData: {},//当前修改数据
+      goodsId: undefined
     })
     const goodsRef = ref()
     // 新增、修改form

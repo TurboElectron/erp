@@ -22,10 +22,19 @@ export const updateUser = (data = {}) => {
 /** 用户列表 */
 export const userList = async (data = {}) => {
     // return httpFetch.post('user/list', data)
+    const {account} = data
+    let where = {}
+    if (account) {
+        where.account = {
+            contains: account
+        }
+    }
     const [total, records] = await prisma.$transaction([
-        prisma.user.count(),
+        prisma.user.count(
+            where
+        ),
         prisma.user.findMany({
-            where: prismaContains(data)
+            where
         })
     ])
     return {

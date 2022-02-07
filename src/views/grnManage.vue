@@ -21,10 +21,7 @@
     </el-form-item>
 
     <el-form-item label="操作人：">
-      <el-select v-model="queryForm.userId" clearable filterable placeholder="选择入库单录入人员">
-        <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
-        </el-option>
-      </el-select>
+      <user-select v-model="queryForm.userId"/>
     </el-form-item>
 
     <el-form-item>
@@ -111,10 +108,7 @@
 
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
           <el-form-item label="操作人：" prop="userId">
-            <el-select v-model="dialogForm.userId" filterable clearable placeholder="选择入库单录入人员" style="width:100%">
-              <el-option v-for="item in userData" :key="item.id" :label="item.account" :value="item.id">
-              </el-option>
-            </el-select>
+            <user-select v-model="dialogForm.userId"/>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
@@ -266,10 +260,11 @@ import SupplierSelect from "@temp/SupplierSelect";
 import RepoSelect from "@temp/RepoSelect";
 import * as math from "mathjs";
 import CategorySelect from "@temp/CategorySelect";
+import UserSelect from "@temp/UserSelect";
 
 export default {
   name: 'grnManage',
-  components: {CategorySelect, RepoSelect, SupplierSelect, GoodsSelect},
+  components: {UserSelect, CategorySelect, RepoSelect, SupplierSelect, GoodsSelect},
   setup(props, context) {
 
     const state = reactive({
@@ -278,11 +273,6 @@ export default {
       isEdit: false,
       saveLoading: false,
       currentEditData: {},// 当前修改数据
-      categoryData: [],// 产品数据
-      userData: [],//用户
-      repoData: [],//仓库
-      supplierData: [],//供应商
-      unitData: [],// 数量单位
       loadignData: false,//加载 产品loading
       queryForm: {
         code: '',
@@ -521,20 +511,6 @@ export default {
         this.getTableData()
       }
     }
-
-    //查询产品树、用户列表、供应商
-    const getUnitAndCategoryData = async () => {
-      state.loadignData = true
-      const res = await Promise.all([getCategoryTree(), userList()]).finally(() => {
-        state.loadignData = false
-      })
-
-      res[0].code === 200 && (state.categoryData = res[0].message)// 产品
-      res[1].code === 200 && (state.userData = res[1].message.records)// 用户
-      state.loadignData = false
-    }
-    //查询产品树
-    getUnitAndCategoryData()
     //查询批次列表
     methods.getTableData()
 
