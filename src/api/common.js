@@ -585,14 +585,14 @@ export const stockDetail = async (data = {}) => {
 /** 入库*/
 export const addGrnList = async (data = {}) => {
     // return httpFetch.post('grn/add', data)
-    await prisma.$transaction(async () => {
-        await prisma.purchase_order.create({
+    const res =    await prisma.$transaction(async () => {
+       let res=  await prisma.purchase_order.create({
             data: {
-                ...omit(data,['purchase_order_item']),
+                ...omit(data,['purchase_order_item', 'id']),
                 date: new Date(data.date),
                 purchase_order_item: {
                     create: data.purchase_order_item.map(_ => {
-                        return omit(_, ['repo','goods','isEdit', 'cid'])
+                        return omit(_, ['repo','goods','isEdit', 'cid', 'id'])
                     })
                 },
             },
@@ -600,9 +600,11 @@ export const addGrnList = async (data = {}) => {
         for (const _ of data.purchase_order_item) {
             await grnUpdateStock(_)
         }
+        return res
     })
     return {
         code: 200,
+        data: res,
         message: '成功'
     }
 }
@@ -1291,7 +1293,14 @@ export const getProfit = async (data={}) => {
     }
 }
 
-
+export const fixStock = async () => {
+    await prisma.$transaction(async ()=> {
+        const res = await prisma.$queryRaw`select SUM(p.amount - s.amount) as totalCount, SUM(s.amount) as totalSaleCount, SUM(p.amount * p.price) as totalBuyPrice, SUM(s.amount * s.price) as totalSalePrice,
+SUM(p.amount * p.price)/SUM(p.amount) as avgBuyPrice
+from purchase_order_item as p inner join sale_order_item as s WHERE p.goodsId = s.goodsId and p.repoId = s.repoId GROUP BY
+p.goodsId, p.repoId;`
+    })
+}
 
 
 

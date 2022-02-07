@@ -15,7 +15,6 @@
     <el-form-item>
       <el-button type="primary"  @click="exportExcel()">导出</el-button>
     </el-form-item>
-
   </el-form>
   <!-- 表格 -->
   <el-table :data="tableData" v-loading="loadingTbl"  style="width: 100%" border empty-text="暂无数据"
@@ -43,7 +42,7 @@
 
   <script>
 import { reactive, toRefs, onMounted } from 'vue';
-import { getInventoryList } from '@/api/common'
+import {fixStock, getInventoryList} from '@/api/common'
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import {exportJson2Excel} from "@/utils/excel";
@@ -76,6 +75,10 @@ export default {
      * 方法
      */
     const methods = {
+      async fix() {
+        await fixStock()
+        await methods.onQuery()
+      },
       async exportExcel() {
         const tHeader = ['仓库名称', '商品名称', '商品编号', '库存']
         const filterVal = ['repo.name', 'goods.name', 'goods.code', 'totalCount']
