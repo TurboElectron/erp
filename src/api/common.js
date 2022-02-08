@@ -950,10 +950,10 @@ export const getOutboundList = async (data = {}) => {
         if (pageSize !== undefined && pageNo !== undefined) {
             where += ` LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
         }
-        const orders = await  prisma.$queryRawUnsafe(`SELECT * FROM sale_order ${where}`)
+        const orders = await  prisma.$queryRawUnsafe(`SELECT *, (otherFee - payOtherFee + totalPrice - payPrice)   as totalOverdraft FROM sale_order ${where}`)
         const records = []
         for (const _ of orders) {
-            const customer = await prisma.sale_customer.findUnique({
+            const sale_customer = await prisma.sale_customer.findUnique({
                 where: {
                     id: _.customerId
                 }
@@ -975,7 +975,7 @@ export const getOutboundList = async (data = {}) => {
             }
             records.push({
                 ..._,
-                customer,
+                sale_customer,
                 sale_order_item
             })
         }

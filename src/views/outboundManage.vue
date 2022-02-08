@@ -29,6 +29,8 @@
     <el-form-item>
       <el-button type="primary" @click="getTableData()" icon="Search">查询
       </el-button>
+      <el-button type="primary" @click="exportExcel()" >导出
+      </el-button>
       <el-button icon="Plus" @click="handlerAdd()">新增出库单</el-button>
     </el-form-item>
   </el-form>
@@ -58,6 +60,7 @@
     <el-table-column prop="payOtherFee" label="人工实付" min-width="100"  />
     <el-table-column prop="totalPrice" label="应付" min-width="100"  />
     <el-table-column prop="payPrice" label="实付" min-width="100"  />
+    <el-table-column prop="totalOverdraft" label="欠款总计" min-width="100"  />
     <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200">
       <template #default="scope">
@@ -258,18 +261,16 @@ import {
   updateOutboundList,
   addOutboundList,
   deleteOutboundList,
-  getCategoryTree, stockDetail,
+  stockDetail, getInventoryList,
 } from '@/api/common'
-import { userList } from '@/api/user'
-import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
-//远程搜索客户，客户
-import remoteMix from '@/mixin/remote'
+import {formatJson, globalLoading, showMessage} from '@/utils'
 import _ from 'lodash'
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import * as math from "mathjs";
 import UserSelect from "@temp/UserSelect";
+import {exportJson2Excel} from "@/utils/excel";
 export default {
   name: 'outboundManage',
   components: {UserSelect, GoodsSelectV2, RepoSelectV2, CustomerSelect},
@@ -295,8 +296,6 @@ export default {
       total: 0,
       loadTable: false,
     })
-
-    const { remoteSupplierData } = remoteMix(state)
     //出库单数据
     const getSupplierFormData = () => ({
       code: '' + moment(new Date()).format('YYYYMMDDHHmmss'),//出库单编号
@@ -350,6 +349,17 @@ export default {
     // 新增、修改dialog ref
     const dialogRef = ref(null)
     const methods = {
+      async exportExcel() {
+        const tHeader = ['订单号', '客户', '人工应付', '人工实付', '商品应付', '商品实付', '总计欠款']
+        const filterVal = ['code', 'sale_customer.name', 'otherFee', 'payOtherFee', 'totalPrice', 'payPrice', 'totalOverdraft']
+        const params = Object.assign({}, state.queryForm)
+        const responseData = await getOutboundList(params)
+        if (responseData.code === 200) {
+          const list = responseData.message.records
+          const data = formatJson(filterVal, list)
+          exportJson2Excel(tHeader, data)
+        }
+      },
       async handleConfirm(row) {
         if (row.isEdit) {
           await methods.handlerSave(false)
@@ -539,7 +549,6 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
-      remoteSupplierData,
       moment
     }
   },
