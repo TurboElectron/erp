@@ -923,55 +923,70 @@ export const updateOutboundList = async (data = {}) => {
 /** 出库明细*/
 export const getOutboundList = async (data = {}) => {
     // return httpFetch.post('outbound/list', data)
-    const {pageSize, pageNo, code, customerId, userId, startDate, endDate} = data
-    let where = {}
+    const {pageSize, pageNo, code, customerId, userId, startDate, endDate, overdraft} = data
+    let where = `WHERE 1=1 `
+    if(overdraft) {
+        where += ` AND totalPrice > payPrice OR otherFee > payOtherFee`
+    }
     if (startDate) {
-        where.date = {
-            gte: new Date(startDate)
-        }
+        where += ` AND date >= ${new Date(startDate).getTime()}`
     }
     if (endDate) {
-        where.date = {
-            ...where.date,
-            lte: new Date(endDate)
-        }
+        where += ` AND date <= ${new Date(endDate).getTime()}`
     }
     if (
         code
     ) {
-        where.code = {
-            contains: code
-        }
+        where += ` AND code like '%${code}%'`
     }
     if (customerId) {
-        where.customerId = customerId
+        where += ` AND customerId = ${customerId}`
     }
     if (userId) {
-        where.userId = userId
+        where += ` AND userId = ${userId}`
     }
-    const [total, records] = await prisma.$transaction([
-        prisma.sale_order.count({where}),
-        prisma.sale_order.findMany({
-            skip: pageSize * (pageNo - 1),
-            take: pageSize,
-            where,
-            include: {
-                sale_customer: true,
-                sale_order_item: {
-                    include: {
-                        goods: true,
-                        repo: true
-                    }
+    const res = await prisma.$transaction(async ()=> {
+        const totals = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM sale_order ${where}`)
+        if (pageSize !== undefined && pageNo !== undefined) {
+            where += ` LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
+        }
+        const orders = await  prisma.$queryRawUnsafe(`SELECT * FROM sale_order ${where}`)
+        const records = []
+        for (const _ of orders) {
+            const customer = await prisma.sale_customer.findUnique({
+                where: {
+                    id: _.customerId
                 }
+            })
+            const sale_order_item = await prisma.sale_order_item.findMany({
+                where: {
+                    orderId: _.id
+                }
+            })
+            for (const v of sale_order_item) {
+                const goods = await prisma.goods.findUnique({where: {
+                    id: v.goodsId
+                    }})
+                const repo = await prisma.repo.findUnique({where: {
+                        id: v.repoId
+                    }})
+                v.goods = goods
+                v.repo = repo
             }
-        })
-    ])
+            records.push({
+                ..._,
+                customer,
+                sale_order_item
+            })
+        }
+        return {
+            records,
+            total: totals[0].count
+        }
+    })
     return {
         code: 200,
-        message: {
-            records,
-            total
-        }
+        message: res
     }
 }
 /** 出库*/
@@ -1297,7 +1312,7 @@ export const fixStock = async () => {
     await prisma.$transaction(async ()=> {
         const res = await prisma.$queryRaw`select SUM(p.amount - s.amount) as totalCount, SUM(s.amount) as totalSaleCount, SUM(p.amount * p.price) as totalBuyPrice, SUM(s.amount * s.price) as totalSalePrice,
 SUM(p.amount * p.price)/SUM(p.amount) as avgBuyPrice
-from purchase_order_item as p inner join sale_order_item as s WHERE p.goodsId = s.goodsId and p.repoId = s.repoId GROUP BY
+from purchase_order_item as p  join sale_order_item as s WHERE p.goodsId = s.goodsId and p.repoId = s.repoId GROUP BY
 p.goodsId, p.repoId;`
     })
 }

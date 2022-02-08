@@ -23,7 +23,9 @@
     <el-form-item label="操作人：">
       <user-select v-model="queryForm.userId" is-edit/>
     </el-form-item>
-
+    <el-form-item label="仅查看欠款：">
+      <el-checkbox v-model="queryForm.overdraft"/>
+    </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="getTableData()" icon="Search">查询
       </el-button>
@@ -286,6 +288,7 @@ export default {
         endDate: '',
         userId: '',
         customerId: '',//供货商
+        overdraft: false
       },
       currentPage: 1,
       pageSize: 10,
@@ -383,17 +386,6 @@ export default {
         dialogForm.payPrice = totalPrice
       },
       /**
-       * 导出
-       */
-      handleExport() {
-        const params = []
-        for (const key in state.queryForm) {
-          params.push(key + "=" + state.queryForm[key])
-        }
-        const url = process.env.VUE_APP_URL_API + "/outbound/exportOutboundList?" + params.join("&")
-        downLoadFile(url)
-      },
-      /**
        * 移除出库明细
        */
       removeOutboundDetail(index) {
@@ -421,7 +413,6 @@ export default {
           pageSize: state.pageSize,
           pageNo: state.currentPage
         })
-        console.log(params)
         const res = await getOutboundList(params)
         res.code === 200 && (state.tableData = res.message.records) && (state.total = res.message.total)
         state.loadTable = false
