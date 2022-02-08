@@ -1,6 +1,6 @@
 import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
-import {intersection, omit} from "lodash";
+import {intersection, intersectionWith, omit, pick} from "lodash";
 import * as math from "mathjs";
 const orderMap = {
     "ascending": 'asc',
@@ -1310,10 +1310,39 @@ export const getProfit = async (data={}) => {
 
 export const fixStock = async () => {
     await prisma.$transaction(async ()=> {
-        const res = await prisma.$queryRaw`select SUM(p.amount - s.amount) as totalCount, SUM(s.amount) as totalSaleCount, SUM(p.amount * p.price) as totalBuyPrice, SUM(s.amount * s.price) as totalSalePrice,
-SUM(p.amount * p.price)/SUM(p.amount) as avgBuyPrice
-from purchase_order_item as p  join sale_order_item as s WHERE p.goodsId = s.goodsId and p.repoId = s.repoId GROUP BY
-p.goodsId, p.repoId;`
+        const purchaseList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice 
+from purchase_order_item  GROUP BY
+goodsId, repoId;`
+        const saleList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice 
+from sale_order_item  GROUP BY
+goodsId, repoId;`
+        const stocks = await prisma.stock.findMany()
+        for(const stock of stocks) {
+            const sale = saleList.find(e => stock.goodsId === e.goodsId && stock.repoId === e.repoId)
+            const purchase = purchaseList.find(e => stock.goodsId === e.goodsId && stock.repoId === e.repoId)
+            if (!sale && !purchase) {
+                await prisma.stock.delete({
+                    where: {
+                        id: stock.id
+                    }
+                })
+            } else {
+                await prisma.stock.update({
+                    where: {
+                        id: stock.id
+                    },
+                    data: {
+                        totalBuyPrice: purchase?.totalPrice??0,
+                        totalSalePrice: sale?.totalPrice??0,
+                        totalCount: math.evaluate(`${purchase?.amount??0} - ${sale?.amount??0}`),
+                        saleCount: sale?.amount??0,
+                        avgBuyPrice: math.evaluate(`${purchase?.totalPrice??0} / ${purchase?.amount??0}`)
+                    }
+                })
+            }
+
+
+        }
     })
 }
 

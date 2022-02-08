@@ -15,6 +15,9 @@
     <el-form-item>
       <el-button type="primary"  @click="exportExcel()">导出</el-button>
     </el-form-item>
+    <el-form-item>
+      <el-button type="primary"  @click="fix">修正</el-button>
+    </el-form-item>
   </el-form>
   <!-- 表格 -->
   <el-table :data="tableData" v-loading="loadingTbl"  style="width: 100%" border empty-text="暂无数据"
