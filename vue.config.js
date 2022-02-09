@@ -35,6 +35,12 @@ module.exports = {
             include: /node_modules/,
             type: "javascript/auto"
         })
+        config.module.rules.push( {
+            test: /\.sql$/,
+            use: [
+                'sql-webpack-loader'
+            ]
+        })
     },
     devServer: {
         host: '0.0.0.0',

@@ -5,28 +5,31 @@
      <v-contextmenu-item @click="handlerEdit(currentEditData)">修改</v-contextmenu-item>
      <v-contextmenu-item @click="handlerDelete(currentEditData)">删除</v-contextmenu-item>
    </v-contextmenu>
-  <el-form :inline="true" size="small" class="demo-form-inline">
-    <el-form-item>
-      <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
-      <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()" :disabled="!currentEditData.id">新增产品</el-button>
-      <goods-select v-model="goodsId" is-edit style="margin: 0 20px"/>
-      <el-button  type="primary"  @click="$refs.goodsRef.onQuery({id: goodsId})">查找</el-button>
-    </el-form-item>
-  </el-form>
-  <div style="display: flex;gap: 20px">
-    <el-tree
-        :data="treeData"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-        :highlight-current="true"
-        @node-click="handleClickNode"
-    >
-      <template #default="{ node, data }">
-        <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label }}</div>
-      </template>
-    </el-tree>
-    <goods :cid="currentEditData.id" ref="goodsRef"/>
+  <div style="display: flex;flex-direction: column;height: 100%;">
+    <el-form :inline="true" size="small" class="demo-form-inline">
+      <el-form-item>
+        <el-button  type="primary" icon="Plus" @click="handlerAdd({})">新增分类</el-button>
+        <el-button  type="primary" icon="Plus" @click="$refs.goodsRef.addGoods()" :disabled="!currentEditData.id">新增产品</el-button>
+        <goods-select v-model="goodsId" is-edit style="margin: 0 20px"/>
+        <el-button  type="primary"  @click="$refs.goodsRef.onQuery({id: goodsId})">查找</el-button>
+      </el-form-item>
+    </el-form>
+    <div style="flex: 1;display: flex;gap: 20px;height: 100%">
+      <el-tree
+          :data="treeData"
+          node-key="id"
+          default-expand-all
+          :expand-on-click-node="false"
+          :highlight-current="true"
+          @node-click="handleClickNode"
+          style="height: 100%;overflow: auto"
+      >
+        <template #default="{ node, data }">
+          <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label }}</div>
+        </template>
+      </el-tree>
+      <goods :cid="currentEditData.id" ref="goodsRef"/>
+    </div>
   </div>
 
   <!-- 新增产品分类 dialog -->

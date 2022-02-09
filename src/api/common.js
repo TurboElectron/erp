@@ -926,7 +926,7 @@ export const getOutboundList = async (data = {}) => {
     const {pageSize, pageNo, code, customerId, userId, startDate, endDate, overdraft} = data
     let where = `WHERE 1=1 `
     if(overdraft) {
-        where += ` AND totalPrice > payPrice OR otherFee > payOtherFee`
+        where += ` AND confirm = 0 AND totalPrice > payPrice OR otherFee > payOtherFee`
     }
     if (startDate) {
         where += ` AND date >= ${new Date(startDate).getTime()}`

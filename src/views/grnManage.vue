@@ -38,8 +38,8 @@
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
-            <el-table-column prop="price" label="进价"/>
-            <el-table-column prop="totalPrice" label="总价"/>
+            <el-table-column prop="price" label="进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
         </div>
@@ -52,12 +52,8 @@
     </el-table-column>
     <el-table-column prop="code" label="订单号" min-width="100"  />
     <el-table-column prop="purchase_supplier.name" label="供应商" min-width="100"  />
-    <el-table-column prop="totalPrice" label="应付" min-width="100"  >
-      <template #default="scope">
-        {{scope.row.totalPrice}}
-      </template>
-    </el-table-column>
-    <el-table-column prop="payPrice" label="实付" min-width="100" sortable  />
+    <el-table-column prop="totalPrice" label="应付" min-width="100" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0" ></el-table-column>
+    <el-table-column prop="payPrice" label="实付" min-width="100"   :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200">
       <template #default="scope">
@@ -162,7 +158,7 @@
           <el-table-column label="预设进价" min-width="160px">
             <template #default="props">
               <el-form-item>
-                <span>{{props.row.goods?.buyPrice??0}}</span>
+                <span>{{props.row.goods?.buyPrice?.toFixed(2)??0}}</span>
               </el-form-item>
             </template>
           </el-table-column>
@@ -170,18 +166,19 @@
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
+                                 :precision="2"
                   style="width:100%" clearable placeholder="请输入单价"
                                  v-if="props.row.isEdit"
                 >
                 </el-input-number>
-                <span v-else>{{props.row.price}}</span>
+                <span v-else>{{props.row.price?.toFixed(2)??0}}</span>
               </el-form-item>
             </template>
           </el-table-column>
 
           <el-table-column label="成本" min-width="200" fixed="right">
             <template #default="props">
-              <el-form-item> {{props.row.totalPrice}}</el-form-item>
+              <el-form-item> {{props.row.totalPrice?.toFixed(2)??0}}</el-form-item>
             </template>
           </el-table-column>
 
@@ -206,7 +203,7 @@
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
           <el-form-item label="总成本：" prop="totalPrice">
             <div class="form-pre-flex">
-              {{dialogForm.totalPrice}}
+              {{dialogForm.totalPrice?.toFixed(2)??0}}
             </div>
           </el-form-item>
         </el-col>

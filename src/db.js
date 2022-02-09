@@ -17,3 +17,10 @@ export const prisma = new PrismaClient({
     },
   },
 })
+prisma.$transaction(async ()=> {
+  await prisma.$executeRaw`ALTER TABLE "sale_order" ADD COLUMN "confirm" BOOLEAN;`
+}).then(()=> {
+  console.log('migrate succeed')
+}).catch(()=> {
+  console.log('migrate failure')
+})

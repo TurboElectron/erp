@@ -5,10 +5,11 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
 import fs from "fs";
+import {PrismaClient} from "@prisma/client";
 const pkg = require('../package.json')
 require('@electron/remote/main').initialize()
 const isDevelopment = process.env.NODE_ENV !== 'production'
-export const dbPath = isDevelopment ? join(__dirname, './prisma/dev.db') : path.join(app.getPath('userData'), `${pkg.version}.db`)
+export const dbPath = isDevelopment ? join(__dirname, '../prisma/dev.db') : path.join(app.getPath('userData'), `${pkg.version}.db`)
 console.log('isDev:::'+ isDevelopment)
 if (!isDevelopment) {
   try {
@@ -23,6 +24,25 @@ if (!isDevelopment) {
     }
   }
 }
+// const prisma = new PrismaClient({
+//   log: ['query'],
+//   datasources: {
+//     db: {
+//       url: `file:${dbPath}`,
+//     },
+//   },
+// })
+// prisma.$connect().then(() => {
+//   fs.readdirSync(join(__dirname, '../prisma/migrations')).forEach(_ => {
+//     if (['init','lock.toml'].includes(_.split('_')[1]) === false) {
+//       fs.readdirSync(join(__dirname, `../prisma/migrations/${_}`)).forEach(r => {
+//         const sql = fs.readFileSync(join(__dirname, `../prisma/migrations/${_}/${r}`)).toString()
+//         console.log(sql)
+//         prisma.$executeRaw`ALTER TABLE "sale_order" ADD COLUMN "confirm" BOOLEAN;`
+//       })
+//     }
+//   })
+// })
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
