@@ -64,7 +64,9 @@ export const goodsDetail = async (data={}) => {
 /** 客户产品 */
 export const goodsList = async (data = {}) => {
     const {pageSize, pageNo,id, cid, name, code} = data
-    let where = {}
+    let where = {
+        
+    }
     if (id) {
         where.id = id
     }
@@ -86,7 +88,10 @@ export const goodsList = async (data = {}) => {
         prisma.goods.findMany({
             skip: pageSize* (pageNo-1),
             take: pageSize,
-            where
+            where,
+            orderBy: {
+                'updatime': 'desc'
+            }
         })
     ])
     return {

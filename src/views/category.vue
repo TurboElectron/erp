@@ -14,21 +14,21 @@
         <el-button  type="primary"  @click="$refs.goodsRef.onQuery({id: goodsId})">查找</el-button>
       </el-form-item>
     </el-form>
-    <div style="flex: 1;display: flex;gap: 20px;height: 100%">
-      <el-tree
+    <div style="flex: 1 0 auto;  height: 0;display: flex;gap: 20px;overflow:auto">
+        <el-tree
           :data="treeData"
           node-key="id"
           default-expand-all
           :expand-on-click-node="false"
           :highlight-current="true"
           @node-click="handleClickNode"
-          style="height: 100%;overflow: auto"
+          style="overflow: auto;height:100%"
       >
         <template #default="{ node, data }">
           <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label }}</div>
         </template>
       </el-tree>
-      <goods :cid="currentEditData.id" ref="goodsRef"/>
+      <goods :cid="currentEditData.id" ref="goodsRef" />
     </div>
   </div>
 

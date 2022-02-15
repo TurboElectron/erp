@@ -1,18 +1,7 @@
 <template>
-  <div style="width: 80%">
-    <el-table :data="tableData" v-loading="loadingTbl"  border empty-text="暂无数据">
-      <el-table-column prop="name" label="名称" width="100" />
-      <el-table-column prop="code" label="编号" width="120" />
-      <el-table-column prop="buyPrice" label="预设进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
-      <el-table-column prop="salePrice" label="预设售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
-      <el-table-column prop="type" label="型号" />
-      <el-table-column prop="brand" label="品牌" />
-      <el-table-column prop="unit" label="单位" />
-      <el-table-column prop="color" label="颜色" />
-      <el-table-column prop="standard" label="规格" />
-      <el-table-column prop="material" label="材质" />
-      <el-table-column prop="descs" label="描述" />
-      <el-table-column label="操作" width="200" fixed="right">
+  <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
+    <el-table :data="tableData"  v-loading="loadingTbl"  border empty-text="暂无数据" style="flex:1;overflow:auto">
+      <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-button icon="Edit" size="mini" @click.prevent="editGoods(scope.row)">
             修改
@@ -28,6 +17,17 @@
 
         </template>
       </el-table-column>
+      <el-table-column prop="name" label="名称" width="100" />
+      <el-table-column prop="code" label="编号" width="120" />
+      <el-table-column prop="buyPrice" label="预设进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+      <el-table-column prop="salePrice" label="预设售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+      <el-table-column prop="type" label="型号" />
+      <el-table-column prop="brand" label="品牌" />
+      <el-table-column prop="unit" label="单位" />
+      <el-table-column prop="color" label="颜色" />
+      <el-table-column prop="standard" label="规格" />
+      <el-table-column prop="material" label="材质" />
+      <el-table-column prop="descs" label="描述" />
     </el-table>
     <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50,300, 500]" :page-size="pageSize"
                    layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"

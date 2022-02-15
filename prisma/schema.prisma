@@ -32,7 +32,7 @@ model goods {
   salePrice           Float?
   descs               String?
   updater             String?
-  updatime            DateTime?
+  updatime            DateTime? @updatedAt
   state               Int                   @default(1)
   picture             String?
   category            category?             @relation(fields: [cid], references: [id])
