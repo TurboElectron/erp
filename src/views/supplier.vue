@@ -19,13 +19,13 @@
     <el-table-column prop="descs" label="备注" />
     <el-table-column label="操作" width="200" fixed="right">
       <template #default="scope">
-        <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
+        <el-button size="small" icon="Edit" @click.prevent="handlerEdit(scope.row)">
           修改
         </el-button>
         <el-popconfirm title="确定要删除吗?" @confirm="handlerDelete(scope.row)" confirm-button-text="确定"
           cancel-button-text="取消">
           <template #reference>
-            <el-button size="mini" type="danger" icon="Delete">
+            <el-button size="small" type="danger" icon="Delete">
               删除
             </el-button>
           </template>

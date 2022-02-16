@@ -27,7 +27,7 @@
     </div>
     <div class="tags-close-box">
       <el-dropdown @command="handleTags">
-        <el-button size="mini">
+        <el-button size="small">
           操作
           <el-icon>
             <arrow-down-bold />
@@ -64,7 +64,7 @@ export default {
     console.log(tagsList, "===============")
 
     /**
-     * 关闭单个标签 
+     * 关闭单个标签
      */
     const closeTags = tabName => {
       const index = tagsList.value.findIndex(v => v.name === tabName)

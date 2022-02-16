@@ -5,8 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
 import fs from "fs";
-import {PrismaClient} from "@prisma/client";
-const pkg = require('../package.json')
+import { autoUpdater } from "electron-updater"
 require('@electron/remote/main').initialize()
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export const dbPath = isDevelopment ? join(__dirname, '../prisma/dev.db') : path.join(app.getPath('userData'), `0.1.1.db`)
@@ -45,18 +44,38 @@ async function createWindow() {
   })
   require('@electron/remote/main').enable(win.webContents)
   if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // console.log(path.join(
+    //     __dirname,
+    //     "../dist_electron/latest-mac.yml" // change path if needed
+    // ))
+    autoUpdater.setFeedURL('http://localhost:8080')
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
+    autoUpdater.checkForUpdates();
   } else {
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
+    autoUpdater.checkForUpdatesAndNotify();
   }
+  win.once('ready-to-show', () => {
+    console.log(1111)
+  })
+  autoUpdater.on('update-available', () => {
+    win.webContents.send('update_available');
+  });
+  autoUpdater.on('update-downloaded', () => {
+    win.webContents.send('update_downloaded');
+  });
 }
 ipcMain.on('download-url', (event, args) => {
   console.log(dbPath)
 })
+ipcMain.on('restart_app', () => {
+  console.log('restart_app')
+  autoUpdater.quitAndInstall();
+});
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar

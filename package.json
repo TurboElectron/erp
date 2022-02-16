@@ -1,12 +1,13 @@
 {
   "name": "evs",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode dev",
     "build": "vue-cli-service build --mode prod",
-    "electron:build": "vue-cli-service electron:build -w --mode prod",
-    "electron:serve": "vue-cli-service electron:serve -w --mode dev",
+    "electron:build": "vue-cli-service electron:build -p always -w  --mode prod",
+    "electron:build-dry": "vue-cli-service electron:build  --mode prod",
+    "electron:serve": "vue-cli-service electron:serve -m --mode dev",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
@@ -21,6 +22,7 @@
     "core-js": "^3.6.5",
     "decimal.js": "^10.3.1",
     "echarts": "^5.0.2",
+    "electron-updater": "^4.6.5",
     "element-plus": "2.0.1",
     "file-saver": "^2.0.5",
     "glob": "^7.2.0",

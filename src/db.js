@@ -1,8 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const { app } = require('@electron/remote')
 const { join, resolve } = require('path')
-const pkg = require('../package.json')
-const glob = require('glob')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 console.log(isDevelopment)
 

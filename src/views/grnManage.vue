@@ -57,13 +57,13 @@
     <el-table-column prop="descs" label="备注" min-width="200"  />
     <el-table-column label="操作" width="200">
       <template #default="scope">
-        <el-button size="mini" icon="Edit" @click.prevent="handlerEdit(scope.row)">
+        <el-button size="small" icon="Edit" @click.prevent="handlerEdit(scope.row)">
           修改
         </el-button>
         <el-popconfirm title="确定要删除吗?" @confirm="handlerDelete(scope.row)" confirm-button-text="确定"
           cancel-button-text="取消">
           <template #reference>
-            <el-button size="mini" type="danger" icon="Delete">
+            <el-button size="small" type="danger" icon="Delete">
               删除
             </el-button>
           </template>
@@ -185,8 +185,8 @@
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="props">
               <el-form-item label-width="0" >
-                <el-button size="mini" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
-                <el-button size="mini" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
+                <el-button size="small" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
+                <el-button size="small" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
               </el-form-item>
             </template>
           </el-table-column>

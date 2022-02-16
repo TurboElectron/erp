@@ -13,6 +13,7 @@ module.exports = {
         electronBuilder: {
             builderOptions: {
                 extraResources: ['prisma/**/*', 'node_modules/.prisma/**/*', 'node_modules/@prisma/client/**/*'],
+                publish: ['github']
             },
             externals: ['@prisma/client'],
             nodeIntegration: true,

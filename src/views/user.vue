@@ -18,7 +18,7 @@
     <el-table-column prop="account" label="姓名" />
     <el-table-column fixed="right" label="操作" width="220">
       <template #default="scope">
-        <el-button icon="Edit" size="mini" v-if="scope.row.account!=='admin'"
+        <el-button icon="Edit" size="small" v-if="scope.row.account!=='admin'"
           @click.prevent="editPassword(scope.$index, scope.row)">
           修改密码
         </el-button>
@@ -26,7 +26,7 @@
           <el-popconfirm title="确定要删除吗?" @confirm="deleteUser(scope.row)" confirm-button-text="确定"
             cancel-button-text="取消">
             <template #reference>
-              <el-button type="danger" icon="Delete" size="mini">
+              <el-button type="danger" icon="Delete" size="small">
                 删除
               </el-button>
             </template>

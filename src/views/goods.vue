@@ -1,15 +1,15 @@
 <template>
   <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
-    <el-table :data="tableData"  v-loading="loadingTbl"  border empty-text="暂无数据" style="flex:1;overflow:auto">
+    <el-table :data="tableData"  v-loading="loadingTbl"  border empty-text="暂无数据" style="height:0;flex:1 0 auto;overflow:auto">
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-button icon="Edit" size="mini" @click.prevent="editGoods(scope.row)">
+          <el-button icon="Edit" size="small" @click.prevent="editGoods(scope.row)">
             修改
           </el-button>
           <el-popconfirm title="确定要删除吗?" @confirm="deleteGoods(scope.row)" confirm-button-text="确定"
                          cancel-button-text="取消">
             <template #reference>
-              <el-button type="danger" size="mini" icon="Delete">
+              <el-button type="danger" size="small" icon="Delete">
                 删除
               </el-button>
             </template>

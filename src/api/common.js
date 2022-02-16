@@ -10,7 +10,10 @@ const orderMap = {
 export const addGoods = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
     const res = await prisma.goods.create({
-        data
+        data: {
+            ...data,
+            updatime: new Date()
+        }
     })
     return {
         code: 200,
@@ -23,7 +26,10 @@ export const updateGoods  = async (data = {}) => {
     // return httpFetch.post('customer/update', data)
     const res = await prisma.goods.update({
         where: {id: data.id},
-        data
+        data: {
+            ...data,
+            updatime: new Date()
+        }
     })
     return {
         code: 200,
@@ -65,7 +71,7 @@ export const goodsDetail = async (data={}) => {
 export const goodsList = async (data = {}) => {
     const {pageSize, pageNo,id, cid, name, code} = data
     let where = {
-        
+
     }
     if (id) {
         where.id = id
@@ -94,6 +100,7 @@ export const goodsList = async (data = {}) => {
             }
         })
     ])
+    console.log(records)
     return {
         code: 200,
         message: {
