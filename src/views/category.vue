@@ -18,8 +18,7 @@
         <el-tree
           :data="treeData"
           node-key="id"
-          default-expand-all
-          :expand-on-click-node="false"
+          :expand-on-click-node="true"
           :highlight-current="true"
           @node-click="handleClickNode"
           style="overflow: auto;height:100%"

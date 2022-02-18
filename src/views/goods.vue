@@ -157,9 +157,9 @@ export default {
         salePrice: [{
           required: true, message: '请输入预设售价', trigger: 'blur',
         }],
-        code: [{
-          required: true, message: '请输入产品编号', trigger: 'blur',
-        }],
+        // code: [{
+        //   required: true, message: '请输入产品编号', trigger: 'blur',
+        // }],
       }
     })
 
@@ -208,9 +208,13 @@ export default {
        * 新增产品
        */
       addGoods() {
-        data.goodsDailog = true;
-        data.isEditGoods = false;
-        handlerResetDialogForm()
+        if (props.cid) {
+          data.goodsDailog = true;
+          data.isEditGoods = false;
+          handlerResetDialogForm()
+        } else {
+          showMessage('error','请先选中分类（深蓝色表示选中）')
+        }
       },
       /**
        * 关闭dialog 之前 重置form
@@ -252,20 +256,22 @@ export default {
      * 保存产品信息
      */
     const handlerSaveGoods = async () => {
-      data.saveLoading = true
-      //根据标识判断是新增还是修改
-      const response = data.isEditGoods ? await updateGoods(data.goodsDialogForm) : await addGoods(data.goodsDialogForm);
-      data.saveLoading = false
-      if (response.code === 200) {
-        ElMessage.success(response.message);
-        //刷新表格
-        methods.onQuery()
-        //关闭dialog
-        data.goodsDailog = false
-      } else {
-        ElMessage.error(response.message);
+      try {
+        data.saveLoading = true
+        //根据标识判断是新增还是修改
+        const response = data.isEditGoods ? await updateGoods(data.goodsDialogForm) : await addGoods(data.goodsDialogForm);
+        if (response.code === 200) {
+          ElMessage.success(response.message);
+          //刷新表格
+          methods.onQuery()
+          //关闭dialog
+          data.goodsDailog = false
+        } else {
+          ElMessage.error(response.message);
+        }
+      } finally {
+        data.saveLoading = false
       }
-
     }
     const handlerResetDialogForm = () => {
       nextTick(() => {
