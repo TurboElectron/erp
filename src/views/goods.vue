@@ -83,7 +83,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button size="small" @click="goodsDailog = false">关闭</el-button>
-        <el-button size="small" :loading="saveLoading" type="primary" @click="saveGoods()">保存</el-button>
+        <el-button size="small" :loading="saveLoading" type="primary" @click="saveGoods()" :disabled="saveLoading">保存</el-button>
       </span>
     </template>
   </el-dialog>
@@ -258,6 +258,7 @@ export default {
     const handlerSaveGoods = async () => {
       try {
         data.saveLoading = true
+        delete data.goodsDialogForm.id
         //根据标识判断是新增还是修改
         const response = data.isEditGoods ? await updateGoods(data.goodsDialogForm) : await addGoods(data.goodsDialogForm);
         if (response.code === 200) {
