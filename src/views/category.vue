@@ -162,4 +162,10 @@ export default {
   },
 }
   </script>
-  <style lang='scss' scoped></style>
+  <style lang='scss' scoped>
+  :deep(.el-tree) {
+    .el-icon.is-leaf.el-tree-node__expand-icon {
+      display: none;
+    }
+  }
+  </style>

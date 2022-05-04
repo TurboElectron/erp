@@ -258,7 +258,6 @@ export default {
     const handlerSaveGoods = async () => {
       try {
         data.saveLoading = true
-        delete data.goodsDialogForm.id
         //根据标识判断是新增还是修改
         const response = data.isEditGoods ? await updateGoods(data.goodsDialogForm) : await addGoods(data.goodsDialogForm);
         if (response.code === 200) {
@@ -277,7 +276,7 @@ export default {
     const handlerResetDialogForm = () => {
       nextTick(() => {
         goodsDialogRef.value.resetFields()
-        Object.assign(data.goodsDialogForm, {cid: props.cid})
+        data.goodsDialogForm = getGoodsDialogFormValues()
         data.saveLoading = false
       })
     }

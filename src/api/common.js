@@ -9,6 +9,7 @@ const orderMap = {
 /** 添加产品 */
 export const addGoods = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
+    delete data.id
     const res = await prisma.goods.create({
         data: {
             ...data,
@@ -154,6 +155,7 @@ export const goodsListV2 = async (data = {}) => {
 /** 注册分类 */
 export const addCategory = async (data = {}) => {
     // return httpFetch.post('category/addCategory', data)
+    delete data.id
     const res = await prisma.category.create({
         data
     })
@@ -240,6 +242,7 @@ export const deleteCategory = async id => {
 /** 添加客户 */
 export const addCustomer = async (data = {}) => {
     // return httpFetch.post('customer/add', data)
+    delete data.id
     const res = await prisma.sale_customer.create({
         data
     })
@@ -308,6 +311,7 @@ export const customerList = async (data = {}) => {
 /** 添加仓库 */
 export const addRepo = async (data = {}) => {
     // return httpFetch.post('repo/add', data)
+    delete data.id
     const res = await prisma.repo.create({
         data
     })
@@ -408,6 +412,7 @@ export const deleteRepo = async id => {
 /** 添加供应商 */
 export const addSupplier = async (data = {}) => {
     // return httpFetch.post('supplier/add', data)
+    delete data.id
     const res = await prisma.purchase_supplier.create({
         data
     })
