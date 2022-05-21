@@ -1072,6 +1072,14 @@ export const geOutboundClassify = async (data = {}) => {
             }
         }
     }
+    if (cid) {
+        where = {
+            ...where,
+            goods: {
+                cid
+            }
+        }
+    }
     if (goodsId) {
         where.goodsId = goodsId
     }
@@ -1129,13 +1137,21 @@ export const getCategorySales = (data = {}) => {
 /** 库存分页列表*/
 export const getInventoryList = async (data = {}) => {
     // return httpFetch.post('inventory/list', data)
-    const {pageSize, pageNo, goodsId, repoId, orderBy} = data
+    const {pageSize, pageNo, goodsId, repoId, orderBy, cid} = data
     let where = {}
     if (goodsId) {
         where.goodsId = goodsId
     }
     if (repoId) {
         where.repoId = repoId
+    }
+    if (cid) {
+        where = {
+            ...where,
+            goods: {
+                cid
+            }
+        }
     }
     let page = {
 
