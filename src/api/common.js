@@ -791,7 +791,7 @@ export const geGrnTotal = (data = {}) => {
 /** 入库按照 商品 最小单位、仓库进行数量统计*/
 export const geGrnClassify = async (data = {}) => {
     // return httpFetch.post('grn/classify', data)
-    const {pageSize, pageNo, goodsId , repoId, startDate, endDate} = data
+    const {pageSize, pageNo, goodsId , repoId, startDate, endDate, cid} = data
     let isDate = {}
     if (startDate) {
         isDate.gte = new Date(startDate)
@@ -804,13 +804,21 @@ export const geGrnClassify = async (data = {}) => {
             is: {
                 date: isDate
             }
-        }
+        },
     }
     if (goodsId) {
         where.goodsId = goodsId
     }
     if (repoId) {
         where.repoId = repoId
+    }
+    if (cid) {
+        where = {
+            ...where,
+            goods: {
+                cid
+            }
+        }
     }
     const [total, records] = await prisma.$transaction([
         prisma.purchase_order_item.count({
@@ -1049,7 +1057,7 @@ export const exportOutboundList = (data = {}) => {
 /** 出库按照 商品 最小单位、仓库进行数量统计*/
 export const geOutboundClassify = async (data = {}) => {
     // return httpFetch.post('outbound/classify', data)
-    const {pageSize, pageNo, goodsId, repoId, startDate, endDate} = data
+    const {pageSize, pageNo, goodsId, repoId, startDate, endDate, cid} = data
     let isDate = {}
     if (startDate) {
         isDate.gte = new Date(startDate)
@@ -1069,6 +1077,14 @@ export const geOutboundClassify = async (data = {}) => {
     }
     if (repoId) {
         where.repoId = repoId
+    }
+    if (cid) {
+        where = {
+            ...where,
+            goods: {
+                cid
+            }
+        }
     }
     const [total, records] = await prisma.$transaction([
         prisma.sale_order_item.count({

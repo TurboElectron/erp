@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+  <div style="display: flex;flex-direction: column;height: 100%;">
   <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="商品：">
       <goods-select-v2  v-model="queryForm.goodsId" :repo-id="queryForm.repoId" is-edit/>
@@ -24,35 +25,51 @@
     </el-form-item>
 
   </el-form>
-  <!-- 表格 -->
-  <el-table :data="tableData" v-loading="loadTable" show-summary style="width: 100%" border empty-text="暂无数据"
-            :summary-method="onSummaryMethod"
-  >
-    <el-table-column prop="repo.name" label="仓库名称" />
-    <el-table-column prop="goods.name" label="商品名称" />
-    <el-table-column prop="amount" label="数量"></el-table-column>
-    <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"></el-table-column>
-    <el-table-column prop="sale_order.date" label="时间">
-      <template #default="scope">
-        {{moment(scope.row.sale_order.date).format('YYYY-MM-DD HH:mm:ss')}}
-      </template>
-    </el-table-column>
-  </el-table>
-  <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
-                 layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="v=>handleSizeChange(v)"
-                 @current-change="v=>handleCurrentChange(v)">
-  </el-pagination>
-
+  <div style="flex: 1 0 auto;  height: 0;display: flex;gap: 20px;overflow:auto">
+    <el-tree
+        :data="treeData"
+        node-key="id"
+        :expand-on-click-node="true"
+        :highlight-current="true"
+        @node-click="handleClickNode"
+        style="overflow: auto;height:100%"
+        :highlightCurrent="!!queryForm.cid"
+        ref="target"
+    >
+    </el-tree>
+    <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
+      <!-- 表格 -->
+      <el-table :data="tableData" v-loading="loadTable"  style="height:0;flex:1 0 auto;overflow:auto" border empty-text="暂无数据"
+                :summary-method="onSummaryMethod"
+      >
+        <el-table-column prop="repo.name" label="仓库名称" />
+        <el-table-column prop="goods.name" label="商品名称" />
+        <el-table-column prop="amount" label="数量"></el-table-column>
+        <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"></el-table-column>
+        <el-table-column prop="sale_order.date" label="时间">
+          <template #default="scope">
+            {{moment(scope.row.sale_order.date).format('YYYY-MM-DD HH:mm:ss')}}
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
+                     layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="v=>handleSizeChange(v)"
+                     @current-change="v=>handleCurrentChange(v)">
+      </el-pagination>
+    </div>
+  </div>
+  </div>
 </template>
 
 <script>
-import { reactive, toRefs, onMounted } from 'vue';
+import { reactive, toRefs, onMounted, ref } from 'vue';
 import moment from 'moment'
-import {geOutboundClassify} from '@/api/common'
+import {geOutboundClassify, getCategoryTree} from '@/api/common'
 import RepoSelect from "@temp/RepoSelect";
 import GoodsSelect from "@temp/GoodsSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
+import {onClickOutside} from "@vueuse/core";
 export default {
   name: 'grnTotal',
   components: {GoodsSelectV2, RepoSelectV2, GoodsSelect, RepoSelect},
@@ -70,6 +87,7 @@ export default {
         repoId: '',
         startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
+        cid: ''
       },
       currentPage: 1,
       pageSize: 10,
@@ -77,12 +95,17 @@ export default {
       tableData: [],
       loadTable: true,
       categoryData: [],
-      repoData: []
+      repoData: [],
+      treeData: []
     });
     /**
      * 方法
      */
     const methods = {
+      handleClickNode(node){
+        state.queryForm.cid = node.id
+        methods.getTableData()
+      },
       /**
        * 获取列表
        */
@@ -158,10 +181,26 @@ export default {
       methods.getTableData()
 
     })
+    /**
+     * 获取产品分类树
+     */
+    const handlerGetCategory = async () => {
+      const categorytreeData = await getCategoryTree()
+      state.treeData = categorytreeData.message
+    }
+    //加载产品类别数据
+    handlerGetCategory()
+    const target = ref(null)
+
+    onClickOutside(target, (event) => {
+      state.queryForm.cid = ''
+      methods.getTableData()
+    })
     return {
       ...toRefs(state),
       ...methods,
-      moment
+      moment,
+      target
     }
   }
 }

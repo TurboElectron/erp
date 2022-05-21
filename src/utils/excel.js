@@ -1,5 +1,5 @@
 import { saveAs } from 'file-saver'
-import XLSX, { WorkBook, WorkSheet } from 'xlsx'
+import * as XLSX from 'xlsx'
 const sheetFromDataArray = (data) => {
     const ws = {}
     const range = {
@@ -109,7 +109,6 @@ export const exportJson2Excel = (header, data, filename = 'excel-list', multiHea
     // Add worksheet to workbook
     wb.SheetNames.push(wsName)
     wb.Sheets[wsName] = ws
-
     const wbout = XLSX.write(wb, {
         bookType: bookType,
         bookSST: false,
