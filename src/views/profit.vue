@@ -19,42 +19,42 @@
   <el-row v-if="data">
       <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
         <el-form-item label="总进价：">
-          {{data.message.purchase._sum.totalPrice??0}}
+          {{data.message.purchase._sum.totalPrice?.toFixed(2)??0}}
         </el-form-item>
       </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="总售价：">
-        {{data.message.sale._sum.totalPrice??0}}
+        {{data.message.sale._sum.totalPrice?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="买入欠款：">
-        {{data.message.overdraftPurchase}}
+        {{data.message.overdraftPurchase?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="卖出欠款：">
-        {{data.message.overdraftSale}}
+        {{data.message.overdraftSale?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="人工费总额：">
-        {{data.message.sale._sum.payOtherFee??0}}
+        {{data.message.sale._sum.payOtherFee?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="人工费欠款：">
-        {{data.message.overdraftOtherFee}}
+        {{data.message.overdraftOtherFee?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="营业额：">
-        {{data.message.profit}}
+        {{data.message.profit?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
     <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
       <el-form-item label="实际营业额（不含欠款）：">
-        {{data.message.realProfit}}
+        {{data.message.realProfit?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
   </el-row>
