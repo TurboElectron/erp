@@ -118,15 +118,15 @@
         <el-divider> <span class="grn-detail-title">入库产品明细</span> </el-divider>
       </el-form-item>
       <el-form-item label-width='0'>
-        <el-table :data="dialogForm.purchase_order_item">
-          <el-table-column label="入库产品分类" min-width="220px">
+        <el-table :data="dialogForm.purchase_order_item" table-layout="auto">
+          <el-table-column label="入库产品分类">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.cid'">
                   <category-select v-model="props.row.cid" :is-edit="props.row.isEdit" />
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="入库产品" min-width="220px">
+          <el-table-column label="入库产品">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.goodsId'"
                 :rules="dialogFormRules.goodsId">
@@ -135,7 +135,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="入库仓库" min-width="220px">
+          <el-table-column label="入库仓库">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
                 <repo-select v-model="props.row.repoId" :is-edit="props.row.isEdit"/>
@@ -143,7 +143,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="入库数量" min-width="160px">
+          <el-table-column label="入库数量">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
                 <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
@@ -155,14 +155,7 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="预设进价" min-width="160px">
-            <template #default="props">
-              <el-form-item>
-                <span>{{props.row.goods?.buyPrice?.toFixed(2)??0}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="单价" min-width="200px">
+          <el-table-column label="单价" >
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
                 <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
@@ -175,8 +168,15 @@
               </el-form-item>
             </template>
           </el-table-column>
+          <el-table-column label="预设进价" >
+            <template #default="props">
+              <el-form-item>
+                <span>{{props.row.goods?.buyPrice?.toFixed(2)??0}}</span>
+              </el-form-item>
+            </template>
+          </el-table-column>
 
-          <el-table-column label="成本" min-width="200" fixed="right">
+          <el-table-column label="成本"  fixed="right">
             <template #default="props">
               <el-form-item> {{props.row.totalPrice?.toFixed(2)??0}}</el-form-item>
             </template>
@@ -186,7 +186,13 @@
             <template #default="props">
               <el-form-item label-width="0" >
                 <el-button size="small" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
-                <el-button size="small" type="danger" icon="Delete" @click="removeGrnDetail(props.$index)" v-if="props.$index!==0">删除</el-button>
+
+                <el-popconfirm title="确定要删除吗?" @confirm="removeGrnDetail(props.$index)" confirm-button-text="确定"
+                               cancel-button-text="取消"  v-if="props.$index!==0">
+                  <template #reference>
+                    <el-button size="small" type="danger" icon="Delete">删除</el-button>
+                  </template>
+                </el-popconfirm>
               </el-form-item>
             </template>
           </el-table-column>
