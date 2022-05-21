@@ -28,10 +28,10 @@
 
   <el-table :data="allRakingData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
     <el-table-column prop="customer.name" label="姓名" />
-    <el-table-column prop="otherFee" label="总人工费" sortable />
-    <el-table-column prop="totalPrice" label="总金额（包含人工）" sortable />
-    <el-table-column prop="payPrice" label="总支付" sortable />
-    <el-table-column prop="allDebt" label="总欠款" sortable />
+    <el-table-column prop="otherFee" label="总人工费" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="totalPrice" label="总金额（包含人工）" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="payPrice" label="总支付" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="allDebt" label="总欠款" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="date" label="时间">
       <template #default="scope">
         {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
@@ -122,21 +122,21 @@ export default {
               name: '购买力',
               color: '#2184e7',
               data: resData.map(v => ({
-                value: v.totalPrice,
+                value: v.totalPrice?.toFixed(2),
                 unitName: '元'
               }))
             }, {
               name: '支付力',
               color: '#34bfa3',
               data: resData.map(v => ({
-                value: v.payPrice,
+                value: v.payPrice?.toFixed(2),
                 unitName: '元'
               }))
             }, {
               name: '欠款',
               color: '#f4516c',
               data: resData.map(v => ({
-                value: v.allDebt,
+                value: v.allDebt?.toFixed(2),
                 unitName: '元'
               }))
             }]

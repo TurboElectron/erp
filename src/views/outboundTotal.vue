@@ -25,11 +25,13 @@
 
   </el-form>
   <!-- 表格 -->
-  <el-table :data="tableData" v-loading="loadTable" show-summary style="width: 100%" border empty-text="暂无数据">
+  <el-table :data="tableData" v-loading="loadTable" show-summary style="width: 100%" border empty-text="暂无数据"
+            :summary-method="onSummaryMethod"
+  >
     <el-table-column prop="repo.name" label="仓库名称" />
     <el-table-column prop="goods.name" label="商品名称" />
     <el-table-column prop="amount" label="数量"></el-table-column>
-    <el-table-column prop="totalPrice" label="总价"></el-table-column>
+    <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"></el-table-column>
     <el-table-column prop="sale_order.date" label="时间">
       <template #default="scope">
         {{moment(scope.row.sale_order.date).format('YYYY-MM-DD HH:mm:ss')}}
@@ -108,7 +110,47 @@ export default {
       handleCurrentChange(value) {
         state.currentPage = value
         this.getTableData()
+      },
+      onSummaryMethod({columns, data}) {
+        const sums = [];
+        columns.forEach((column, index) => {
+          if (index === 0) {
+            sums[index] = '总价';
+            return;
+          }
+
+          const values = data.map(item => Number(item[column.property]));
+          if (column.property === 'totalPrice') {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0).toFixed(2);
+            sums[index] += ' 元';
+          }else{
+            sums[index] = '--'
+          }
+
+          if (column.property === 'amount') {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr);
+              if (!isNaN(value)) {
+                return prev + curr;
+              } else {
+                return prev;
+              }
+            }, 0);
+            sums[index] += ' ';
+          }
+
+        });
+
+        return sums;
       }
+
 
     }
     onMounted(() => {
