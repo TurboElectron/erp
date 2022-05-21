@@ -7,7 +7,11 @@
       placeholder="请输入供应商名称"
       :remote-method="search"
       :loading="loading"
-      @focus="()=> search()"
+      @visible-change="(val)=> {
+        if(val) {
+           search()
+        }
+      }"
   >
     <el-option
         v-for="item in data?.message?.records??[]"

@@ -7,7 +7,11 @@
       placeholder="请输入仓库名称"
       :remote-method="search"
       :loading="loading"
-      @focus="()=> search()"
+      @visible-change="(val)=> {
+        if(val) {
+           search()
+        }
+      }"
       v-if="isEdit"
   >
     <el-option

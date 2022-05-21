@@ -201,7 +201,7 @@
       </el-form-item>
 
       <el-form-item label-width='0'>
-        <el-button type="text" size="medium" icon="CirclePlus" @click="addGrnDetailList()">添加入库产品</el-button>
+        <el-button type="text"  icon="CirclePlus" @click="addGrnDetailList()">添加入库产品</el-button>
       </el-form-item>
 
       <el-row>

@@ -26,14 +26,14 @@
     <el-table-column prop="repo.name" label="仓库名称" />
     <el-table-column prop="goods.name" label="商品名称" />
     <el-table-column prop="goods.code" label="商品编号" />
-    <el-table-column prop="goods.buyPrice" label="预设进价" />
-    <el-table-column prop="goods.salePrice" label="预设售价" />
+    <el-table-column prop="goods.buyPrice" label="预设进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="goods.salePrice" label="预设售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalCount" label="库存总量" sortable="custom" />
     <el-table-column prop="saleCount" label="销售总量"  sortable="custom" />
-    <el-table-column prop="totalBuyPrice" label="总进价" />
+    <el-table-column prop="totalBuyPrice" label="总进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
-    <el-table-column prop="totalSalePrice" label="总售价" />
-    <el-table-column prop="profit" label="总利润" />
+    <el-table-column prop="totalSalePrice" label="总售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="profit" label="总利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
   </el-table>
 
   <el-pagination v-model:currentPage="currentPage" :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"

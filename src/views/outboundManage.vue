@@ -203,7 +203,7 @@
       </el-form-item>
 
       <el-form-item label-width='0'>
-        <el-button type="text" size="medium" icon="CirclePlus" @click="addOutboundDetailList()">添加出库产品</el-button>
+        <el-button type="text"  icon="CirclePlus" @click="addOutboundDetailList()">添加出库产品</el-button>
       </el-form-item>
       <el-row>
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">

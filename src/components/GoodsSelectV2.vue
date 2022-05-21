@@ -7,7 +7,11 @@
       placeholder="请输入产品编号"
       :remote-method="searchGoods"
       :loading="loading"
-      @focus="()=> searchGoods()"
+      @visible-change="(val)=> {
+        if(val) {
+           searchGoods()
+        }
+      }"
       v-if="isEdit"
   >
     <el-option
