@@ -158,12 +158,16 @@
           <el-table-column label="单价" >
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
-                <el-input-number v-model.number="props.row.price" :min="0" @change="getTotalPrice(props.$index)"
-                                 :precision="2"
-                  style="width:100%" clearable placeholder="请输入单价"
+                <input
+                       v-model.number="props.row.price"
+                       type="number"
+                       :min="0"
+                       :step="0.01"
+                       oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+                       @change="getTotalPrice(props.$index)"
+                  style="width:100%"  placeholder="请输入单价"
                                  v-if="props.row.isEdit"
-                >
-                </el-input-number>
+                />
                 <span v-else>{{props.row.price?.toFixed(2)??0}}</span>
               </el-form-item>
             </template>
@@ -215,9 +219,13 @@
         </el-col>
         <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
           <el-form-item label="已付款：" prop="payPrice">
-            <el-input-number v-model="dialogForm.payPrice" :precision="2" :min="0" clearable placeholder="请输入已付款"
-              style="width:100%">
-            </el-input-number>
+            <input v-model="dialogForm.payPrice"
+                   type="number"
+                   :min="0"
+                   :step="0.01"
+                   oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+                   placeholder="请输入已付款"
+              style="width:100%"/>
           </el-form-item>
         </el-col>
 

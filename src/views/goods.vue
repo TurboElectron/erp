@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
+  <div style="height:100%;overflow:auto;display:flex;flex-direction:column">
     <el-table :data="tableData"  v-loading="loadingTbl"  border empty-text="暂无数据" style="height:0;flex:1 0 auto;overflow:auto">
       <el-table-column label="操作" width="200">
         <template #default="scope">
@@ -49,10 +49,20 @@
         </el-input>
       </el-form-item>
       <el-form-item label="预设进价：" prop="buyPrice">
-        <el-input-number v-model.number="goodsDialogForm.buyPrice"  :precision="2" clearable placeholder="请输入预设进价"></el-input-number>
+        <input v-model.number="goodsDialogForm.buyPrice"
+               type="number"
+               :min="0"
+               :step="0.01"
+               oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+               placeholder="请输入预设进价"/>
       </el-form-item>
       <el-form-item label="预设售价：" prop="salePrice">
-        <el-input-number v-model.number="goodsDialogForm.salePrice"  :precision="2" clearable placeholder="请输入预设售价"></el-input-number>
+        <input v-model.number="goodsDialogForm.salePrice"
+               type="number"
+               :min="0"
+               :step="0.01"
+               oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
+               placeholder="请输入预设售价"/>
       </el-form-item>
       <el-form-item label="产品型号：" prop="type">
         <el-input v-model="goodsDialogForm.type" show-word-limit clearable placeholder="请输入产品型号">
