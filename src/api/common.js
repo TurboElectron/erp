@@ -125,8 +125,13 @@ export const goodsListV2 = async (data = {}) => {
         }
     }
     if (code) {
-        where.code = {
-            contains: code
+        where = {
+            ...where,
+            goods: {
+                code: {
+                    contains: code
+                }
+            }
         }
     }
     const [total,records] = await prisma.$transaction([

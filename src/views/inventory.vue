@@ -34,7 +34,7 @@
        </el-tree>
        <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
          <!-- 表格 -->
-         <el-table :data="tableData" v-loading="loadingTbl"  style="height:0;flex:1 0 auto" border empty-text="暂无数据"
+         <el-table :data="tableData" v-loading="loadingTbl"  style="height:0;flex:1 0 auto;overflow:auto" border empty-text="暂无数据"
                    @sort-change="handleSortChange"
          >
            <el-table-column prop="repo.name" label="仓库名称" />
