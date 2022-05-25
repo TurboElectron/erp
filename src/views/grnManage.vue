@@ -266,7 +266,7 @@ import _ from 'lodash'
 import GoodsSelect from "@temp/GoodsSelect";
 import SupplierSelect from "@temp/SupplierSelect";
 import RepoSelect from "@temp/RepoSelect";
-import * as math from "mathjs";
+import {math} from "@/utils";
 import CategorySelect from "@temp/CategorySelect";
 import UserSelect from "@temp/UserSelect";
 
@@ -354,7 +354,7 @@ export default {
       },
       getTotalPrice(index) {
         const curGrnDetail = dialogForm.purchase_order_item[index]
-        dialogForm.purchase_order_item[index].totalPrice =  math.evaluate(`${curGrnDetail.amount} * ${curGrnDetail.price}`)
+        dialogForm.purchase_order_item[index].totalPrice =  Number(math.evaluate(`${curGrnDetail.amount} * ${curGrnDetail.price}`).valueOf())
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
@@ -373,11 +373,11 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = dialogForm.purchase_order_item.reduce((total, c) => math.evaluate(`${total} + ${c.totalPrice}`), 0)
+        const totalPrice = math.evaluate(dialogForm.purchase_order_item.reduce((total, c) => math.evaluate(`${total} + ${c.totalPrice}`), 0)).valueOf()
         // 总价格
-        dialogForm.totalPrice = totalPrice
+        dialogForm.totalPrice = Number(totalPrice)
         // 已付款
-        dialogForm.payPrice = totalPrice
+        dialogForm.payPrice = Number(totalPrice)
       },
       /**
        * 导出

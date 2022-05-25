@@ -1,7 +1,7 @@
 import httpFetch from '@/utils/https'
 import {prisma} from "@/db";
 import {intersection, intersectionWith, omit, pick} from "lodash";
-import * as math from "mathjs";
+import {math} from "@/utils";
 const orderMap = {
     "ascending": 'asc',
     "descending": 'desc',
@@ -498,8 +498,8 @@ const grnUpdateStock = async (_) => {
             data: {
                 totalCount: stock.totalCount + _.amount,
                 buyPrice: _.price,
-                avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} + ${_.totalPrice}) / ${stock.totalCount} + ${_.amount}`),
-                totalBuyPrice: math.evaluate(`${stock.totalBuyPrice} + ${_.totalPrice}`)
+                avgBuyPrice: Number(math.evaluate(`(${stock.totalBuyPrice} + ${_.totalPrice}) / ${stock.totalCount} + ${_.amount}`).valueOf()),
+                totalBuyPrice: Number(math.evaluate(`${stock.totalBuyPrice} + ${_.totalPrice}`).valueOf())
             }
         })
     } else {
@@ -511,7 +511,7 @@ const grnUpdateStock = async (_) => {
                 saleCount: 0,
                 totalSalePrice: 0,
                 buyPrice: _.price,
-                avgBuyPrice: math.evaluate(`${_.totalPrice} / ${_.amount}`),
+                avgBuyPrice: Number(math.evaluate(`${_.totalPrice} / ${_.amount}`).valueOf()),
                 totalBuyPrice: _.totalPrice
             }
         })
@@ -533,7 +533,7 @@ const outboundUpdateStock = async (_) => {
                 totalCount: stock.totalCount??0 - _.amount??0,
                 saleCount: stock.saleCount??0 + _.amount??0,
                 salePrice:  _.price??0,
-                totalSalePrice: math.evaluate(`${stock.totalSalePrice??0} + ${_.totalPrice??0}`)
+                totalSalePrice: Number(math.evaluate(`${stock.totalSalePrice??0} + ${_.totalPrice??0}`).valueOf())
             }
         })
     }
@@ -553,8 +553,8 @@ const grnDeleteStock = async (_) => {
             },
             data: {
                 totalCount: stock.totalCount - _.amount,
-                totalBuyPrice: math.evaluate(`${stock.totalBuyPrice} - ${_.totalPrice}`),
-                avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} -  ${_.totalPrice}) / (${stock.totalCount} - ${_.amount})`),
+                totalBuyPrice: Number(math.evaluate(`${stock.totalBuyPrice} - ${_.totalPrice}`).valueOf()),
+                avgBuyPrice: Number(math.evaluate(`(${stock.totalBuyPrice} -  ${_.totalPrice}) / (${stock.totalCount} - ${_.amount})`).valueOf()),
             }
         })
     }
@@ -575,7 +575,7 @@ const outboundDeleteStock = async  (_) => {
                 totalCount: stock.totalCount??0 + _.amount??0,
                 saleCount: stock.saleCount??0 - _.amount??0,
                 salePrice:  _.price??0,
-                totalSalePrice: math.evaluate(`${stock.totalSalePrice??0} - ${_.totalPrice??0}`),
+                totalSalePrice: Number(math.evaluate(`${stock.totalSalePrice??0} - ${_.totalPrice??0}`).valueOf()),
             }
         })
     }
@@ -682,8 +682,8 @@ export const updateGrnList = async (data = {}) => {
                 data: {
                     totalCount:  stock.totalCount - poi.amount + _.amount,
                     buyPrice: _.price,
-                    totalBuyPrice:  math.evaluate(`${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}`),
-                    avgBuyPrice: math.evaluate(`(${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}) / (${stock.totalCount} - ${poi.amount} + ${_.amount})`) ,
+                    totalBuyPrice:  Number(math.evaluate(`${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}`).valueOf()),
+                    avgBuyPrice: Number(math.evaluate(`(${stock.totalBuyPrice} - ${poi.totalPrice} + ${_.totalPrice}) / (${stock.totalCount} - ${poi.amount} + ${_.amount})`).valueOf()) ,
                 }
             })
             await prisma.purchase_order_item.update({
@@ -930,9 +930,9 @@ export const updateOutboundList = async (data = {}) => {
                     id: stock.id
                 },
                 data: {
-                    totalCount: math.evaluate(`${stock.totalCount} + ${soi.amount} - ${_.amount}`),
+                    totalCount: Number(math.evaluate(`${stock.totalCount} + ${soi.amount} - ${_.amount}`).valueOf()),
                     salePrice: _.price,
-                    totalSalePrice: math.evaluate(`${stock.totalSalePrice} + ${soi.totalPrice} - ${_.totalPrice}`),
+                    totalSalePrice: Number(math.evaluate(`${stock.totalSalePrice} + ${soi.totalPrice} - ${_.totalPrice}`).valueOf()),
                 }
             })
             await prisma.sale_order_item.update({
@@ -1192,7 +1192,7 @@ export const getInventoryList = async (data = {}) => {
             records: records.map(_ => {
                 return {
                     ..._,
-                    profit: math.evaluate(`${_.totalSalePrice} - ${_.totalBuyPrice}`)
+                    profit: Number(math.evaluate(`${_.totalSalePrice} - ${_.totalBuyPrice}`).valueOf())
                 }
             })
         }
@@ -1263,7 +1263,7 @@ export const getCustomerRaking = async (data = {}) => {
                     }
                 }),
                 ..._._sum,
-                allDebt: math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`)
+                allDebt: Number(math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`).valueOf())
             }
         }))
     }
@@ -1312,7 +1312,7 @@ export const getSupplierRaking = async (data = {}) => {
                     }
                 }),
                 ..._._sum,
-                allDebt: math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`)
+                allDebt: Number(math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`).valueOf())
             }
         }))
     }
@@ -1353,11 +1353,11 @@ export const getProfit = async (data={}) => {
         message: {
             purchase,
             sale,
-            overdraftPurchase: math.evaluate(`${purchase._sum.totalPrice??0} - ${purchase._sum.payPrice??0}`),
-            overdraftSale: math.evaluate(`${sale._sum.totalPrice??0} - ${sale._sum.payPrice??0}`),
-            overdraftOtherFee: math.evaluate(`${sale._sum.otherFee??0} - ${sale._sum.payOtherFee??0}`),
-            profit: math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0} + ${sale._sum.otherFee??0}`),
-            realProfit: math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0} + ${sale._sum.payOtherFee??0}`)
+            overdraftPurchase: Number(math.evaluate(`${purchase._sum.totalPrice??0} - ${purchase._sum.payPrice??0}`).valueOf()),
+            overdraftSale: Number(math.evaluate(`${sale._sum.totalPrice??0} - ${sale._sum.payPrice??0}`).valueOf()),
+            overdraftOtherFee: Number(math.evaluate(`${sale._sum.otherFee??0} - ${sale._sum.payOtherFee??0}`).valueOf()),
+            profit: Number(math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0} + ${sale._sum.otherFee??0}`).valueOf()),
+            realProfit: Number(math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0} + ${sale._sum.payOtherFee??0}`).valueOf())
         }
     }
 }
@@ -1388,9 +1388,9 @@ goodsId, repoId;`
                     data: {
                         totalBuyPrice: purchase?.totalPrice??0,
                         totalSalePrice: sale?.totalPrice??0,
-                        totalCount: math.evaluate(`${purchase?.amount??0} - ${sale?.amount??0}`),
+                        totalCount: Number(math.evaluate(`${purchase?.amount??0} - ${sale?.amount??0}`).valueOf()),
                         saleCount: sale?.amount??0,
-                        avgBuyPrice: math.evaluate(`${purchase?.totalPrice??0} / ${purchase?.amount??0}`)
+                        avgBuyPrice: Number(math.evaluate(`${purchase?.totalPrice??0} / ${purchase?.amount??0}`).valueOf())
                     }
                 })
             }

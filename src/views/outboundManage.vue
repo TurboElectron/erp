@@ -294,7 +294,7 @@ import _ from 'lodash'
 import CustomerSelect from "@temp/CustomerSelect";
 import RepoSelectV2 from "@temp/RepoSelectV2";
 import GoodsSelectV2 from "@temp/GoodsSelectV2";
-import * as math from "mathjs";
+import {math} from "@/utils";
 import UserSelect from "@temp/UserSelect";
 import {exportJson2Excel} from "@/utils/excel";
 export default {
@@ -395,7 +395,7 @@ export default {
       },
       getTotalPrice(index) {
         const curOutboundDetail = dialogForm.sale_order_item[index]
-        dialogForm.sale_order_item[index].totalPrice = math.evaluate(`${curOutboundDetail.amount} * ${curOutboundDetail.price}`)
+        dialogForm.sale_order_item[index].totalPrice = Number(math.evaluate(`${curOutboundDetail.amount} * ${curOutboundDetail.price}`).valueOf())
         this.calculateTotalPrice()
       },
       async getReferInfo(index) {
@@ -416,11 +416,11 @@ export default {
       calculateTotalPrice() {
         const totalPrice = math.evaluate(`${dialogForm.sale_order_item.reduce((total, c) => math.evaluate(
             `${total} + ${c.totalPrice}`
-        ), 0)}`)
+        ), 0)}`).valueOf()
         // 总价格
-        dialogForm.totalPrice = totalPrice
+        dialogForm.totalPrice = Number(totalPrice)
         // 已付款
-        dialogForm.payPrice = totalPrice
+        dialogForm.payPrice = Number(totalPrice)
       },
       /**
        * 移除出库明细

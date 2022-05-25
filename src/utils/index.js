@@ -148,12 +148,8 @@ export function prismaEquals (map,where={}) {
 
 
 const config = {
-    epsilon: 1e-12,
-    matrix: 'Matrix',
     number: 'BigNumber',
-    precision: 2,
-    predictable: false,
-    randomSeed: null
+    precision: 20,
 }
 export const math = create(all, config)
 
