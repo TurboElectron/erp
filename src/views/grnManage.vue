@@ -373,7 +373,7 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = math.evaluate(dialogForm.purchase_order_item.reduce((total, c) => math.evaluate(`${total} + ${c.totalPrice}`), 0)).valueOf()
+        const totalPrice = dialogForm.purchase_order_item.reduce((total, c) => math.evaluate(`${total} + ${c.totalPrice}`), 0).valueOf()
         // 总价格
         dialogForm.totalPrice = Number(totalPrice)
         // 已付款

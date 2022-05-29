@@ -414,9 +414,9 @@ export default {
        * 计算总价格
        */
       calculateTotalPrice() {
-        const totalPrice = math.evaluate(`${dialogForm.sale_order_item.reduce((total, c) => math.evaluate(
+        const totalPrice = dialogForm.sale_order_item.reduce((total, c) => math.evaluate(
             `${total} + ${c.totalPrice}`
-        ), 0)}`).valueOf()
+        ), 0).valueOf()
         // 总价格
         dialogForm.totalPrice = Number(totalPrice)
         // 已付款
