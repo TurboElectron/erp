@@ -1,6 +1,6 @@
 <template>
   <el-cascader
-      :options="data?.message??[]"
+      :options="data??[]"
       v-model="cid"
       v-if="isEdit"
       :props="{
@@ -9,7 +9,7 @@
         checkStrictly: true
       }"
   ></el-cascader>
-  <span v-else>{{findItemNested(data?.message??[], cid, 'children')}}</span>
+  <span v-else>{{findItemNested(data??[], cid, 'children')}}</span>
 </template>
 <script>
 export default {
@@ -28,13 +28,11 @@ const props = defineProps({
   },
   isEdit: {
     type: Boolean
-  }
+  },
+  data: Array
 })
 const emit = defineEmits(['update:modelValue','change'])
 const cid = useVModel(props,'modelValue', emit )
-
-const {data, loading, run} =useRequest(()=> getCategoryTree(), {manual:false})
-
 const findItemNested = (arr, itemId, nestingKey) => (
     arr.reduce((a, item) => {
       if (a) return a;

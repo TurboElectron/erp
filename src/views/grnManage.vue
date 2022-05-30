@@ -122,7 +122,7 @@
           <el-table-column label="入库产品分类">
             <template #default="props">
               <el-form-item label-width="0" :prop="'purchase_order_item.'+props.$index+'.cid'">
-                  <category-select v-model="props.row.cid" :is-edit="props.row.isEdit" />
+                  <category-select v-model="props.row.cid" :is-edit="props.row.isEdit" :data="data.message??[]"/>
               </el-form-item>
             </template>
           </el-table-column>
@@ -258,7 +258,7 @@ import {
   updateGrnList,
   addGrnList,
   deleteGrnList
-  , goodsDetail,
+  , goodsDetail, getCategoryTree,
 } from '@/api/common'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
 //远程搜索供应商，客户
@@ -269,6 +269,7 @@ import RepoSelect from "@temp/RepoSelect";
 import {math} from "@/utils";
 import CategorySelect from "@temp/CategorySelect";
 import UserSelect from "@temp/UserSelect";
+import {useRequest} from "vue-request";
 
 export default {
   name: 'grnManage',
@@ -542,6 +543,7 @@ export default {
     }
     //查询批次列表
     methods.getTableData()
+    const {data, loading, run} =useRequest(()=> getCategoryTree(), {manual:false})
 
     return {
       ...methods,
@@ -549,7 +551,8 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
-      moment
+      moment,
+      data
     }
   },
 }
