@@ -2,11 +2,7 @@
  <template>
   <el-form :inline="true" size="small" :model="queryForm" class="demo-form-inline">
     <el-form-item label="客户：">
-      <el-select v-model="queryForm.customerId" remote filterable :loading="loadignData"
-        :remote-method="query=>remoteCustomeData(query,'customerData','loadignData')" clearable placeholder="选择客户">
-        <el-option v-for="item in customerData" :key="item.id" :label="item.name" :value="item.id">
-        </el-option>
-      </el-select>
+      <customer-select v-model="queryForm.customerId" />
     </el-form-item>
 
     <el-form-item label="开始时间：" prop="startDate">
@@ -62,16 +58,15 @@
 import { reactive, toRefs, toRaw, watch, onMounted, onBeforeUnmount } from 'vue'
 import BaseCharts from '@temp/BaseCharts.vue'
 import { getCustomerRaking, customerList, getCategorySales } from '@/api/common'
-import remoteMix from '@/mixin/remote'
 import moment from "moment";
+import CustomerSelect from "@temp/CustomerSelect";
 export default {
   name: 'customerAnalysis',
   components: {
+    CustomerSelect,
     BaseCharts
   },
   setup(props, context) {
-
-    const { remoteCustomeData } = remoteMix(state)
     let state = reactive({
       queryForm: {
         customerId: '',
@@ -203,7 +198,6 @@ export default {
     return {
       ...toRefs(state), //抛出
       ...methods,
-      remoteCustomeData,
       moment
     }
   },

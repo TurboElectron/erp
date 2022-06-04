@@ -8,7 +8,7 @@ const IS_PROD = process.env.NODE_ENV === 'production'
 const resolve = dir => path.join(__dirname, dir)
 module.exports = {
     publicPath: './',
-    productionSourceMap: false,
+    productionSourceMap: true,
     pluginOptions: {
         electronBuilder: {
             builderOptions: {
