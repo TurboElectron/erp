@@ -42,8 +42,10 @@
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
+            <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="price" label="售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="profit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
         </div>
@@ -60,6 +62,7 @@
     <el-table-column prop="payOtherFee" label="人工实付" min-width="100"  :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalPrice" label="应付" min-width="100" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0" />
     <el-table-column prop="payPrice" label="实付" min-width="100"  :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="profit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalOverdraft" label="欠款总计" min-width="100"  :formatter="(row, column, cellValue, index) => row.confirm ? '0.00' : cellValue?.toFixed(2)??0"/>
     <el-table-column prop="confirm" label="是否付清" min-width="100"  :formatter="(row, column, cellValue, index) => row.confirm ? '是' : row.totalOverdraft >0 ? '否': '是'"/>
     <el-table-column prop="descs" label="备注" min-width="200"  />
@@ -142,7 +145,13 @@
               </el-form-item>
             </template>
           </el-table-column>
-
+          <el-table-column label="库存剩余" >
+            <template #default="props">
+              <el-form-item>
+                <span>{{props.row.stock?.totalCount}}</span>
+              </el-form-item>
+            </template>
+          </el-table-column>
           <el-table-column label="出库数量" >
             <template #default="props">
               <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">

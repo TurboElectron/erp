@@ -1002,7 +1002,12 @@ export const getOutboundList = async (data = {}) => {
                     }})
                 v.goods = goods
                 v.repo = repo
+
+                const {message} = await stockDetail(v)
+                v.avgBuyPrice = message.avgBuyPrice
+                v.profit = v.totalPrice - message.avgBuyPrice * v.amount
             }
+            _.profit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0) + _.otherFee
             records.push({
                 ..._,
                 sale_customer,
