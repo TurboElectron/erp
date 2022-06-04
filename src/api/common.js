@@ -1261,6 +1261,7 @@ export const getCustomerRaking = async (data = {}) => {
     return {
         code: 200,
         message: await Promise.all(res.map(async _ => {
+            const {message} = await getOutboundList({ customerId, startDate, endDate})
             return {
                 customer: await prisma.sale_customer.findUnique({
                     where: {
@@ -1268,6 +1269,8 @@ export const getCustomerRaking = async (data = {}) => {
                     }
                 }),
                 ..._._sum,
+                orders: message.records,
+                profit: message.records.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0),
                 allDebt: Number(math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`).valueOf())
             }
         }))

@@ -23,11 +23,52 @@
   </el-form>
 
   <el-table :data="allRakingData" v-loading="loadingTbl" style="width: 100%" border empty-text="暂无数据">
+    <el-table-column type="expand">
+      <template #default="props">
+        <div class="outbound-detail-list">
+          <el-table :data="props.row.orders">
+            <el-table-column type="expand">
+              <template #default="props">
+                <div class="outbound-detail-list">
+                  <el-table :data="props.row.sale_order_item">
+                    <el-table-column prop="goods.name" label="产品名称"/>
+                    <el-table-column prop="amount" label="数量"/>
+                    <el-table-column prop="goods.unit" label="单位"></el-table-column>
+                    <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+                    <el-table-column prop="price" label="售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+                    <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+                    <el-table-column prop="profit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+                    <el-table-column prop="repo.name" label="仓库"/>
+                  </el-table>
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="date" label="创建时间" min-width="100">
+              <template #default="scope">
+                {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
+              </template>
+            </el-table-column>
+            <el-table-column prop="code" label="订单号" min-width="100"  />
+            <el-table-column prop="sale_customer.name" label="客户" min-width="100"  />
+            <el-table-column prop="otherFee" label="人工应付" min-width="100"  :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="payOtherFee" label="人工实付" min-width="100"  :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="totalPrice" label="应付" min-width="100" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0" />
+            <el-table-column prop="payPrice" label="实付" min-width="100"  :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="profit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="totalOverdraft" label="欠款总计" min-width="100"  :formatter="(row, column, cellValue, index) => row.confirm ? '0.00' : cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="confirm" label="是否付清" min-width="100"  :formatter="(row, column, cellValue, index) => row.confirm ? '是' : row.totalOverdraft >0 ? '否': '是'"/>
+            <el-table-column prop="descs" label="备注" min-width="200"  />
+          </el-table>
+        </div>
+      </template>
+    </el-table-column>
     <el-table-column prop="customer.name" label="姓名" />
     <el-table-column prop="otherFee" label="总人工费" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="totalPrice" label="总金额（包含人工）" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="payPrice" label="总支付" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="allDebt" label="总欠款" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="profit" label="利润" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="date" label="时间">
       <template #default="scope">
         {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
