@@ -1008,6 +1008,7 @@ export const getOutboundList = async (data = {}) => {
                 v.profit = v.totalPrice - message.avgBuyPrice * v.amount
             }
             _.profit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0) + _.otherFee
+            _.netProfit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0)
             records.push({
                 ..._,
                 sale_customer,
@@ -1261,7 +1262,7 @@ export const getCustomerRaking = async (data = {}) => {
     return {
         code: 200,
         message: await Promise.all(res.map(async _ => {
-            const {message} = await getOutboundList({ customerId, startDate, endDate})
+            const {message} = await getOutboundList({ customerId:_.customerId, startDate, endDate})
             return {
                 customer: await prisma.sale_customer.findUnique({
                     where: {
@@ -1271,6 +1272,7 @@ export const getCustomerRaking = async (data = {}) => {
                 ..._._sum,
                 orders: message.records,
                 profit: message.records.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0),
+                netProfit: message.records.map(r => r.netProfit).reduce((pre,cur)=> {return pre+cur},0),
                 allDebt: Number(math.evaluate(`${_._sum.totalPrice} -  ${_._sum.payPrice}`).valueOf())
             }
         }))

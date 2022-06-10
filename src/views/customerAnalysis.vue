@@ -68,7 +68,8 @@
     <el-table-column prop="totalPrice" label="总金额（包含人工）" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="payPrice" label="总支付" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="allDebt" label="总欠款" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
-    <el-table-column prop="profit" label="利润" sortable :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="profit" label="利润（含人工）" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+    <el-table-column prop="netProfit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
     <el-table-column prop="date" label="时间">
       <template #default="scope">
         {{moment(scope.row.date).format('YYYY-MM-DD HH:mm:ss')}}
