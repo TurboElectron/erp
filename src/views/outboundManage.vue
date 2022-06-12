@@ -35,10 +35,10 @@
     </el-form-item>
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border>
-    <el-table-column type="expand">
+    <el-table-column type="expand" >
       <template #default="props">
         <div class="outbound-detail-list">
-          <el-table :data="props.row.sale_order_item">
+          <el-table :data="props.row.sale_order_item" show-summary     :summary-method="getSummaries">
             <el-table-column prop="goods.name" label="产品名称"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
@@ -585,7 +585,32 @@ export default {
       dialogFormRules,
       dialogForm,
       dialogRef,
-      moment
+      moment,
+       getSummaries: (param) => {
+        const { columns, data } = param
+        const sums = []
+        columns.forEach((column, index) => {
+          if (index === 0) {
+            sums[index] = 'Total Cost'
+            return
+          }
+          const values = data.map((item) => Number(item[column.property]))
+          if (!values.every((value) => Number.isNaN(value))) {
+            sums[index] = `${values.reduce((prev, curr) => {
+              const value = Number(curr)
+              if (!Number.isNaN(value)) {
+                return prev + curr
+              } else {
+                return prev
+              }
+            }, 0).toFixed(2)}`
+          } else {
+            sums[index] = 'N/A'
+          }
+        })
+
+        return sums
+      }
     }
   },
 }

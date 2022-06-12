@@ -1363,7 +1363,7 @@ export const getProfit = async (data={}) => {
         },
         where
     })
-    const res = await prisma.$queryRawUnsafe(`SELECT sum(totalCount * avgBuyPrice) as sum FROM stock`)
+    const res = await prisma.$queryRawUnsafe(`SELECT sum(totalCount * avgBuyPrice) as sum, sum( totalSalePrice - saleCount * avgBuyPrice) as sum1, sum(totalSalePrice) as sum2 FROM stock`)
     return {
         code: 200,
         message: {
@@ -1374,7 +1374,9 @@ export const getProfit = async (data={}) => {
             overdraftOtherFee: Number(math.evaluate(`${sale._sum.otherFee??0} - ${sale._sum.payOtherFee??0}`).valueOf()),
             profit: Number(math.evaluate(`${sale._sum.totalPrice??0} - ${purchase._sum.totalPrice??0} + ${sale._sum.otherFee??0}`).valueOf()),
             realProfit: Number(math.evaluate(`${sale._sum.payPrice??0} - ${purchase._sum.payPrice??0} + ${sale._sum.payOtherFee??0}`).valueOf()),
-            restStock: res[0].sum
+            restStock: res[0].sum,
+            saleProfit: res[0].sum1,
+            salePrice: res[0].sum2,
         }
     }
 }

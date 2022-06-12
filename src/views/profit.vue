@@ -57,11 +57,22 @@
         {{data.message.realProfit?.toFixed(2)??0}}
       </el-form-item>
     </el-col>
+    <el-divider/>
   </el-row>
     <el-row>
       <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
         <el-form-item label="库存剩余：" style="color: red;font-weight: bold">
           {{data.message.restStock?.toFixed(2)??0}}
+        </el-form-item>
+      </el-col>
+      <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+        <el-form-item label="出库总额：" style="color: red;font-weight: bold">
+          {{data.message.salePrice?.toFixed(2)??0}}
+        </el-form-item>
+      </el-col>
+      <el-col :xs="24" :sm="12" :md="8" :lg="8" :xl="6">
+        <el-form-item label="出库利润：" style="color: red;font-weight: bold">
+          {{data.message.saleProfit?.toFixed(2)??0}}
         </el-form-item>
       </el-col>
     </el-row>
