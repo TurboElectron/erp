@@ -940,7 +940,12 @@ export const updateOutboundList = async (data = {}) => {
                     id: _.id
                 },
                 data: {
-                    ...omit(_, ['id', 'repo', 'goods','isEdit', 'stock', 'maxAmount']),
+                    ...pick(_, ['orderId',
+                'repoId',
+                'goodsId',
+                'amount',
+                'price',
+                'totalPrice']),
                 }
             })
         }
