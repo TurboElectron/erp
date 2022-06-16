@@ -436,6 +436,7 @@ export default {
        */
       removeOutboundDetail(index) {
         dialogForm.sale_order_item.splice(index, 1)
+        methods.calculateTotalPrice()
       },
       /**
        * 新增出库产品明细

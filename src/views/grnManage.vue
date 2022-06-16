@@ -396,6 +396,7 @@ export default {
        */
       removeGrnDetail(index) {
         dialogForm.purchase_order_item.splice(index, 1)
+        methods.calculateTotalPrice()
       },
       /**
        * 新增入库产品明细
