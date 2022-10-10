@@ -40,10 +40,11 @@
         <div class="outbound-detail-list">
           <el-table :data="props.row.sale_order_item" show-summary     :summary-method="getSummaries">
             <el-table-column prop="goods.name" label="产品名称"/>
+            <el-table-column prop="goods.code" label="产品编号"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
             <el-table-column prop="avgBuyPrice" label="平均进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
-            <el-table-column prop="price" label="售价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+            <el-table-column prop="price" label="售价" :formatter="(row, column, cellValue, index) => (row.totalPrice?.toFixed(2)??0) / row.amount"/>
             <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="profit" label="利润" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="repo.name" label="仓库"/>

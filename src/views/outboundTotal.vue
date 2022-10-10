@@ -192,10 +192,10 @@ export default {
     handlerGetCategory()
     const target = ref(null)
 
-    onClickOutside(target, (event) => {
-      state.queryForm.cid = ''
-      methods.getTableData()
-    })
+    // onClickOutside(target, (event) => {
+    //   state.queryForm.cid = ''
+    //   methods.getTableData()
+    // })
     return {
       ...toRefs(state),
       ...methods,
