@@ -36,9 +36,12 @@
         <div class="grn-detail-list">
           <el-table :data="props.row.purchase_order_item">
             <el-table-column prop="goods.name" label="产品名称"/>
+            <el-table-column prop="goods.code" label="产品编号"/>
             <el-table-column prop="amount" label="数量"/>
             <el-table-column prop="goods.unit" label="单位"></el-table-column>
-            <el-table-column prop="price" label="进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
+<!--            <el-table-column prop="price" label="进价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>-->
+            <el-table-column prop="price" label="平均进价" :formatter="(row, column, cellValue, index) => ((row.totalPrice??0) / row.amount)?.toFixed(2)"/>
+
             <el-table-column prop="totalPrice" label="总价" :formatter="(row, column, cellValue, index) => cellValue?.toFixed(2)??0"/>
             <el-table-column prop="repo.name" label="仓库"/>
           </el-table>
@@ -365,7 +368,7 @@ export default {
           const {code, message} = await goodsDetail({id: goodsId})
           if (code === 200) {
             dialogForm.purchase_order_item[index].goods = message
-            dialogForm.purchase_order_item[index].price = message.buyPrice
+            // dialogForm.purchase_order_item[index].price = message.buyPrice
             dialogForm.purchase_order_item[index].cid = message.cid
           }
         }
@@ -442,6 +445,10 @@ export default {
               dialogForm[key] = item[key]
             }
           }
+          dialogForm.purchase_order_item = dialogForm.purchase_order_item.map(p => ({
+            ...p,
+            price: p.totalPrice / p.amount
+          }))
           dialogForm.id = item.id
         })
       },

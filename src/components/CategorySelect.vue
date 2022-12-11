@@ -33,11 +33,11 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue','change'])
 const cid = useVModel(props,'modelValue', emit )
-const findItemNested = (arr, itemId, nestingKey) => (
-    arr.reduce((a, item) => {
-      if (a) return a;
-      if (item.id === itemId) return item.label;
-      if (item[nestingKey]) return findItemNested(item[nestingKey], itemId, nestingKey)
-    }, null)
-)
+const findItemNested = (arr, itemId, nestingKey) => {
+  return  arr.reduce((a, item) => {
+    if (a) return a;
+    if (item.id === itemId) return item.label;
+    if (item[nestingKey]) return findItemNested(item[nestingKey], itemId, nestingKey)
+  }, null)
+}
 </script>

@@ -185,6 +185,7 @@ export const getCategoryTree = async (data = {}) => {
         }
     }
     await iter(list)
+    console.log('CategoryTree:::', list)
     return {
         code: 200,
         message: list
@@ -980,51 +981,50 @@ export const getOutboundList = async (data = {}) => {
     if (userId) {
         where += ` AND userId = ${userId}`
     }
-    const res = await prisma.$transaction(async ()=> {
-        const totals = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM sale_order ${where}`)
-        if (pageSize !== undefined && pageNo !== undefined) {
-            where += ` LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
-        }
-        const orders = await  prisma.$queryRawUnsafe(`SELECT *, (otherFee - payOtherFee + totalPrice - payPrice)   as totalOverdraft FROM sale_order ${where}`)
-        const records = []
-        for (const _ of orders) {
-            const sale_customer = await prisma.sale_customer.findUnique({
-                where: {
-                    id: _.customerId
-                }
-            })
-            const sale_order_item = await prisma.sale_order_item.findMany({
-                where: {
-                    orderId: _.id
-                }
-            })
-            for (const v of sale_order_item) {
-                const goods = await prisma.goods.findUnique({where: {
-                    id: v.goodsId
-                    }})
-                const repo = await prisma.repo.findUnique({where: {
-                        id: v.repoId
-                    }})
-                v.goods = goods
-                v.repo = repo
 
-                const {message} = await stockDetail(v)
-                v.avgBuyPrice = message.avgBuyPrice
-                v.profit = v.totalPrice - message.avgBuyPrice * v.amount
-            }
-            _.profit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0) + _.otherFee
-            _.netProfit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0)
-            records.push({
-                ..._,
-                sale_customer,
-                sale_order_item
-            })
-        }
-        return {
-            records,
-            total: totals[0].count
-        }
+  const totals = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM sale_order ${where}`)
+  if (pageSize !== undefined && pageNo !== undefined) {
+    where += ` LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
+  }
+  const orders = await  prisma.$queryRawUnsafe(`SELECT *, (otherFee - payOtherFee + totalPrice - payPrice)   as totalOverdraft FROM sale_order ${where}`)
+  const records = []
+  for (const _ of orders) {
+    const sale_customer = await prisma.sale_customer.findUnique({
+      where: {
+        id: _.customerId
+      }
     })
+    const sale_order_item = await prisma.sale_order_item.findMany({
+      where: {
+        orderId: _.id
+      }
+    })
+    for (const v of sale_order_item) {
+      const goods = await prisma.goods.findUnique({where: {
+          id: v.goodsId
+        }})
+      const repo = await prisma.repo.findUnique({where: {
+          id: v.repoId
+        }})
+      v.goods = goods
+      v.repo = repo
+
+      const {message} = await stockDetail(v)
+      v.avgBuyPrice = message.avgBuyPrice
+      v.profit = v.totalPrice - message.avgBuyPrice * v.amount
+    }
+    _.profit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0) + _.otherFee
+    _.netProfit = sale_order_item.map(r => r.profit).reduce((pre,cur)=> {return pre+cur},0)
+    records.push({
+      ..._,
+      sale_customer,
+      sale_order_item
+    })
+  }
+    const res = {
+      records,
+      total: totals[0].count
+    }
     return {
         code: 200,
         message: res
@@ -1383,10 +1383,10 @@ export const getProfit = async (data={}) => {
 
 export const fixStock = async () => {
     await prisma.$transaction(async ()=> {
-        const purchaseList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice 
+        const purchaseList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice
 from purchase_order_item  GROUP BY
 goodsId, repoId;`
-        const saleList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice 
+        const saleList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice
 from sale_order_item  GROUP BY
 goodsId, repoId;`
         const stocks = await prisma.stock.findMany()
