@@ -254,7 +254,7 @@
 </template>
 
   <script>
-import { reactive, toRefs, ref, nextTick, toRaw } from 'vue'
+import { reactive, toRefs, ref, nextTick, toRaw, watch } from 'vue'
 import moment from 'moment'
 import {
   getGrnList,
@@ -447,7 +447,8 @@ export default {
           }
           dialogForm.purchase_order_item = dialogForm.purchase_order_item.map(p => ({
             ...p,
-            price: p.totalPrice / p.amount
+            price: p.totalPrice / p.amount,
+            cid: p.goods.cid
           }))
           dialogForm.id = item.id
         })
@@ -552,7 +553,6 @@ export default {
     //查询批次列表
     methods.getTableData()
     const {data, loading, run} =useRequest(()=> getCategoryTree(), {manual:false})
-
     return {
       ...methods,
       ...toRefs(state), //抛出
