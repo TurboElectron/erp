@@ -203,7 +203,7 @@
               <el-form-item label-width="0">
                 <el-button size="small" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
                 <el-popconfirm title="确定要删除吗?" @confirm="removeOutboundDetail(props.$index)" confirm-button-text="确定"
-                               cancel-button-text="取消"  v-if="props.$index!==0">
+                               cancel-button-text="取消">
                   <template #reference>
                     <el-button size="small" type="danger" icon="Delete">删除</el-button>
                   </template>
@@ -416,7 +416,7 @@ export default {
           if (code === 200) {
             dialogForm.sale_order_item[index].stock = message
             dialogForm.sale_order_item[index].maxAmount = message.totalCount + curOutboundDetail.amount
-            dialogForm.sale_order_item[index].price = message.goods.salePrice
+            // dialogForm.sale_order_item[index].price = message.goods.salePrice
           }
         }
       },
