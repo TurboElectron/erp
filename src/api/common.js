@@ -1380,7 +1380,34 @@ export const getProfit = async (data={}) => {
         }
     }
 }
-
+export const fixGrn = async ()=> {
+        const purchaseList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice
+from purchase_order_item  GROUP BY
+goodsId, repoId;`
+        return  await Promise.all(purchaseList.map(async item => {
+            if (item.amount === 0) return
+            if(item.totalPrice === 0) {
+                return  await prisma.purchase_order_item.update({
+                    where: {
+                        id: item.id
+                    },
+                    data: {
+                        totalPrice: Number(math.evaluate(`${item.price} * ${Number(item.amount)}`).valueOf())
+                    }
+                })
+            }
+            if(item.price === 0) {
+                return  await  prisma.purchase_order_item.update({
+                    where: {
+                        id: item.id
+                    },
+                    data: {
+                        price: Number(math.evaluate(`${item.totalPrice} / ${Number(item.amount)}`).valueOf())
+                    }
+                })
+            }
+        }))
+}
 export const fixStock = async () => {
     await prisma.$transaction(async ()=> {
         const purchaseList = await prisma.$queryRaw`select *, SUM(amount) as amount, SUM(totalPrice) as totalPrice
@@ -1408,7 +1435,7 @@ goodsId, repoId;`
                         totalBuyPrice: purchase?.totalPrice??0,
                         totalSalePrice: sale?.totalPrice??0,
                         totalCount: Number(math.evaluate(`${purchase?.amount??0} - ${sale?.amount??0}`).valueOf()),
-                        saleCount: sale?.amount??0,
+                        saleCount: Number(sale?.amount??0),
                         avgBuyPrice: Number(math.evaluate(`${purchase?.totalPrice??0} / ${purchase?.amount??0}`).valueOf())
                     }
                 })

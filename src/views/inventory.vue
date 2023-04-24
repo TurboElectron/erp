@@ -68,6 +68,7 @@ import RepoSelectV2 from "@temp/RepoSelectV2";
 import {exportJson2Excel} from "@/utils/excel";
 import {formatJson} from "@/utils";
 import {onClickOutside} from "@vueuse/core";
+import {ElMessage} from "element-plus";
 export default {
   name: 'inventory',
   components: {RepoSelectV2, GoodsSelectV2},
@@ -105,6 +106,7 @@ export default {
       async fix() {
         await fixStock()
         await methods.getTableData()
+        ElMessage.success('修正成功')
       },
       async exportExcel() {
         const tHeader = ['仓库名称', '商品名称', '商品编号', '库存']

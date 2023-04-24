@@ -28,6 +28,7 @@
       <el-button type="primary" @click="getTableData()" icon="Search">查询
       </el-button>
       <el-button icon="Plus" @click="handlerAdd()">新增入库单</el-button>
+      <el-button  @click="handlerFix()">修正</el-button>
     </el-form-item>
   </el-form>
   <el-table :data="tableData" v-loading="loadTable" row-key="id" border>
@@ -261,7 +262,7 @@ import {
   updateGrnList,
   addGrnList,
   deleteGrnList
-  , goodsDetail, getCategoryTree,
+  , goodsDetail, getCategoryTree, fixGrn,
 } from '@/api/common'
 import { globalLoading, showMessage, downLoadFile, getDataById } from '@/utils'
 //远程搜索供应商，客户
@@ -273,6 +274,7 @@ import {math} from "@/utils";
 import CategorySelect from "@temp/CategorySelect";
 import UserSelect from "@temp/UserSelect";
 import {useRequest} from "vue-request";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'grnManage',
@@ -475,6 +477,14 @@ export default {
           dialogForm.date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
           state.currentEditData = item
         })
+      },
+
+       handlerFix() {
+         fixGrn().then(()=> {
+           ElMessage.success('修正成功')
+         }).catch(e => {
+           console.log(e)
+         })
       },
       /**
        * 删除
