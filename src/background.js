@@ -5,7 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
 import fs from "fs";
-import { autoUpdater } from "electron-updater"
+import { autoUpdater, NsisUpdater } from "electron-updater"
 require('@electron/remote/main').initialize()
 const isDevelopment = process.env.NODE_ENV !== 'production'
 export const dbPath = isDevelopment ? join(__dirname, '../prisma/dev.db') : path.join(app.getPath('userData'), `0.1.1.db`)
@@ -27,7 +27,10 @@ if (!isDevelopment) {
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
-
+const autoUpdaterV2 = new NsisUpdater({
+  provider: 'generic',
+  url: 'https://guxukai.tech/electron/electron'
+})
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -57,15 +60,15 @@ async function createWindow() {
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdaterV2.checkForUpdatesAndNotify();
   }
   win.once('ready-to-show', () => {
     console.log(1111)
   })
-  autoUpdater.on('update-available', () => {
+  autoUpdaterV2.on('update-available', () => {
     win.webContents.send('update_available');
   });
-  autoUpdater.on('update-downloaded', () => {
+  autoUpdaterV2.on('update-downloaded', () => {
     win.webContents.send('update_downloaded');
   });
 }
@@ -74,7 +77,7 @@ ipcMain.on('download-url', (event, args) => {
 })
 ipcMain.on('restart_app', () => {
   console.log('restart_app')
-  autoUpdater.quitAndInstall();
+  autoUpdaterV2.quitAndInstall();
 });
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
