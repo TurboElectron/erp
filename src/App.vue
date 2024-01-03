@@ -1,6 +1,6 @@
 <template>
   <router-view />
-  <el-button style="position: absolute;left: 50%;transform: translateX(-50%);top: 0;z-index: 99999;opacity: .8" @click="handleRefresh">刷新({{$route.fullPath}})</el-button>
+  <el-button style="position: absolute;left: 50%;transform: translateX(-50%);top: 0;z-index: 99999;opacity: .8" @click="handleRefresh">页面卡顿点击刷新({{$route.fullPath}})</el-button>
   <div id="notification" class="hidden">
     <p id="message"></p>
     <button id="close-button" @click="closeNotification()">

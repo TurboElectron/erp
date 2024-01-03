@@ -21,17 +21,20 @@
     </el-form-item>
   </el-form>
      <div style="flex: 1 0 auto;  height: 0;display: flex;gap: 20px;overflow:auto">
-       <el-tree
-           :data="treeData"
-           node-key="id"
-           :expand-on-click-node="true"
-           :highlight-current="true"
-           @node-click="handleClickNode"
-           style="overflow: auto;height:100%"
-           :highlightCurrent="!!queryForm.cid"
-           ref="target"
-       >
-       </el-tree>
+       <div>
+         <el-button @click="clearTarget">清除选中</el-button>
+         <el-tree
+             :data="treeData"
+             node-key="id"
+             :expand-on-click-node="true"
+             :highlight-current="true"
+             @node-click="handleClickNode"
+             style="overflow: auto;height:100%"
+             :highlightCurrent="!!queryForm.cid"
+             ref="target"
+         >
+         </el-tree>
+       </div>
        <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
          <!-- 表格 -->
          <el-table :data="tableData" v-loading="loadingTbl"  style="height:0;flex:1 0 auto;overflow:auto" border empty-text="暂无数据"
@@ -104,9 +107,13 @@ export default {
         methods.getTableData()
       },
       async fix() {
-        await fixStock()
-        await methods.getTableData()
-        ElMessage.success('修正成功')
+        try {
+          await fixStock()
+          await methods.getTableData()
+          ElMessage.success('修正成功')
+        } catch  {
+          ElMessage.error('修正失败，请重启')
+        }
       },
       async exportExcel() {
         const tHeader = ['仓库名称', '商品名称', '商品编号', '库存']
@@ -160,6 +167,10 @@ export default {
       handleCurrentChange(value) {
         state.currentPage = value
         methods.getTableData()
+      },
+      clearTarget() {
+          state.queryForm.cid = ''
+          methods.getTableData()
       }
     }
     onMounted(() => {
@@ -178,10 +189,10 @@ export default {
     handlerGetCategory()
     const target = ref(null)
 
-    onClickOutside(target, (event) => {
-      state.queryForm.cid = ''
-      methods.getTableData()
-    })
+    // onClickOutside(target, (event) => {
+    //   state.queryForm.cid = ''
+    //   methods.getTableData()
+    // })
     return {
       ...toRefs(state),
       ...methods,

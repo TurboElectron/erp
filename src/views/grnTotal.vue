@@ -27,7 +27,9 @@
   </el-form>
 
    <div style="flex: 1 0 auto;  height: 0;display: flex;gap: 20px;overflow:auto">
-     <el-tree
+     <div>
+       <el-button @click="clearTarget">清除选中</el-button>
+       <el-tree
          :data="treeData"
          node-key="id"
          :expand-on-click-node="true"
@@ -38,6 +40,7 @@
          ref="target"
      >
      </el-tree>
+     </div>
      <div style="width: 80%;height:100%;overflow:auto;display:flex;flex-direction:column">
        <!-- 表格 -->
        <el-table :data="tableData" v-loading="loadTable"  style="height:0;flex:1 0 auto;overflow:auto" border empty-text="暂无数据"
@@ -172,6 +175,10 @@ export default {
 
         return sums;
       },
+      clearTarget() {
+        state.queryForm.cid = ''
+        methods.getTableData()
+      }
     }
     onMounted(() => {
       //查询客户数据
@@ -189,10 +196,10 @@ export default {
     handlerGetCategory()
     const target = ref(null)
 
-    onClickOutside(target, (event) => {
-      state.queryForm.cid = ''
-      methods.getTableData()
-    })
+    // onClickOutside(target, (event) => {
+    //   state.queryForm.cid = ''
+    //   methods.getTableData()
+    // })
     return {
       ...toRefs(state),
       ...methods,
