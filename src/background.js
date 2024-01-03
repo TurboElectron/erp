@@ -29,7 +29,7 @@ protocol.registerSchemesAsPrivileged([
 ])
 const autoUpdaterV2 = new NsisUpdater({
   provider: 'generic',
-  url: 'https://guxukai.tech/electron/electron'
+  url: 'https://guxukai.tech/electron'
 })
 async function createWindow() {
   // Create the browser window.
