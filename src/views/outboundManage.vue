@@ -127,9 +127,9 @@
 
       </el-row>
       <el-form-item label-width='0'>
-        <el-divider> <span class="outbound-detail-title">出库产品明细</span> </el-divider>
+        <el-divider> <span class="outbound-detail-title" style="cursor: pointer;" @click="reloadTable">出库产品明细（点击刷新）</span> </el-divider>
       </el-form-item>
-      <el-form-item label-width='0'>
+      <el-form-item label-width='0' v-if="detailsShow">
         <el-table :data="dialogForm.sale_order_item" table-layout="auto">
           <el-table-column label="出库仓库" >
             <template #default="props">
@@ -331,6 +331,7 @@ export default {
       pageSize: 10,
       total: 0,
       loadTable: false,
+      detailsShow: true
     })
     //出库单数据
     const getSupplierFormData = () => ({
@@ -576,6 +577,12 @@ export default {
       handleCurrentChange(value) {
         state.currentPage = value
         this.getTableData()
+      },
+      reloadTable() {
+        state.detailsShow = false
+        nextTick(()=> {
+          state.detailsShow = true
+        })
       }
     }
     //查询批次列表
