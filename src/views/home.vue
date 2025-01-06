@@ -265,10 +265,15 @@
   <div>待开发</div>
   <el-form>
     <el-form-item label="数据库地址：">
-      {{dbPath}}
+      <div @click="handleOpenPath">
+        {{dbPath}}
+      </div>
     </el-form-item>
   </el-form>
 </template>
 <script setup>
 const dbPath = window.dbPath
+const handleOpenPath = ()=> {
+  ipcRenderer.send('open-folder', dbPath);
+}
 </script>

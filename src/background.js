@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import path, {join} from "path";
@@ -79,6 +79,12 @@ ipcMain.on('restart_app', () => {
   console.log('restart_app')
   autoUpdaterV2.quitAndInstall();
 });
+ipcMain.on('open-folder', (event, args) => {
+  console.log(args)
+  const folderPath = path.dirname(args)
+  console.log(folderPath)
+  shell.openPath(folderPath)
+})
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
