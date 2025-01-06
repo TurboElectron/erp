@@ -27,3 +27,4 @@ pnpm-debug.log*
 /token.ssh
 /token.sh
 /pnpm-lock.yaml
+/package-lock.json
