@@ -37,7 +37,17 @@ export const updateGoods  = async (data = {}) => {
         message: '成功'
     }
 }
-
+export const checkIfGoodsInPurchaseOrder = async (data = {}) => {
+    const res = await prisma.purchase_order_item.findFirst({
+        where: {
+            goodsId: data.id
+        },
+        select: {
+            purchase_order: true
+        },
+    })
+    return res?.purchase_order
+}
 /** 删除产品 */
 export const removeGoods  = async (data = {}) => {
     // return httpFetch.post('customer/delete', data)

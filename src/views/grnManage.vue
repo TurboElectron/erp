@@ -427,6 +427,7 @@ export default {
         })
         console.log(params)
         const res = await getGrnList(params)
+        console.log(res)
         res.code === 200 && (state.tableData = res.message.records) && (state.total = res.message.total)
         state.loadTable = false
       },

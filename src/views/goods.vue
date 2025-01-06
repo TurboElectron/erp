@@ -101,9 +101,10 @@
 
 <script>
 import { reactive, toRefs, ref, onMounted, nextTick } from 'vue';
-import { ElMessage, ElLoading } from "element-plus";
+import {ElMessage, ElLoading, ElMessageBox} from "element-plus";
 import { globalLoading, showMessage } from '@/utils'
 import { addGoods, updateGoods, removeGoods, goodsList } from '@/api/common'
+import {checkIfGoodsInPurchaseOrder} from "../api/common";
 export default {
   name: 'goods',
   props: {
@@ -208,6 +209,12 @@ export default {
        */
       async deleteGoods(goodsData) {
         const loading = globalLoading()
+        const checkRes = await checkIfGoodsInPurchaseOrder({id: goodsData.id})
+        if (checkRes) {
+          ElMessageBox.alert(`该产品存在入库订单${checkRes.code}中，请先删除该订单`, '提示')
+          loading.close()
+          return
+        }
         let res = await removeGoods({ id: goodsData.id });
         loading.close()
         showMessage(res.code === 200 ? 'success' : 'error', res.message)

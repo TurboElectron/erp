@@ -3,8 +3,8 @@
   "version": "0.2.13",
   "private": true,
   "scripts": {
-    "serve": "pnpm run electron:serve",
-    "build": "pnpm run electron:serve",
+    "serve": "npm run electron:serve",
+    "build": "npm run electron:serve",
     "publish": "vue-cli-service electron:build  -w  --mode prod",
     "electron:build": "vue-cli-service electron:build  --mode prod",
     "electron:serve": "vue-cli-service electron:serve -m --mode dev",
