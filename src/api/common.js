@@ -509,7 +509,7 @@ const grnUpdateStock = async (_) => {
             data: {
                 totalCount: stock.totalCount + _.amount,
                 buyPrice: _.price,
-                avgBuyPrice: Number(math.evaluate(`(${stock.totalBuyPrice} + ${_.totalPrice}) / ${stock.totalCount} + ${_.amount}`).valueOf()),
+                avgBuyPrice: Number(math.evaluate(`(${stock.totalBuyPrice} + ${_.totalPrice}) / (${stock.totalCount} + ${_.amount})`).valueOf()),
                 totalBuyPrice: Number(math.evaluate(`${stock.totalBuyPrice} + ${_.totalPrice}`).valueOf())
             }
         })
@@ -783,7 +783,12 @@ export const getGrnList = async (data = {}) => {
                         repo: true,
                     }
                 }
-            }
+            },
+            orderBy: [
+                {
+                    date: 'desc'
+                }
+            ]
         })
     ])
     return {
@@ -994,9 +999,9 @@ export const getOutboundList = async (data = {}) => {
 
   const totals = await prisma.$queryRawUnsafe(`SELECT COUNT(*) as count FROM sale_order ${where}`)
   if (pageSize !== undefined && pageNo !== undefined) {
-    where += ` LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
+    where += ` ORDER BY date DESC LIMIT ${pageSize} OFFSET ${pageSize * (pageNo - 1)}`
   }
-  const orders = await  prisma.$queryRawUnsafe(`SELECT *, (otherFee - payOtherFee + totalPrice - payPrice)   as totalOverdraft FROM sale_order ${where}`)
+  const orders = await  prisma.$queryRawUnsafe(`SELECT *, (otherFee - payOtherFee + totalPrice - payPrice)   as totalOverdraft FROM sale_order  ${where}`)
   const records = []
   for (const _ of orders) {
     const sale_customer = await prisma.sale_customer.findUnique({
