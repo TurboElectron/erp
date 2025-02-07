@@ -130,89 +130,98 @@
         <el-divider> <span class="outbound-detail-title" style="cursor: pointer;" @click="reloadTable">出库产品明细（点击刷新）</span> </el-divider>
       </el-form-item>
       <el-form-item label-width='0' v-if="detailsShow">
-        <el-table :data="dialogForm.sale_order_item" table-layout="auto">
-          <el-table-column label="出库仓库" >
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">
-                <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId" :is-edit="props.row.isEdit"/>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="出库产品" >
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.goodsId'"
-                            :rules="dialogFormRules.goodsId">
-                <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit"/>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="库存剩余" >
-            <template #default="props">
-              <el-form-item>
-                <span>{{props.row.stock?.totalCount}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="出库数量" >
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">
-                <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"
-                                 :max="props.row.maxAmount"
-                                 style="width:100%" clearable placeholder="请输入出库数量"
-                :disabled="!(props.row.goodsId && props.row.repoId)"
-                                 v-if="props.row.isEdit"
-                >
-                </el-input-number>
-                <span v-else>{{props.row.amount}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="单价" >
-            <template #default="props">
-              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">
-                <input v-model.number="props.row.price"
-                       type="number"
-                       :min="0"
-                       :step="0.01"
-                       oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"
-                       @change="getTotalPrice(props.$index)"
-                                 style="width:100%" clearable placeholder="请输入单价"
-                                 :disabled="!(props.row.goodsId && props.row.repoId)"
-                                 v-if="props.row.isEdit"
-                />
-                <span v-else>{{props.row.price?.toFixed(2)??0}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="预设售价" >
-            <template #default="props">
-              <el-form-item>
-                <span>{{props.row.stock?.goods?.salePrice?.toFixed(2)??0}}</span>
-              </el-form-item>
-            </template>
-          </el-table-column>
+        <div style="height: 400px; width: 100%;">
+        <el-auto-resizer>
+          <template #default="{ height, width }">
+        <el-table-v2 :data="dialogForm.sale_order_item" table-layout="auto" :width="width"     :height="height" :columns="tableColumns">
+<!--          <template #row="props">-->
+<!--            {{props.repoId}}-->
+<!--          </template>-->
+<!--          <el-table-column label="出库仓库" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.repoId'" :rules="dialogFormRules.repoId">-->
+<!--                <repo-select-v2 v-model="props.row.repoId" :goods-id="props.row.goodsId" :is-edit="props.row.isEdit"/>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+<!--          <el-table-column label="出库产品" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.goodsId'"-->
+<!--                            :rules="dialogFormRules.goodsId">-->
+<!--                <goods-select-v2 v-model="props.row.goodsId" :repo-id="props.row.repoId" @change="getReferInfo(props.$index)" :is-edit="props.row.isEdit"/>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+<!--          <el-table-column label="库存剩余" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item>-->
+<!--                <span>{{props.row.stock?.totalCount}}</span>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+<!--          <el-table-column label="出库数量" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.amount'" :rules="dialogFormRules.amount">-->
+<!--                <el-input-number v-model.number="props.row.amount" @change="getTotalPrice(props.$index)" :min="0"-->
+<!--                                 :max="props.row.maxAmount"-->
+<!--                                 style="width:100%" clearable placeholder="请输入出库数量"-->
+<!--                :disabled="!(props.row.goodsId && props.row.repoId)"-->
+<!--                                 v-if="props.row.isEdit"-->
+<!--                >-->
+<!--                </el-input-number>-->
+<!--                <span v-else>{{props.row.amount}}</span>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+<!--          <el-table-column label="单价" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0" :prop="'sale_order_item.'+props.$index+'.price'" :rules="dialogFormRules.price">-->
+<!--                <input v-model.number="props.row.price"-->
+<!--                       type="number"-->
+<!--                       :min="0"-->
+<!--                       :step="0.01"-->
+<!--                       oninput="value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')"-->
+<!--                       @change="getTotalPrice(props.$index)"-->
+<!--                                 style="width:100%" clearable placeholder="请输入单价"-->
+<!--                                 :disabled="!(props.row.goodsId && props.row.repoId)"-->
+<!--                                 v-if="props.row.isEdit"-->
+<!--                />-->
+<!--                <span v-else>{{props.row.price?.toFixed(2)??0}}</span>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+<!--          <el-table-column label="预设售价" >-->
+<!--            <template #default="props">-->
+<!--              <el-form-item>-->
+<!--                <span>{{props.row.stock?.goods?.salePrice?.toFixed(2)??0}}</span>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
-          <el-table-column label="总售价"  fixed="right">
-            <template #default="props">
-              <el-form-item> {{props.row.totalPrice?.toFixed(2)??0}}</el-form-item>
-            </template>
-          </el-table-column>
+<!--          <el-table-column label="总售价"  fixed="right">-->
+<!--            <template #default="props">-->
+<!--              <el-form-item> {{props.row.totalPrice?.toFixed(2)??0}}</el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
-          <el-table-column label="操作" width="200" fixed="right">
-            <template #default="props">
-              <el-form-item label-width="0">
-                <el-button size="small" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>
-                <el-popconfirm title="确定要删除吗?" @confirm="removeOutboundDetail(props.$index)" confirm-button-text="确定"
-                               cancel-button-text="取消">
-                  <template #reference>
-                    <el-button size="small" type="danger" icon="Delete">删除</el-button>
-                  </template>
-                </el-popconfirm>
-              </el-form-item>
-            </template>
-          </el-table-column>
+<!--          <el-table-column label="操作" width="200" fixed="right">-->
+<!--            <template #default="props">-->
+<!--              <el-form-item label-width="0">-->
+<!--                <el-button size="small" type="primary" @click="handleConfirm(props.row)">{{props.row.isEdit ? '确认': '编辑' }}</el-button>-->
+<!--                <el-popconfirm title="确定要删除吗?" @confirm="removeOutboundDetail(props.$index)" confirm-button-text="确定"-->
+<!--                               cancel-button-text="取消">-->
+<!--                  <template #reference>-->
+<!--                    <el-button size="small" type="danger" icon="Delete">删除</el-button>-->
+<!--                  </template>-->
+<!--                </el-popconfirm>-->
+<!--              </el-form-item>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
 
-        </el-table>
+        </el-table-v2>
+          </template>
+        </el-auto-resizer>
+        </div>
       </el-form-item>
 
       <el-form-item label-width='0'>
@@ -290,7 +299,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref, nextTick, toRaw } from 'vue'
+import {reactive, toRefs, ref, nextTick, toRaw, h} from 'vue'
 import moment from 'moment'
 import {
   getOutboundList,
@@ -307,6 +316,7 @@ import GoodsSelectV2 from "@temp/GoodsSelectV2";
 import {math} from "@/utils";
 import UserSelect from "@temp/UserSelect";
 import {exportJson2Excel} from "@/utils/excel";
+import {ElButton, ElFormItem, ElInputNumber, ElPopconfirm} from "element-plus";
 export default {
   name: 'outboundManage',
   components: {UserSelect, GoodsSelectV2, RepoSelectV2, CustomerSelect},
@@ -400,7 +410,12 @@ export default {
       },
       async handleConfirm(row) {
         if (row.isEdit) {
-          await methods.handlerSave(false)
+          const loading = globalLoading({
+            text: '保存中'
+          })
+          await methods.handlerSave(false).finally(()=> {
+            loading.close()
+          })
         }
         row.isEdit = !row.isEdit
       },
@@ -523,6 +538,9 @@ export default {
       },
       //保存
       handlerSave(close=true) {
+        const loading = globalLoading({
+          text: '保存中'
+        })
         return new Promise((resolve, reject) => {
           dialogRef.value.validate(async (valid) => {
             if (valid) {
@@ -554,6 +572,8 @@ export default {
               reject(false)
             }
           })
+        }).finally(()=> {
+          loading.close()
         })
       },
       /**
@@ -589,6 +609,270 @@ export default {
     methods.getTableData()
 
     return {
+      tableColumns: [{
+        key: 'repoId',
+        title: '出库仓库',
+        width: 150,
+        cellRenderer: (props)=> {
+          console.log(props)
+          return h(
+              ElFormItem,
+              {
+                labelWidth: 0,
+                prop: 'sale_order_item.'+props.rowIndex+'.repoId',
+                rules: dialogFormRules.repoId,
+              },
+              {
+                default: ()=> {
+                  return h(
+                      RepoSelectV2,
+                      {
+                        goodsId: props.rowData.goodsId,
+                        isEdit: props.rowData.isEdit,
+                        modelValue: props.rowData.repoId,
+                        ['onUpdate:modelValue']: (val)=> {
+                          props.rowData.repoId = val
+                        }
+                      }
+                  )
+                }
+              }
+          )
+        }
+      },
+        {
+          key: 'goodsId',
+          title: '出库产品',
+          width: 150,
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                  labelWidth: 0,
+                  prop: 'sale_order_item.'+props.rowIndex+'.goodsId',
+                  rules: dialogFormRules.goodsId,
+                },
+                {
+                  default: ()=> {
+                    return h(
+                        GoodsSelectV2,
+                        {
+                          repoId: props.rowData.repoId,
+                          isEdit: props.rowData.isEdit,
+                          modelValue: props.rowData.goodsId,
+                          ['onUpdate:modelValue']: (val)=> {
+                            props.rowData.goodsId=val
+                          },
+                          ['onChange']:()=> {
+                            methods.getReferInfo(props.rowIndex)
+                          }
+                        }
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '库存剩余',
+          width: 150,
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                },
+                {
+                  default: ()=> {
+                    return h(
+                        'span',
+                        {
+                        },
+                        props.rowData.stock?.totalCount
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '出库数量',
+          width: 150,
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                  labelWidth: 0,
+                  prop: 'sale_order_item.'+props.rowIndex+'.amount',
+                  rules: dialogFormRules.amount,
+                },
+                {
+                  default: ()=> {
+                    return props.rowData.isEdit? h(
+                        ElInputNumber,
+                        {
+                          disabled: !(props.rowData.goodsId && props.rowData.repoId),
+                          modelValue: props.rowData.amount,
+                          min: 0,
+                          max: props.rowData.maxAmount,
+                          ['onUpdate:modelValue']: (val)=> {
+                            props.rowData.amount = val
+                          },
+                          ['onChange']:()=> {
+                            methods.getTotalPrice(props.rowIndex)
+                          }
+                        }
+                    ): h(
+                        'span',
+                        {},
+                        props.rowData.amount
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '单价',
+          width: 150,
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                  labelWidth: 0,
+                  prop: 'sale_order_item.'+props.rowIndex+'.price',
+                  rules: dialogFormRules.price,
+                },
+                {
+                  default: ()=> {
+                    return props.rowData.isEdit? h(
+                        ElInputNumber,
+                        {
+                          clearable: true,
+                          placeholder: '请输入单价',
+                          style: 'width:100%',
+                          disabled: !(props.rowData.goodsId && props.rowData.repoId),
+                          type: 'number',
+                          modelValue: props.rowData.price,
+                          min: 0,
+                          step: 0.01,
+                          ['onUpdate:modelValue']: (val)=> {
+                            props.rowData.price = val
+                          },
+                          ['oninput']: (value)=> {
+                            value=value.replace(/[^\d.]/g, '').replace(/\.{2,}/g, '.').replace('.', '$#$').replace(/\./g, '').replace('$#$', '.').replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3').replace(/^\./g, '')
+                          },
+                          ['onChange']: ()=> {
+                            methods.getTotalPrice(props.rowIndex)
+                          }
+                        }
+                    ): h(
+                        'span',
+                        {},
+                        props.rowData.price
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '预设售价',
+          width: 150,
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                },
+                {
+                  default: ()=> {
+                    return h(
+                        'span',
+                        {
+                        },
+                        props.rowData.stock?.goods?.salePrice?.toFixed(2)??0
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '总售价',
+          width: 150,
+          fixed: 'right',
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                },
+                {
+                  default: ()=> {
+                    return h(
+                        'span',
+                        {
+                        },
+                        props.rowData.totalPrice?.toFixed(2)??0
+                    )
+                  }
+                }
+            )
+          }
+        },
+        {
+          // key: 'goodsId',
+          title: '操作',
+          width: 200,
+          fixed: 'right',
+          cellRenderer: (props)=> {
+            console.log(props)
+            return h(
+                ElFormItem,
+                {
+                },
+                {
+                  default: ()=> {
+                    return [
+                        h(ElButton, {
+                          size: 'small',
+                          type: 'primary',
+                          ['onClick']: ()=> {
+                          methods.handleConfirm(props.rowData)
+                          }
+                        }, props.rowData.isEdit ? '确认': '编辑'),
+                      h(ElPopconfirm, {
+                        title: '确定要删除吗?',
+                        ['onConfirm']: ()=> {
+                          methods.removeOutboundDetail(props.rowIndex)
+                        },
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                      }, {
+                        reference: ()=> {
+                          return h(ElButton, {
+                            size: 'small',
+                            type: 'danger',
+                            icon: 'Delete'
+                          }, '删除')
+                        }
+                      })
+                    ]
+                  }
+                }
+            )
+          }
+        },
+        ],
       ...methods,
       ...toRefs(state), //抛出
       dialogFormRules,

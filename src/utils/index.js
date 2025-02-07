@@ -29,12 +29,13 @@ export const getDataById = (data, id) => {
  * loading
  * @returns
  */
-export const globalLoading = function () {
+export const globalLoading = function (params) {
     return ElLoading.service({
         lock: true,
         text: 'Loading',
         spinner: 'el-icon-loading',
         background: 'rgba(0, 0, 0, 0.7)',
+        ...params
     })
 }
 /**
