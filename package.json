@@ -1,6 +1,6 @@
 {
   "name": "evs",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "private": true,
   "scripts": {
     "serve": "npm run electron:serve",
@@ -10,7 +10,7 @@
     "electron:serve": "vue-cli-service electron:serve -m --mode dev",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "release": "bumpp package.json --push --tag"
+    "release": "bumpp package.json --commit --push --tag"
   },
   "main": "background.js",
   "dependencies": {
