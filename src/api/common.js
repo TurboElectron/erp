@@ -183,7 +183,11 @@ export const addCategory = async (data = {}) => {
 export const getCategoryTree = async (data = {}) => {
     // return httpFetch.post('category/getCategoriesTree', data)
     const list = await prisma.category.findMany({
-        where: {pid: null},
+        where: {pid: null, NOT: {
+            label: {
+                equals: ''
+            }
+            }},
     })
     async function iter(arr) {
         for (let i = 0; i < arr.length; i++) {

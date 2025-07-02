@@ -24,7 +24,7 @@
           style="overflow: auto;height:100%"
       >
         <template #default="{ node, data }">
-          <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label }}</div>
+          <div v-contextmenu:contextmenu @contextmenu="currentEditData = data">{{ node.label || '--' }}</div>
         </template>
       </el-tree>
       <goods :cid="currentEditData.id" ref="goodsRef" />
@@ -42,7 +42,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button size="small" @click="dialogVisible = false">关闭</el-button>
-        <el-button size="small" :loading="saveLoading" type="primary" @click="handlerSava()">保存</el-button>
+        <el-button size="small" :loading="saveLoading" type="primary" :disabled="dialogForm.label.trim() === ''" @click="handlerSava()">保存</el-button>
       </span>
     </template>
   </el-dialog>

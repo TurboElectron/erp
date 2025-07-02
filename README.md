@@ -3,6 +3,12 @@
 ## Project setup
 
 ```
+arch -x86_64 zsh
+
+npm install -g node-gyp 
+npm uninstall node-sass
+npm install sass -i
+
 npm install
 ```
 
@@ -18,12 +24,4 @@ npm run serve
 npm run build
 ```
 
-### 体验地址
 
-[体验地址](http://101.200.188.171:8888/#/login)
-
-## 联系方式
-
-```
-1069722589@qq.com
-```
