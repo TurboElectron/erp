@@ -87,7 +87,7 @@ export default {
       queryForm: {
         goodsId: '',
         repoId: '',
-        startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(new Date(+new Date() - 365 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
         cid: ''
       },

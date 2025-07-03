@@ -133,7 +133,7 @@
         <div style="height: 400px; width: 100%;">
         <el-auto-resizer>
           <template #default="{ height, width }">
-        <el-table-v2 :data="dialogForm.sale_order_item" table-layout="auto" :width="width"     :height="height" :columns="tableColumns">
+        <el-table-v2 :data="dialogForm.sale_order_item" table-layout="auto" :width="width"  ref="tableRef"   :height="height" :columns="tableColumns">
 <!--          <template #row="props">-->
 <!--            {{props.repoId}}-->
 <!--          </template>-->
@@ -331,7 +331,7 @@ export default {
       loadignData: false,//加载 产品loading
       queryForm: {
         code: '',
-        startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
+        startDate: moment(new Date(+new Date() - 365 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
         endDate: '',
         userId: '',
         customerId: '',//供货商
@@ -466,6 +466,9 @@ export default {
           totalPrice: 0,//采购成本
           price: 0,//单价
           isEdit: true
+        })
+        this.$nextTick(()=> {
+          tableRef.value?.scrollToRow(dialogForm.sale_order_item.length)
         })
       },
       /**
@@ -607,14 +610,15 @@ export default {
     }
     //查询批次列表
     methods.getTableData()
+    const tableRef = ref()
 
     return {
+      tableRef,
       tableColumns: [{
         key: 'repoId',
         title: '出库仓库',
         width: 150,
         cellRenderer: (props)=> {
-          console.log(props)
           return h(
               ElFormItem,
               {
@@ -645,7 +649,7 @@ export default {
           title: '出库产品',
           width: 150,
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -679,7 +683,7 @@ export default {
           title: '库存剩余',
           width: 150,
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -702,7 +706,7 @@ export default {
           title: '出库数量',
           width: 150,
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -741,7 +745,7 @@ export default {
           title: '单价',
           width: 150,
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -787,7 +791,7 @@ export default {
           title: '预设售价',
           width: 150,
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -811,7 +815,7 @@ export default {
           width: 150,
           fixed: 'right',
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {
@@ -835,7 +839,7 @@ export default {
           width: 200,
           fixed: 'right',
           cellRenderer: (props)=> {
-            console.log(props)
+            
             return h(
                 ElFormItem,
                 {

@@ -85,7 +85,7 @@ import moment from "moment";
 import {computed, ref, unref} from "vue";
 import {useRequest} from "vue-request";
 const   queryForm = ref({
-  startDate: moment(new Date(+new Date() - 30 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
+  startDate: moment(new Date(+new Date() - 365 * 24 * 60 * 60 * 1000)).format('YYYY-MM-DD HH:mm:ss'),
   endDate: '',
 },)
 const {data, loading, run} = useRequest(()=> getProfit(unref(queryForm)))
